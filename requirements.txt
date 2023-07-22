@@ -1,0 +1,12 @@
+fastapi
+pydantic-settings
+uvicorn
+pony
+validators
+isort
+black
+mypy
+flake8
+jinja2
+httpx
+psycopg2-binary
