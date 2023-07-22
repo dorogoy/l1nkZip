@@ -45,7 +45,7 @@ class Link(db.Entity):  # type: ignore
 
     @property
     def full_link(self) -> str:
-        return str(Path(settings.domain_redirect, self.link))
+        return str(Path(settings.api_domain, self.link))
 
 
 class PhishTank(db.Entity):  # type: ignore

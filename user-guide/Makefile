@@ -13,4 +13,4 @@ deploy: env_ok
 
 .PHONY: clean
 clean:
-	rm -rf env env_ok build
+	rm -rf env env_ok site

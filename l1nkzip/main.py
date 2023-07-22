@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request, responses, status
 from fastapi.templating import Jinja2Templates
 
-from l1nkzip.config import fastapi_settings, settings
+from l1nkzip.config import openapi_tags, ponyorm_settings, settings
 from l1nkzip.models import GenericInfo, LinkInfo, Url, db, insert_link, set_visit
 from l1nkzip.phishtank import delete_old_phishes, get_phish, update_phishtanks
 
@@ -16,11 +16,22 @@ def sqlite_litestream(db, connection):
     cursor.execute("PRAGMA wal_autocheckpoint = 0;")
 
 
-db.bind(provider="sqlite", filename=settings.sqlite_db, create_db=True)
+db.bind(**ponyorm_settings[settings.db_type])
 db.generate_mapping(create_tables=True)
 
 
-app = FastAPI(**fastapi_settings)
+app = FastAPI(
+    title=settings.api_name,
+    description="Simple API URL shortener that removes all the crap. Here you don't need an account or tokens to shorten a URL.",
+    summary="Uncompromised URL shortener",
+    version="0.1.5",
+    license_info={
+        "name": "MIT",
+        "identifier": "MIT",
+    },
+    redoc_url=None,
+    openapi_tags=openapi_tags,
+)
 
 BASE_PATH = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=f"{BASE_PATH}/templates")
@@ -28,9 +39,14 @@ templates = Jinja2Templates(directory=f"{BASE_PATH}/templates")
 
 @app.get("/", include_in_schema=False)
 async def root() -> responses.RedirectResponse:
-    return responses.RedirectResponse(
-        settings.site_domain, status_code=status.HTTP_301_MOVED_PERMANENTLY
-    )
+    redirect: responses.RedirectResponse
+    if settings.site_domain:
+        redirect = responses.RedirectResponse(
+            settings.site_domain, status_code=status.HTTP_301_MOVED_PERMANENTLY
+        )
+    else:
+        redirect = responses.RedirectResponse("/404")
+    return redirect
 
 
 @app.get("/404", response_class=responses.HTMLResponse, include_in_schema=False)

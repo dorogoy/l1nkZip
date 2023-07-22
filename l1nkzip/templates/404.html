@@ -16,7 +16,9 @@
                     The page you’re looking for doesn’t exist.
                 </p>
                 <p>Please check the URL in the address bar and try again.</p>
+                {% if homepage %}
                 <a href="{{ homepage }}" class="btn btn-primary">{{ api_name }} homepage</a>
+                {% endif %}
             </div>
         </div>
     </body>
