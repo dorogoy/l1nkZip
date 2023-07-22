@@ -9,3 +9,4 @@ mypy
 flake8
 jinja2
 httpx
+psycopg2-binary

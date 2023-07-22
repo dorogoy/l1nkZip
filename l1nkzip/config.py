@@ -6,13 +6,14 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     api_name: str = "l1nkZip"
     api_domain: str = "https://l1nk.zip"
-    db_type: str = "memory"
+    db_type: str = "inmemory"
     db_name: str = "l1nkzip.sqlite"
     db_user: Optional[str] = None
     db_password: Optional[str] = None
     db_host: Optional[str] = None
     db_dsn: Optional[str] = None
-    site_domain: Optional[str] = "https://dorogoy.github.io/l1nkZip/"
+    phishtank: Optional[str] = None
+    site_url: Optional[str] = "https://dorogoy.github.io/l1nkZip/"
     # Keep the token secret
     token: str = "__change_me__"
     # Change this to your own random generator string
@@ -35,7 +36,7 @@ openapi_tags: list[dict[str, Any]] = [
 
 
 ponyorm_settings = {
-    "memory": {"provider": "sqlite", "filename": ":sharedmemory:"},
+    "inmemory": {"provider": "sqlite", "filename": ":sharedmemory:"},
     "sqlite": {
         "provider": settings.db_type,
         "filename": settings.db_name,
@@ -67,5 +68,6 @@ ponyorm_settings = {
         "password": settings.db_password,
         "database": settings.db_name,
         "host": settings.db_host,
+        "sslmode": "disable",
     },
 }

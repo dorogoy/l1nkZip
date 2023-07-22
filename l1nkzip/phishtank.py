@@ -3,13 +3,17 @@ from datetime import timedelta
 import httpx
 from fastapi import HTTPException
 
+from l1nkzip.config import settings
 from l1nkzip.models import PhishTank, Url, db_session, utcnow_zone_aware
 
 
 async def update_phishtanks():
+    phishtank_url = "http://data.phishtank.com/data"
+    if isinstance(settings.phishtank, str) and settings.phishtank != "anonymous":
+        phishtank_url = f"{phishtank_url}/{settings.phishtank}"
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            "http://data.phishtank.com/data/online-valid.json",
+            f"{phishtank_url}/online-valid.json",
             headers={"User-Agent": "phishtank/l1nkZip", "accept-encoding": "gzip"},
             follow_redirects=True,
         )

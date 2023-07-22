@@ -5,7 +5,12 @@ from fastapi.templating import Jinja2Templates
 
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
 from l1nkzip.models import GenericInfo, LinkInfo, Url, db, insert_link, set_visit
-from l1nkzip.phishtank import delete_old_phishes, get_phish, update_phishtanks
+from l1nkzip.phishtank import (
+    PhishTank,
+    delete_old_phishes,
+    get_phish,
+    update_phishtanks,
+)
 
 
 @db.on_connect(provider="sqlite")
@@ -40,9 +45,9 @@ templates = Jinja2Templates(directory=f"{BASE_PATH}/templates")
 @app.get("/", include_in_schema=False)
 async def root() -> responses.RedirectResponse:
     redirect: responses.RedirectResponse
-    if settings.site_domain:
+    if settings.site_url:
         redirect = responses.RedirectResponse(
-            settings.site_domain, status_code=status.HTTP_301_MOVED_PERMANENTLY
+            settings.site_url, status_code=status.HTTP_301_MOVED_PERMANENTLY
         )
     else:
         redirect = responses.RedirectResponse("/404")
@@ -55,7 +60,7 @@ async def not_found(request: Request):
         "404.html",
         {
             "request": request,
-            "homepage": settings.site_domain,
+            "homepage": settings.site_url,
             "api_name": settings.api_name,
         },
         status_code=404,
@@ -68,6 +73,8 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
     if token != settings.token:
         raise HTTPException(status_code=401, detail="Unauthorized")
     else:
+        if not settings.phishtank:
+            raise HTTPException(status_code=501, detail="PhishTank is not implemented")
         await update_phishtanks()
         deleted_phishes = delete_old_phishes(days=cleanup_days)
         return GenericInfo(
@@ -79,10 +86,13 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
 def get_url(link: str) -> responses.RedirectResponse:
     """Redirect to the full URL. If the URL is a phishing URL, it will be redirected to the PhishTank page."""
     redirect: responses.RedirectResponse
+    phish = False
     link_data = set_visit(link)
-    phish = get_phish(Url(url=link_data.url)) if link_data else False
 
-    if phish:
+    if settings.phishtank and link_data:
+        phish = get_phish(Url(url=link_data.url))
+
+    if isinstance(phish, PhishTank):
         redirect = responses.RedirectResponse(
             phish.phish_detail_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT
         )
@@ -102,7 +112,7 @@ def create_url(url: Url) -> LinkInfo:
     If the URL is a phishing URL, it will be rejected.
     If the URL is already in the database, the information about it will be returned.
     """
-    phish = get_phish(url)
+    phish = get_phish(url) if settings.phishtank else False
     if phish:
         raise HTTPException(
             status_code=403,
