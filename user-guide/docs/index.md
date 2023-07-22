@@ -56,3 +56,5 @@ echo $response;
 ```
 
 It's all about options.
+
+You can check all the available endpoints in the [API documentation](https://l1nk.zip/docs).
