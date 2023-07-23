@@ -97,17 +97,17 @@
 
 <h1 id="l1nkzip">L1nkZip</h1>
 <p>L1nkZip is a simple URL shortener API. It is written in Python and uses the <a href="https://fastapi.tiangolo.com">Fastapi</a> framework and <a href="https://ponyorm.org">Pony ORM</a>. The main priority of this project is to be simple and low in resource usage. The first option in L1nkZip is always a combination of <a href="https://www.sqlite.org">sqlite</a> for the database and <a href="https://litestream.io">litestream</a> for its replication and resilience from cheap and volatile environments. Using Pony ORM allows to use any other database if sqlite is not of your taste. This app is mainly focused on running inside a container managed by Kubernetes or docker.</p>
-<p>The code of l1nkZip is available on its <a href="https://dorogoy.github.io/l1nkZip">Github repository</a> under the <a href="https://spdx.org/licenses/MIT.html">MIT license</a>. You can check all the available endpoints at the <a href="https://l1nk.zip/docs">API documentation</a>.</p>
+<p>The code of l1nkZip is available on its <a href="https://github.com/dorogoy/l1nkZip">Github repository</a> under the <a href="https://spdx.org/licenses/MIT.html">MIT license</a>. You can check all the available endpoints at the <a href="https://l1nk.zip/docs">API documentation</a>.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li>Simple to setup and use. It just works.</li>
-<li>Low resource usage and also low maintenance for cheap <a href="/install">self-hosting</a>.</li>
+<li>Low resource usage and also low maintenance for cheap <a href="/l1nkZip/install">self-hosting</a>.</li>
 <li>Using <a href="https://litestream.io">litestream</a>, you will have a reliable database almost impossible to destroy, backed on any compatible and unexpensive S3 bucket.</li>
-<li>Although <a href="https://litestream.io">litestream</a> being, in most cases, the best choice, Postgresql is also available. Other databases are available <a href="/install/#requirements">building your own images</a>.</li>
+<li>Although <a href="https://litestream.io">litestream</a> being, in most cases, the best choice, Postgresql is also available. Other databases are available <a href="/l1nkZip/install/#requirements">building your own images</a>.</li>
 <li>Optional protection against phisphing using the <a href="https://phishtank.org">PhishTank</a> database.</li>
 </ul>
 <h2 id="usage-examples">Usage examples</h2>
-<p>Being an API, links can be posted in many different ways. These examples are using the official API domain, available for general usage by everyone, but you can self-host it and use your own domain if you want. If you are interested on self-hosting, check the <a href="/install">installation</a> page.</p>
+<p>Being an API, links can be posted in many different ways. These examples are using the official API domain, available for general usage by everyone, but you can self-host it and use your own domain if you want. If you are interested on self-hosting, check the <a href="/l1nkZip/install">installation</a> page.</p>
 <p>From the command-line, you have plenty of options, like <a href="https://curl.se">curl</a>, <a href="https://www.gnu.org/software/wget/">wget</a>, <a href="https://httpie.io">httpie</a> or <a href="https://www.python-httpx.org">httpx</a> to just name a few. Here is an example with <code>curl</code>:</p>
 <pre><code class="language-bash">curl -X 'POST' \
   'https://l1nk.zip/url' \
@@ -217,5 +217,5 @@ echo $response;
 
 <!--
 MkDocs version : 1.4.3
-Build Date UTC : 2023-07-23 09:53:33.191279+00:00
+Build Date UTC : 2023-07-23 10:34:37.380673+00:00
 -->

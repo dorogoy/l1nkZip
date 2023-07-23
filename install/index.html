@@ -108,7 +108,7 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="installation">Installation</h1>
-<p>L1nkZip is distributed as a Docker image, although the full code can be found on the <a href="https://dorogoy.github.io/l1nkZip">Github repository</a> in case you want to use it directly or contribute. It can be run as a Docker container or deployed to a Kubernetes cluster. <a href="https://litestream.io">Litestream</a> is not required to run L1nkZip, but it is strongly encouraged if you are going to use sqlite.</p>
+<p>L1nkZip is distributed as a Docker image, although the full code can be found on the <a href="https://github.com/dorogoy/l1nkZip">Github repository</a> in case you want to use it directly or contribute. It can be run as a Docker container or deployed to a Kubernetes cluster. <a href="https://litestream.io">Litestream</a> is not required to run L1nkZip, but it is strongly encouraged if you are going to use sqlite.</p>
 <h2 id="requirements">Requirements</h2>
 <p>L1nkZip would not be possible without the amazings <a href="https://fastapi.tiangolo.com">FastApi</a> and <a href="https://ponyorm.org">PonyORM</a> projects. The only requirement is Python 3.7+ if you use sqlite. Otherwise, you must install the database driver for your database of choice.</p>
 <p>The official Docker image comes with sqlite and postgresql support, but you can extend it to support other databases.</p>
@@ -146,7 +146,7 @@ RUN pip install --no-cache-dir MySQL-python
 <p>To avoid overloading the service, the Phishtank database is downloaded into the local L1nkZip database. This action will be launched each time the update endpoint is contacted successfully. The update endpoint is protected by the <code>TOKEN</code> environment variable and should be called periodically by a cronjob or similar. Please, be respectful with the Phishtank policies. Check the <a href="https://l1nk.zip/docs">API documentation</a> for more details about the update endpoint.</p>
 <p>Each update to the Phishtank database can add new entries and remove old ones. This will keep the size of the database under control, it is not growing all the time. When an entry is removed from the database, the shortened URL will be allowed/reactivated again. Keep in mind that L1nkZip is not a censorship tool and it is not intended to be used as such.</p>
 <h2 id="docker-image">Docker image</h2>
-<p>The docker image is available on <a href="https://dorogoy.github.io/l1nkZip">Docker Hub</a>.</p>
+<p>The docker image is available on <a href="https://hub.docker.com/r/dorogoy/l1nkzip">Docker Hub</a>.</p>
 <pre><code class="language-bash">docker pull dorogoy/l1nkzip
 </code></pre>
 <h2 id="kubernetes-manifest">Kubernetes manifest</h2>
@@ -155,7 +155,7 @@ RUN pip install --no-cache-dir MySQL-python
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: litestreamº
+  name: litestream
 data:
   litestream.yml: |
     dbs:
