@@ -29,7 +29,7 @@ app = FastAPI(
     title=settings.api_name,
     description="Simple API URL shortener that removes all the crap. Here you don't need an account or tokens to shorten a URL.",
     summary="Uncompromised URL shortener",
-    version="0.1.5",
+    version="0.1.6",
     license_info={
         "name": "MIT",
         "identifier": "MIT",

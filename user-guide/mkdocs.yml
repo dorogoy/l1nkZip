@@ -1,7 +1,7 @@
 site_name: L1nkZip
 repo_url: https://github.com/dorogoy/l1nkZip
 edit_uri: edit/master/user-guide/docs/
-theme: readthedocs
+# theme: readthedocs
 nav:
   - Home: index.md
   - Installation: install.md
