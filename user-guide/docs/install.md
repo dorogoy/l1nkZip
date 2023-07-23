@@ -1,10 +1,10 @@
 # Installation
 
-L1nkZip is distributed as a Docker image, although the full code can be found on the [Github repository](https://github.com/dorogoy/l1nkZip/) in case you want to use it directly or contribute. It can be run as a Docker container or deployed to a Kubernetes cluster. [Litestream](https://litestream.io) is not required to run L1nkZip, but it is strongly encouraged if your choice is sqlite.
+L1nkZip is distributed as a Docker image, although the full code can be found on the [Github repository][Github repository] in case you want to use it directly or contribute. It can be run as a Docker container or deployed to a Kubernetes cluster. [Litestream][litestream] is not required to run L1nkZip, but it is strongly encouraged if you are going to use sqlite.
 
 ## Requirements
 
-L1nkZip would not be possible without the amazings [FastApi](https://fastapi.tiangolo.com) and [PonyORM](https://ponyorm.org) projects. The only requirement is Python 3.7+ if you use sqlite. Otherwise, you must install the database driver for your database of choice.
+L1nkZip would not be possible without the amazings [FastApi][FastApi] and [PonyORM][PonyORM] projects. The only requirement is Python 3.7+ if you use sqlite. Otherwise, you must install the database driver for your database of choice.
 
 The official Docker image comes with sqlite and postgresql support, but you can extend it to support other databases.
 
@@ -26,7 +26,7 @@ For more information check the [PonyORM documentation](https://docs.ponyorm.org/
 ### Required environment variables
 
 * `API_DOMAIN`: Domain of the API. This is the domain of the shortened URLs.
-* `DB_TYPE`: Database type. Supported values are `inmemory`, `sqlite` and `postgresql`. Other databases like `mysql`, `oracle`, and `cockroachdb` are also supported thanks to [PonyORM](https://ponyorm.org), but require additional drivers.
+* `DB_TYPE`: Database type. Supported values are `inmemory`, `sqlite` and `postgresql`. Other databases like `mysql`, `oracle`, and `cockroachdb` are also supported thanks to [PonyORM][PonyORM], but require additional drivers.
 * `DB_NAME`: Database name. Used for sqlite and postgresql.
 * `TOKEN`: Token used to authenticate some administrative actions to the API. This is a secret value and should not be shared.
 * `GENERATOR_STRING`: String used to generate the shortened URLs. This is a secret value and should not be shared. You can shuffle uppercase, lowercase letters and/or numbers without repeating them.
@@ -39,17 +39,19 @@ For more information check the [PonyORM documentation](https://docs.ponyorm.org/
 * `DB_PASSWORD`: Database password. Used for postgresql.
 * `DB_DSN`: Database DSN. Used for Oracle.
 * `SITE_URL`: URL of the website. Used when the API is visited from a browser.
-* `PHISHTANK`: Enable protection against phisphing. Default: false. The values can also be "anonymous" or your actual [PhishTank key](https://phishtank.org/developer_info.php). More details below.
+* `PHISHTANK`: Enable protection against phisphing. Default: false. The values can also be "anonymous" or your actual [PhishTank key][PhishTank developer info]. More details below.
 
 ## Phishtank support
 
-L1nkZip can be configured to check if the URL to be shortened is in the [PhishTank](https://phishtank.org) database. This is an optional feature and can be enabled by setting the `PHISHTANK` environment variable to `anonymous` or your actual [PhishTank key](https://phishtank.org/developer_info.php).
+L1nkZip can be configured to check if the URL to be shortened is in the [PhishTank][PhishTank] database. This is an optional feature and can be enabled by setting the `PHISHTANK` environment variable to `anonymous` or your actual [PhishTank key][PhishTank developer info].
 
-To avoid overloading the Phishtank service, the Phishtank database is downloaded into the local database. This action will be launched each time the update endpoint is contacted successfully. The update endpoint is protected by the `TOKEN` environment variable and should be called periodically by a cronjob or similar. Please, don't update the database more than once an hour. Once a day should be enough for low traffic APIs. Check the [API documentation](https://l1nk.zip/docs) for more details.
+To avoid overloading the service, the Phishtank database is downloaded into the local L1nkZip database. This action will be launched each time the update endpoint is contacted successfully. The update endpoint is protected by the `TOKEN` environment variable and should be called periodically by a cronjob or similar. Please, be respectful with the Phishtank policies. Check the [API documentation][Swagger UI] for more details about the update endpoint.
+
+Each update to the Phishtank database can add new entries and remove old ones. This will keep the size of the database under control, it is not growing all the time. When an entry is removed from the database, the shortened URL will be allowed/reactivated again. Keep in mind that L1nkZip is not a censorship tool and it is not intended to be used as such.
 
 ## Docker image
 
-The docker image is available on [Docker Hub](https://hub.docker.com/r/dorogoy/l1nkzip).
+The docker image is available on [Docker Hub][Github repository].
 
 ```bash
 docker pull dorogoy/l1nkzip
@@ -57,9 +59,25 @@ docker pull dorogoy/l1nkzip
 
 ## Kubernetes manifest
 
-This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets and configMaps are not included and it uses a sqlite database with litestream. Please, have a look at the [Litestream documentation](https://litestream.io) for more details.
+This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. This example is for a S3 compatible service (idrivee), [Amazon S3 configuration](https://litestream.io/guides/s3/) for AWS is slightly different. Please, have a look at the [Litestream documentation][litestream] for more details.
 
 ```yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: litestreamº
+data:
+  litestream.yml: |
+    dbs:
+      - path: /data/l1nkzip.db
+        replicas:
+          - type: s3
+            bucket: <your-bucket>
+            path: l1nkzip.db
+            endpoint: <your-endpoint>
+            region: <your-region>
+            force-path-style: true
 ---
 apiVersion: v1
 kind: Service
@@ -206,3 +224,11 @@ spec:
           requests:
             storage: 1Gi
 ```
+
+[FastApi]: https://fastapi.tiangolo.com
+[PonyORM]: https://ponyorm.org
+[PhishTank]: https://phishtank.org
+[PhishTank developer info]: https://phishtank.org/developer_info.php
+[Swagger UI]: https://l1nk.zip/docs
+[litestream]: https://litestream.io
+[Github repository]: https://dorogoy.github.io/l1nkZip

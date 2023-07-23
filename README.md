@@ -4,7 +4,7 @@ L1nkZip is a simple URL shortener API. It is written in Python and uses the [Fas
 
 The working API is available at https://l1nk.zip/docs
 
-The full documentation is available at https://dorogoy.github.io/l1nkzip.
+The full documentation is available at https://dorogoy.github.io/l1nkZip.
 
 ## Features
 

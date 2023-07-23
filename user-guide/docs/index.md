@@ -1,18 +1,20 @@
 # L1nkZip
 
-L1nkZip is a simple URL shortener API. It is written in Python and uses the [Fastapi](https://fastapi.tiangolo.com/) framework and [Pony ORM](https://ponyorm.org/). The main priority of this project is to be simple and low in resource usage. The first option in L1nkZip is always a combination of [sqlite](https://www.sqlite.org) for the database and [litestream](https://litestream.io) for its replication and resilience from cheap and volatile environments. Using Pony ORM allows to use any other database if sqlite is not of your taste. This app is mainly focused on running inside a container managed by Kubernetes or docker.
+L1nkZip is a simple URL shortener API. It is written in Python and uses the [Fastapi][FastApi] framework and [Pony ORM][PonyORM]. The main priority of this project is to be simple and low in resource usage. The first option in L1nkZip is always a combination of [sqlite](https://www.sqlite.org) for the database and [litestream][litestream] for its replication and resilience from cheap and volatile environments. Using Pony ORM allows to use any other database if sqlite is not of your taste. This app is mainly focused on running inside a container managed by Kubernetes or docker.
+
+The code of l1nkZip is available on its [Github repository][Github repository] under the [MIT license](https://spdx.org/licenses/MIT.html). You can check all the available endpoints at the [API documentation][Swagger UI].
 
 ## Features
 
 * Simple to setup and use. It just works.
-* Low resource usage and also low maintenance.
-* If you choose the [litestream](https://litestream.io) way, it is very cheap to host. You will have a reliable database almost impossible to destroy, backed on any compatible S3 bucket.
-* Do you want to use Postgresql? No problem. Just change the configuration and you are ready to go.
-* Optional protection against phisphing with the [PhishTank](https://phishtank.org) database.
+* Low resource usage and also low maintenance for cheap [self-hosting](/install).
+* Using [litestream][litestream], you will have a reliable database almost impossible to destroy, backed on any compatible and unexpensive S3 bucket.
+* Although [litestream][litestream] being, in most cases, the best choice, Postgresql is also available. Other databases are available [building your own images](/install/#requirements).
+* Optional protection against phisphing using the [PhishTank][PhishTank] database.
 
 ## Usage examples
 
-Being an API, links can be posted in many creative ways. These examples are using the official API domain, available for general usage, but you can selfhost it and use your own domain if you want. If you are interested in selfhosting, check the [installation](/install) page.
+Being an API, links can be posted in many different ways. These examples are using the official API domain, available for general usage by everyone, but you can self-host it and use your own domain if you want. If you are interested on self-hosting, check the [installation](/install) page.
 
 From the command-line, you have plenty of options, like [curl](https://curl.se), [wget](https://www.gnu.org/software/wget/), [httpie](https://httpie.io) or [httpx](https://www.python-httpx.org) to just name a few. Here is an example with `curl`:
 
@@ -23,13 +25,13 @@ curl -X 'POST' \
   -d '{"url": "https://www.google.com"}'
 ```
 
-of a shorter one with `httpx`:
+or a shorter one with `httpx`:
 
 ```bash
 httpx -m POST -j '{"url": "https://www.google.com"}' https://l1nk.zip/url
 ```
 
-You can also use non CLI apps, like [Postman](https://www.postman.com) or [Insomnia](https://insomnia.rest). Or even the included [Swagger UI](https://l1nk.zip/docs).
+You can also use non CLI apps, like [Postman](https://www.postman.com) or [Insomnia](https://insomnia.rest). Or even the included [Swagger UI][Swagger UI] that allows you to add a link quickly [from a web form](https://l1nk.zip/docs#/urls/create_url_url_post).
 
 Of course, you can also use your preferred programming language. Here is an example in Python:
 
@@ -57,4 +59,9 @@ echo $response;
 
 It's all about options.
 
-You can check all the available endpoints in the [API documentation](https://l1nk.zip/docs).
+[FastApi]: https://fastapi.tiangolo.com
+[PonyORM]: https://ponyorm.org
+[PhishTank]: https://phishtank.org
+[Swagger UI]: https://l1nk.zip/docs
+[litestream]: https://litestream.io
+[Github repository]: https://dorogoy.github.io/l1nkZip
