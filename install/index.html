@@ -1,97 +1,114 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Installation - L1nkZip</title>
-    <link rel="stylesheet" href="../css/theme.css" />
-    <link rel="stylesheet" href="../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-    
-      <script>
-        // Current page data
-        var mkdocs_page_name = "Installation";
-        var mkdocs_page_input_path = "install.md";
-        var mkdocs_page_url = null;
-      </script>
-    
-    <script src="../js/jquery-3.6.0.min.js" defer></script>
-    <!--[if lt IE 9]>
-      <script src="../js/html5shiv.min.js"></script>
-    <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-    <div class="wy-side-scroll">
-      <div class="wy-side-nav-search">
-          <a href=".." class="icon icon-home"> L1nkZip
-        </a><div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
-  </form>
-</div>
-      </div>
-
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
-                </li>
-              </ul>
-              <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">Installation</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#required-environment-variables">Required environment variables</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#optional-environment-variables">Optional environment variables</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#phishtank-support">Phishtank support</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#docker-image">Docker image</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#kubernetes-manifest">Kubernetes manifest</a>
-    </li>
-    </ul>
-                </li>
-              </ul>
-      </div>
-    </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="..">L1nkZip</a>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-      </nav>
-      <div class="wy-nav-content">
-        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-      <li>Installation</li>
-    <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/dorogoy/l1nkZip/edit/master/user-guide/docs/install.md" class="icon icon-github"> Edit on GitHub</a>
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-            <div class="section" itemprop="articleBody">
-              
-                <h1 id="installation">Installation</h1>
-<p>L1nkZip is distributed as a Docker image, although the full code can be found on the <a href="https://github.com/dorogoy/l1nkZip/">Github repository</a> in case you want to use it directly or contribute. It can be run as a Docker container or deployed to a Kubernetes cluster. <a href="https://litestream.io">Litestream</a> is not required to run L1nkZip, but it is strongly encouraged if your choice is sqlite.</p>
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Installation - L1nkZip</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">L1nkZip</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Installation</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/dorogoy/l1nkZip/edit/master/user-guide/docs/install.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#installation" class="nav-link">Installation</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#requirements" class="nav-link">Requirements</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#configuration" class="nav-link">Configuration</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#phishtank-support" class="nav-link">Phishtank support</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#docker-image" class="nav-link">Docker image</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#kubernetes-manifest" class="nav-link">Kubernetes manifest</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="installation">Installation</h1>
+<p>L1nkZip is distributed as a Docker image, although the full code can be found on the <a href="https://dorogoy.github.io/l1nkZip">Github repository</a> in case you want to use it directly or contribute. It can be run as a Docker container or deployed to a Kubernetes cluster. <a href="https://litestream.io">Litestream</a> is not required to run L1nkZip, but it is strongly encouraged if you are going to use sqlite.</p>
 <h2 id="requirements">Requirements</h2>
 <p>L1nkZip would not be possible without the amazings <a href="https://fastapi.tiangolo.com">FastApi</a> and <a href="https://ponyorm.org">PonyORM</a> projects. The only requirement is Python 3.7+ if you use sqlite. Otherwise, you must install the database driver for your database of choice.</p>
 <p>The official Docker image comes with sqlite and postgresql support, but you can extend it to support other databases.</p>
@@ -126,14 +143,31 @@ RUN pip install --no-cache-dir MySQL-python
 </ul>
 <h2 id="phishtank-support">Phishtank support</h2>
 <p>L1nkZip can be configured to check if the URL to be shortened is in the <a href="https://phishtank.org">PhishTank</a> database. This is an optional feature and can be enabled by setting the <code>PHISHTANK</code> environment variable to <code>anonymous</code> or your actual <a href="https://phishtank.org/developer_info.php">PhishTank key</a>.</p>
-<p>To avoid overloading the Phishtank service, the Phishtank database is downloaded into the local database. This action will be launched each time the update endpoint is contacted successfully. The update endpoint is protected by the <code>TOKEN</code> environment variable and should be called periodically by a cronjob or similar. Please, don't update the database more than once an hour. Once a day should be enough for low traffic APIs. Check the <a href="https://l1nk.zip/docs">API documentation</a> for more details.</p>
+<p>To avoid overloading the service, the Phishtank database is downloaded into the local L1nkZip database. This action will be launched each time the update endpoint is contacted successfully. The update endpoint is protected by the <code>TOKEN</code> environment variable and should be called periodically by a cronjob or similar. Please, be respectful with the Phishtank policies. Check the <a href="https://l1nk.zip/docs">API documentation</a> for more details about the update endpoint.</p>
+<p>Each update to the Phishtank database can add new entries and remove old ones. This will keep the size of the database under control, it is not growing all the time. When an entry is removed from the database, the shortened URL will be allowed/reactivated again. Keep in mind that L1nkZip is not a censorship tool and it is not intended to be used as such.</p>
 <h2 id="docker-image">Docker image</h2>
-<p>The docker image is available on <a href="https://hub.docker.com/r/dorogoy/l1nkzip">Docker Hub</a>.</p>
+<p>The docker image is available on <a href="https://dorogoy.github.io/l1nkZip">Docker Hub</a>.</p>
 <pre><code class="language-bash">docker pull dorogoy/l1nkzip
 </code></pre>
 <h2 id="kubernetes-manifest">Kubernetes manifest</h2>
-<p>This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets and configMaps are not included and it uses a sqlite database with litestream. Please, have a look at the <a href="https://litestream.io">Litestream documentation</a> for more details.</p>
+<p>This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. This example is for a S3 compatible service (idrivee), <a href="https://litestream.io/guides/s3/">Amazon S3 configuration</a> for AWS is slightly different. Please, have a look at the <a href="https://litestream.io">Litestream documentation</a> for more details.</p>
 <pre><code class="language-yaml">---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: litestreamº
+data:
+  litestream.yml: |
+    dbs:
+      - path: /data/l1nkzip.db
+        replicas:
+          - type: s3
+            bucket: &lt;your-bucket&gt;
+            path: l1nkzip.db
+            endpoint: &lt;your-endpoint&gt;
+            region: &lt;your-region&gt;
+            force-path-style: true
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -278,52 +312,81 @@ spec:
         resources:
           requests:
             storage: 1Gi
-</code></pre>
-              
+</code></pre></div>
             </div>
-          </div><footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-  </div>
-
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-          
         </div>
-      </div>
 
-    </section>
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
 
-  </div>
-
-  <div class="rst-versions" role="note" aria-label="Versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    
-        <span>
-          <a href="https://github.com/dorogoy/l1nkZip" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
-        </span>
-    
-    
-      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
-    
-    
-  </span>
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
 </div>
-    <script>var base_url = '..';</script>
-    <script src="../js/theme_extra.js" defer></script>
-    <script src="../js/theme.js" defer></script>
-      <script src="../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
-            SphinxRtdTheme.Navigation.enable(true);
-        };
-    </script>
 
-</body>
+    </body>
 </html>
