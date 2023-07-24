@@ -46,6 +46,8 @@ Author: Michael Fogleman
 License: MIT
 Link: http://code.activestate.com/recipes/576918/
 """
+import unittest
+
 from l1nkzip.config import settings
 
 DEFAULT_BLOCK_SIZE = 24
@@ -132,6 +134,28 @@ def encode_url(n: int, min_length: int = MIN_LENGTH) -> str:
 
 def decode_url(n: str) -> int:
     return DEFAULT_ENCODER.decode_url(n)
+
+
+class TestGenerator(unittest.TestCase):
+    def setUp(self):
+        self.encoder = UrlEncoder(
+            alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq", block_size=DEFAULT_BLOCK_SIZE
+        )
+
+    def test_encode_url(self):
+        # The result must be always the same
+        self.assertEqual(self.encoder.encode_url(23, MIN_LENGTH), "5wppq")
+
+    def test_decode_url(self):
+        # Can be decoded returning the original integer
+        self.assertEqual(self.encoder.decode_url("5wppq"), 23)
+
+    def test_generator_string(self):
+        encoder2 = UrlEncoder(
+            alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fqABCD",
+            block_size=DEFAULT_BLOCK_SIZE,
+        )
+        self.assertNotEqual(encoder2.encode_url(23, MIN_LENGTH), "5wppq")
 
 
 if __name__ == "__main__":
