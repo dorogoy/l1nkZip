@@ -1,2 +1,3 @@
 mkdocs
 ghp-import
+mkdocs-material
