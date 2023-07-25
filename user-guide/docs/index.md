@@ -7,14 +7,14 @@ The code of l1nkZip is available on its [Github repository][Github repository] u
 ## Features
 
 * Simple to setup and use. It just works.
-* Low resource usage and also low maintenance for cheap [self-hosting](/install).
+* Low resource usage and also low maintenance for cheap [self-hosting](/l1nkZip/install).
 * Using [litestream][litestream], you will have a reliable database almost impossible to destroy, backed on any compatible and unexpensive S3 bucket.
-* Although [litestream][litestream] being, in most cases, the best choice, Postgresql is also available. Other databases are available [building your own images](/install/#requirements).
+* Although [litestream][litestream] being, in most cases, the best choice, Postgresql is also available. Other databases are available [building your own images](/l1nkZip/install/#requirements).
 * Optional protection against phisphing using the [PhishTank][PhishTank] database.
 
 ## Usage examples
 
-Being an API, links can be posted in many different ways. These examples are using the official API domain, available for general usage by everyone, but you can self-host it and use your own domain if you want. If you are interested on self-hosting, check the [installation](/install) page.
+Being an API, links can be posted in many different ways. These examples are using the official API domain, available for general usage by everyone, but you can self-host it and use your own domain if you want. If you are interested on self-hosting, check the [installation](/l1nkZip/install) page.
 
 From the command-line, you have plenty of options, like [curl](https://curl.se), [wget](https://www.gnu.org/software/wget/), [httpie](https://httpie.io) or [httpx](https://www.python-httpx.org) to just name a few. Here is an example with `curl`:
 
@@ -64,4 +64,4 @@ It's all about options.
 [PhishTank]: https://phishtank.org
 [Swagger UI]: https://l1nk.zip/docs
 [litestream]: https://litestream.io
-[Github repository]: https://dorogoy.github.io/l1nkZip
+[Github repository]: https://github.com/dorogoy/l1nkZip
