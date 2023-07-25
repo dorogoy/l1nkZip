@@ -1,4 +1,4 @@
-# Installation
+# Self-hosting
 
 L1nkZip is distributed as a Docker image, although the full code can be found on the [Github repository][Github repository] in case you want to use it directly or contribute. It can be run as a Docker container or deployed to a Kubernetes cluster. [Litestream][litestream] is not required to run L1nkZip, but it is strongly encouraged if you are going to use sqlite.
 
@@ -59,7 +59,7 @@ docker pull dorogoy/l1nkzip
 
 ## Kubernetes manifest
 
-This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. This example is for a S3 compatible service (idrivee), [Amazon S3 configuration](https://litestream.io/guides/s3/) for AWS is slightly different. Please, have a look at the [Litestream documentation][litestream] for more details.
+This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. This example is for a S3 compatible service (idrive e2), [Amazon S3 configuration](https://litestream.io/guides/s3/) for AWS is slightly different. Please, have a look at the [Litestream documentation][litestream] for more details.
 
 ```yaml
 ---

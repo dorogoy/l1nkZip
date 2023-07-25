@@ -1,7 +1,30 @@
 site_name: L1nkZip
+site_author: Sergio Rael
 repo_url: https://github.com/dorogoy/l1nkZip
+repo_name: dorogoy/l1nkZip
 edit_uri: edit/master/user-guide/docs/
-# theme: readthedocs
+theme:
+  name: material
+  features:
+    - content.action.edit
+    - content.code.copy
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+  palette:
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
 nav:
-  - Home: index.md
-  - Installation: install.md
+  - Getting started: index.md
+  - Self-hosting: selfhosting.md
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
