@@ -14,7 +14,10 @@ async def update_phishtanks():
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{phishtank_url}/online-valid.json",
-            headers={"User-Agent": "phishtank/l1nkZip", "accept-encoding": "gzip"},
+            headers={
+                "User-Agent": f"phishtank/{settings.api_name}",
+                "accept-encoding": "gzip",
+            },
             follow_redirects=True,
         )
         if response.status_code != 200:

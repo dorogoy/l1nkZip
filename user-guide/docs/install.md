@@ -51,7 +51,7 @@ Each update to the Phishtank database can add new entries and remove old ones. T
 
 ## Docker image
 
-The docker image is available on [Docker Hub][Github repository].
+The docker image is available on [Docker Hub][Docker Hub].
 
 ```bash
 docker pull dorogoy/l1nkzip
@@ -66,7 +66,7 @@ This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. T
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: litestreamº
+  name: litestream
 data:
   litestream.yml: |
     dbs:
@@ -231,4 +231,5 @@ spec:
 [PhishTank developer info]: https://phishtank.org/developer_info.php
 [Swagger UI]: https://l1nk.zip/docs
 [litestream]: https://litestream.io
-[Github repository]: https://dorogoy.github.io/l1nkZip
+[Github repository]: https://github.com/dorogoy/l1nkZip
+[Docker Hub]: https://hub.docker.com/r/dorogoy/l1nkzip
