@@ -376,18 +376,18 @@
 
 
 <h1 id="getting-started">Getting started</h1>
-<p>L1nkZip is a simple URL shortener API. It is written in Python and uses the <a href="https://fastapi.tiangolo.com">Fastapi</a> framework and <a href="https://ponyorm.org">Pony ORM</a>. The main priorities of this project are strong privacy, simplicity and low resource usage to have cheaper hosting as possible. The first option in L1nkZip is always a combination of <a href="https://www.sqlite.org">sqlite</a> for the database and <a href="https://litestream.io">litestream</a> for its replication and resilience from cheap and volatile environments. Using Pony ORM allows other options if sqlite is not of your taste. This app is mainly focused on running inside a container managed by Kubernetes or docker.</p>
-<p>The code of l1nkZip is available on its <a href="https://github.com/dorogoy/l1nkZip">Github repository</a> under the <a href="https://spdx.org/licenses/MIT.html">MIT license</a>. You can check all the available endpoints at the <a href="https://l1nk.zip/docs">API documentation</a>.</p>
+<p>L1nkZip is a simple URL shortener API. It is written in Python and uses the <a href="https://fastapi.tiangolo.com">Fastapi</a> framework and <a href="https://ponyorm.org">Pony ORM</a>. The main features of this project are strong privacy, simplicity and low resource usage to have cheaper hosting as possible. The first option in L1nkZip is always a combination of <a href="https://www.sqlite.org">sqlite</a> for the database and <a href="https://litestream.io">litestream</a> for its replication and resilience from cheap and volatile environments. Using Pony ORM allows other options if sqlite is not of your taste. This app is mainly focused on running inside a container managed by Kubernetes or docker.</p>
+<p>The code of l1nkZip is available at its <a href="https://github.com/dorogoy/l1nkZip">Github repository</a> under the <a href="https://spdx.org/licenses/MIT.html">MIT license</a>. You can check all the available endpoints at the <a href="https://l1nk.zip/docs">API documentation</a>.</p>
 <h2 id="features">Features</h2>
 <ul>
-<li>Free installation for casual usage, available to use right now to everyone at <a href="https://l1nk.zip/docs">https://l1nk.zip/docs</a>.</li>
+<li>Free URL shortener available at <a href="https://l1nk.zip/docs">https://l1nk.zip/docs</a>.</li>
 <li>Simple to setup, low resource usage and low maintenance for cheap <a href="/l1nkZip/install">self-hosting</a>.</li>
 <li>Using <a href="https://litestream.io">litestream</a>, you will have a reliable database almost impossible to destroy, backed on any compatible and unexpensive S3 bucket.</li>
 <li>Although <a href="https://litestream.io">litestream</a> being, in most cases, the best choice, Postgresql is also available. Other databases like MySQL, Oracle or CockroachDB can be used <a href="/l1nkZip/install/#requirements">building your own images</a>.</li>
-<li>Optional protection against phisphing using the <a href="https://phishtank.org">PhishTank</a> database.</li>
+<li>Optional protection against phishing using the <a href="https://phishtank.org">PhishTank</a> database.</li>
 </ul>
 <h2 id="user-manual">User manual</h2>
-<p>Being an API, links can be posted in many different ways. These examples are using the official API domain, available for general usage by everyone, but you can self-host it and use your own domain. If you are interested on self-hosting, check the <a href="/l1nkZip/install">installation</a> page.</p>
+<p>Being an API, URLs can be posted in many different ways. These examples are using the official API domain, available for general usage by everyone, but you can self-host it and use your own domain. If you are interested on self-hosting, check the <a href="/l1nkZip/install">installation</a> page.</p>
 <p>From the command-line, you have plenty of options, like <a href="https://curl.se">curl</a>, <a href="https://www.gnu.org/software/wget/">wget</a>, <a href="https://httpie.io">httpie</a> or <a href="https://www.python-httpx.org">httpx</a> to just name a few. Here is an example with <code>curl</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-X<span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">&#39;https://l1nk.zip/url&#39;</span><span class="w"> </span><span class="se">\</span>
