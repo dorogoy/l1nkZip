@@ -39,7 +39,7 @@ For more information check the [PonyORM documentation](https://docs.ponyorm.org/
 * `DB_PASSWORD`: Database password. Used for postgresql.
 * `DB_DSN`: Database DSN. Used for Oracle.
 * `SITE_URL`: URL of the website. Used when the API is visited from a browser.
-* `PHISHTANK`: Enable protection against phisphing. Default: false. The values can also be "anonymous" or your actual [PhishTank key][PhishTank developer info]. More details below.
+* `PHISHTANK`: Enable protection against phishing. Default: false. The values can also be "anonymous" or your actual [PhishTank key][PhishTank developer info]. More details below.
 
 ## Phishtank support
 
