@@ -21,7 +21,7 @@ From the command-line, you have plenty of options, like [curl](https://curl.se),
 ```bash
 curl -X 'POST' \
   'https://l1nk.zip/url' \
-  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
   -d '{"url": "https://www.google.com"}'
 ```
 
