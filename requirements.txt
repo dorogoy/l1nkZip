@@ -8,5 +8,5 @@ mypy==1.7.0
 pony==0.7.16
 psycopg2-binary
 pydantic-settings==2.0.3
-uvicorn==0.23.2
+uvicorn==0.26.0
 validators==0.22.0
