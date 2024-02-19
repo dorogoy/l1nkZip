@@ -1,4 +1,4 @@
-black==23.7.0
+black==24.2.0
 fastapi==0.109.1
 flake8==6.1.0
 httpx==0.24.1
