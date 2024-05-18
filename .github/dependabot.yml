@@ -6,3 +6,19 @@ updates:
       interval: "weekly"
     versioning-strategy: increase-if-necessary
     open-pull-requests-limit: 3
+    commit-message:
+      prefix: fix
+      prefix-development: chore
+      include: scope
+    reviewers:
+      - "dorogoy"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+      include: scope
+    reviewers:
+      - "dorogoy"
