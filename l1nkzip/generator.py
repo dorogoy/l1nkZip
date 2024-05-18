@@ -151,6 +151,24 @@ class TestGenerator(unittest.TestCase):
         # Can be decoded returning the original integer
         self.assertEqual(self.encoder.decode_url("5wppq"), 23)
 
+    def test_encode_decode(self):
+        for i in range(100):
+            encoded = encode_url(i)
+            decoded = decode_url(encoded)
+            self.assertEqual(i, decoded)
+
+    def test_min_length(self):
+        self.assertEqual(len(encode_url(1, min_length=5)), 5)
+        self.assertEqual(len(encode_url(1000, min_length=10)), 10)
+
+    def test_alphabet(self):
+        custom_alphabet = "0123456789abcdef"
+        encoder = UrlEncoder(alphabet=custom_alphabet)
+        encoded = encoder.encode_url(1234)
+        self.assertTrue(all(char in custom_alphabet for char in encoded))
+        decoded = encoder.decode_url(encoded)
+        self.assertEqual(decoded, 1234)
+
     def test_generator_string(self):
         encoder2 = UrlEncoder(
             alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fqABCD",
