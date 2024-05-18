@@ -46,6 +46,7 @@ Author: Michael Fogleman
 License: MIT
 Link: http://code.activestate.com/recipes/576918/
 """
+
 import unittest
 
 from l1nkzip.config import settings
