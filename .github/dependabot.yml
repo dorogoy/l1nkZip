@@ -6,3 +6,12 @@ updates:
       interval: "weekly"
     versioning-strategy: increase-if-necessary
     open-pull-requests-limit: 3
+    reviewers:
+      - "dorogoy"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "dorogoy"
