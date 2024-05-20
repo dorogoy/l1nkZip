@@ -23,6 +23,11 @@
           "CHANGELOG.md"
         ]
       }
+    ],
+    ["@semantic-release/exec",
+      {
+        "prepareCmd": "./update-version.sh ${nextRelease.version}"
+      }
     ]
   ]
 }
