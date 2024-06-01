@@ -9,4 +9,4 @@ pony==0.7.16
 psycopg2-binary
 pydantic-settings==2.2.1
 uvicorn==0.29.0
-validators==0.22.0
+validators==0.28.3
