@@ -20,7 +20,8 @@
       {
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
         "assets": [
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "l1nkzip/version.py"
         ]
       }
     ],
