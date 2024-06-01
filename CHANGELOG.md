@@ -1,3 +1,10 @@
+## [0.1.11](https://github.com/dorogoy/l1nkZip/compare/v0.1.10...v0.1.11) (2024-06-01)
+
+
+### Bug Fixes
+
+* **deps:** bump pydantic-settings from 2.1.0 to 2.2.1 ([1f0aa6b](https://github.com/dorogoy/l1nkZip/commit/1f0aa6bc001953dc5b6cd819e89b8e4903a45cdc))
+
 ## [0.1.10](https://github.com/dorogoy/l1nkZip/compare/v0.1.9...v0.1.10) (2024-05-22)
 
 
