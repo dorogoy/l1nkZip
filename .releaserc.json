@@ -16,6 +16,12 @@
       }
     ],
     [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "./update-version.sh ${nextRelease.version}"
+      }
+    ],
+    [
       "@semantic-release/git",
       {
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
@@ -23,11 +29,6 @@
           "CHANGELOG.md",
           "l1nkzip/version.py"
         ]
-      }
-    ],
-    ["@semantic-release/exec",
-      {
-        "prepareCmd": "./update-version.sh ${nextRelease.version}"
       }
     ]
   ]
