@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/dorogoy/l1nkZip/compare/v0.1.11...v0.2.0) (2024-06-01)
+
+
+### Features
+
+* **release:** add exec plugin to update version ([0bc251a](https://github.com/dorogoy/l1nkZip/commit/0bc251ae938425b01eaa89c55cfd0be9c93f85db))
+
 ## [0.1.11](https://github.com/dorogoy/l1nkZip/compare/v0.1.10...v0.1.11) (2024-06-01)
 
 
