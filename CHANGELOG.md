@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/dorogoy/l1nkZip/compare/v0.2.2...v0.3.0) (2024-06-02)
+
+
+### Features
+
+* Add `get_visits` function to retrieve link info ([96084ee](https://github.com/dorogoy/l1nkZip/commit/96084eed92aa69ba589615f432b7054f36097ca5))
+
 ## [0.2.2](https://github.com/dorogoy/l1nkZip/compare/v0.2.1...v0.2.2) (2024-06-01)
 
 
