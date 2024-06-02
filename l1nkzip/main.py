@@ -1,10 +1,19 @@
 from pathlib import Path
+from typing import List
 
 from fastapi import FastAPI, HTTPException, Request, responses, status
 from fastapi.templating import Jinja2Templates
 
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
-from l1nkzip.models import GenericInfo, LinkInfo, Url, db, insert_link, set_visit
+from l1nkzip.models import (
+    GenericInfo,
+    LinkInfo,
+    Url,
+    db,
+    get_visits,
+    insert_link,
+    set_visit,
+)
 from l1nkzip.phishtank import (
     PhishTank,
     delete_old_phishes,
@@ -81,6 +90,15 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
         return GenericInfo(
             detail=f"PhishTank list updated. {deleted_phishes} entries have been deleted"
         )
+
+
+@app.get("/list/{token}", tags=["urls"])
+def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
+    """Get a list of all the URLs shortened by this API."""
+    if token != settings.token:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    else:
+        return get_visits(limit=limit)
 
 
 @app.get("/{link}", tags=["urls"])
