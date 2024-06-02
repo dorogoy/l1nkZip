@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import List
 
 from pony.orm import Database, Optional, PrimaryKey, Required, db_session
 from pydantic import BaseModel, HttpUrl
@@ -59,7 +60,7 @@ class PhishTank(db.Entity):  # type: ignore
 
 
 @db_session
-def insert_link(url):
+def insert_link(url) -> Link:
     already_exists = Link.get(url=url)
     if already_exists:
         return already_exists
@@ -75,3 +76,16 @@ def set_visit(link) -> Link:
     if link_data:
         link_data.visits += 1
     return link_data
+
+
+@db_session
+def get_visits(limit: int = 100) -> List[LinkInfo]:
+    return [
+        LinkInfo(
+            link=link.link,
+            full_link=link.full_link,
+            url=link.url,
+            visits=link.visits,
+        )
+        for link in Link.select()[:limit]
+    ]
