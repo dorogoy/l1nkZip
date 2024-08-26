@@ -5,7 +5,7 @@ httpx==0.27.0
 isort==5.13.2
 jinja2==3.1.4
 mypy==1.10.0
-pony==0.7.16
+pony==0.7.18
 psycopg2-binary
 pydantic-settings==2.2.1
 uvicorn==0.29.0
