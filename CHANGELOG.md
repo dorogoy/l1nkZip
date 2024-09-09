@@ -1,3 +1,10 @@
+## [0.3.3](https://github.com/dorogoy/l1nkZip/compare/v0.3.2...v0.3.3) (2024-09-09)
+
+
+### Bug Fixes
+
+* **deps:** bump pydantic-settings from 2.2.1 to 2.4.0 ([#83](https://github.com/dorogoy/l1nkZip/issues/83)) ([1050bfc](https://github.com/dorogoy/l1nkZip/commit/1050bfced2251e5fd96acd52c5a84d52257312a0))
+
 ## [0.3.2](https://github.com/dorogoy/l1nkZip/compare/v0.3.1...v0.3.2) (2024-09-09)
 
 
