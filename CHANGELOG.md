@@ -1,3 +1,17 @@
+## [0.3.2](https://github.com/dorogoy/l1nkZip/compare/v0.3.1...v0.3.2) (2024-09-09)
+
+
+### Bug Fixes
+
+* **deps:** bump pony from 0.7.16 to 0.7.19 ([097ed4c](https://github.com/dorogoy/l1nkZip/commit/097ed4c0d7ef25487a18b4e5e3f6aadc29e1bbe4))
+
+## [0.3.1](https://github.com/dorogoy/l1nkZip/compare/v0.3.0...v0.3.1) (2024-09-09)
+
+
+### Bug Fixes
+
+* **deps:** bump uvicorn from 0.29.0 to 0.30.6 ([75a0523](https://github.com/dorogoy/l1nkZip/commit/75a05237de40a10d7e9dde9802d325b6c0c195bc))
+
 # [0.3.0](https://github.com/dorogoy/l1nkZip/compare/v0.2.2...v0.3.0) (2024-06-02)
 
 
