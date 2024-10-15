@@ -1,3 +1,10 @@
+## [0.3.5](https://github.com/dorogoy/l1nkZip/compare/v0.3.4...v0.3.5) (2024-10-15)
+
+
+### Bug Fixes
+
+* **deps:** bump validators from 0.28.3 to 0.34.0 ([957f09f](https://github.com/dorogoy/l1nkZip/commit/957f09f18ec5ed9823aec5a2e7e96a6144c32fc0))
+
 ## [0.3.4](https://github.com/dorogoy/l1nkZip/compare/v0.3.3...v0.3.4) (2024-10-15)
 
 
