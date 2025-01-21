@@ -1,3 +1,10 @@
+## [0.3.6](https://github.com/dorogoy/l1nkZip/compare/v0.3.5...v0.3.6) (2025-01-21)
+
+
+### Bug Fixes
+
+* **deps:** bump httpx from 0.27.0 to 0.28.1 ([2880037](https://github.com/dorogoy/l1nkZip/commit/2880037083b5d9d16732a1ee0ae9af523885093b))
+
 ## [0.3.5](https://github.com/dorogoy/l1nkZip/compare/v0.3.4...v0.3.5) (2024-10-15)
 
 
