@@ -9,6 +9,7 @@ from l1nkzip.models import (
     GenericInfo,
     LinkInfo,
     Url,
+    check_db_connection,
     db,
     get_visits,
     insert_link,
@@ -62,6 +63,18 @@ async def root() -> responses.RedirectResponse:
     else:
         redirect = responses.RedirectResponse("/404")
     return redirect
+
+
+@app.get("/health", tags=["system"])
+async def health_check():
+    """Check if the application and database are working properly"""
+    try:
+        if check_db_connection():
+            return "OK"
+    except Exception:
+        raise HTTPException(
+            status_code=503, detail="Service unavailable - Database connection failed"
+        )
 
 
 @app.get("/404", response_class=responses.HTMLResponse, include_in_schema=False)
