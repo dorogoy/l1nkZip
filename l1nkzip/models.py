@@ -87,5 +87,5 @@ def get_visits(limit: int = 100) -> List[LinkInfo]:
             url=link.url,
             visits=link.visits,
         )
-        for link in Link.select()[:limit]
+        for link in list(Link.select()[:limit])
     ]
