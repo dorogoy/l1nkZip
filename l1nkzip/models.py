@@ -89,3 +89,13 @@ def get_visits(limit: int = 100) -> List[LinkInfo]:
         )
         for link in list(Link.select()[:limit])
     ]
+
+
+@db_session
+def check_db_connection():
+    try:
+        with db_session:
+            db.select("SELECT 1")
+            return True
+    except Exception as e:
+        raise Exception(f"Database connection error: {e}")
