@@ -1,3 +1,10 @@
+## [0.3.8](https://github.com/dorogoy/l1nkZip/compare/v0.3.7...v0.3.8) (2025-01-29)
+
+
+### Bug Fixes
+
+* **deps:** bump uvicorn from 0.30.6 to 0.34.0 ([5d85050](https://github.com/dorogoy/l1nkZip/commit/5d8505010b3b91d34a910aafee7256f812fb646e))
+
 ## [0.3.7](https://github.com/dorogoy/l1nkZip/compare/v0.3.6...v0.3.7) (2025-01-21)
 
 
