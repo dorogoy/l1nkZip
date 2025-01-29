@@ -9,8 +9,8 @@ env_ok:
 
 .PHONY: fmt
 fmt: env_ok
-	venv/bin/isort --sp .isort.cfg $(py_dirs)
-	venv/bin/black $(py_files)
+	venv/bin/ruff check --fix $(py_dirs)
+	venv/bin/ruff format $(py_dirs)
 
 .PHONY: check
 check: env_ok
@@ -18,9 +18,8 @@ check: env_ok
 		--check-untyped-defs \
 		--ignore-missing-imports \
 		$(py_dirs)
-	venv/bin/python -m flake8 --select F $(py_dirs)
-	venv/bin/isort --sp .isort.cfg $(py_files) --check
-	venv/bin/black --check $(py_files)
+	venv/bin/ruff check $(py_dirs)
+	venv/bin/ruff format --check $(py_dirs)
 
 .PHONY: test
 test: check
