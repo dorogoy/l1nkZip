@@ -1,3 +1,15 @@
+# [0.4.0](https://github.com/dorogoy/l1nkZip/compare/v0.3.8...v0.4.0) (2025-01-29)
+
+
+### Bug Fixes
+
+* convert Link query to list for stable iteration ([3b45da0](https://github.com/dorogoy/l1nkZip/commit/3b45da064a4f3b18b06e585a89bf768528291649))
+
+
+### Features
+
+* add health check endpoint and db connection test ([6738edd](https://github.com/dorogoy/l1nkZip/commit/6738edd6c79a7501e606266641d89ba740710d89))
+
 ## [0.3.8](https://github.com/dorogoy/l1nkZip/compare/v0.3.7...v0.3.8) (2025-01-29)
 
 
