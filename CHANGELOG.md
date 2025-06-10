@@ -1,3 +1,10 @@
+## [0.4.3](https://github.com/dorogoy/l1nkZip/compare/v0.4.2...v0.4.3) (2025-06-10)
+
+
+### Bug Fixes
+
+* **deps:** bump jinja2 from 3.1.5 to 3.1.6 ([3dd768d](https://github.com/dorogoy/l1nkZip/commit/3dd768d04ea72c1602880e772171a8addd687598))
+
 ## [0.4.2](https://github.com/dorogoy/l1nkZip/compare/v0.4.1...v0.4.2) (2025-06-10)
 
 
