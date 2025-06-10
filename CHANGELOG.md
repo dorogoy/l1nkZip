@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/dorogoy/l1nkZip/compare/v0.4.1...v0.4.2) (2025-06-10)
+
+
+### Bug Fixes
+
+* **deps:** bump fastapi from 0.115.8 to 0.115.12 ([ebce3e2](https://github.com/dorogoy/l1nkZip/commit/ebce3e2fa6f29adfe6fd85d168ae1a9979f215ec))
+
 ## [0.4.1](https://github.com/dorogoy/l1nkZip/compare/v0.4.0...v0.4.1) (2025-02-26)
 
 
