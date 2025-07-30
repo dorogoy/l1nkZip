@@ -1,3 +1,10 @@
+## [0.4.4](https://github.com/dorogoy/l1nkZip/compare/v0.4.3...v0.4.4) (2025-07-30)
+
+
+### Bug Fixes
+
+* **deps:** bump ruff from 0.9.3 to 0.12.5 ([c486c44](https://github.com/dorogoy/l1nkZip/commit/c486c4416b69fdce7b97588d19be413ddb689f44))
+
 ## [0.4.3](https://github.com/dorogoy/l1nkZip/compare/v0.4.2...v0.4.3) (2025-06-10)
 
 
