@@ -15,6 +15,7 @@ The full documentation is available at https://dorogoy.github.io/l1nkZip.
 * Optional protection against phisphing with the [PhishTank](https://phishtank.org) database.
 * Built-in rate limiting protection against abuse through mass URL creation or enumeration attacks using [slowapi](https://github.com/laurentS/slowapi).
 * Optional Redis caching for improved performance on frequently accessed URLs (TTL-based with configurable expiration).
+* **Comprehensive monitoring and observability** with Prometheus metrics, structured logging, and alerting support.
 
 ## Companion CLI Tool
 
@@ -70,3 +71,84 @@ export REDIS_TTL=3600
 ```
 
 When Redis is not configured, L1nkZip operates normally without any caching, ensuring backward compatibility.
+
+## Monitoring and Observability
+
+L1nkZip provides comprehensive monitoring and observability features to ensure reliable operation and performance tracking. The monitoring system is built around Prometheus metrics and structured logging, making it easy to integrate with modern observability stacks.
+
+### Prometheus Metrics
+
+L1nkZip exposes a standard Prometheus metrics endpoint at `/metrics` when monitoring is enabled. The metrics include:
+
+#### HTTP Metrics
+- **Request Count**: Total HTTP requests by method, endpoint, and status code
+- **Request Latency**: Response time histograms with configurable buckets
+- **Active Requests**: Gauge of currently processing requests
+
+#### Business Metrics
+- **URLs Created**: Counter of shortened URLs
+- **Redirects**: Counter of URL redirections
+- **Phishing Blocks**: Counter of blocked malicious URLs
+
+#### Performance Metrics
+- **Cache Performance**: Hit/miss rates for Redis operations
+- **Database Queries**: Query duration histograms
+- **Rate Limiting**: Violation counters by endpoint
+
+### Configuration
+
+Enable monitoring by setting the following environment variables:
+
+```bash
+# Enable Prometheus metrics endpoint
+METRICS_ENABLED=true
+
+# Optional: Configure logging
+LOG_LEVEL=INFO          # DEBUG, INFO, WARN, ERROR
+LOG_FORMAT=text         # text or json for structured logging
+```
+
+### Structured Logging
+
+When `LOG_FORMAT=json` is set, L1nkZip outputs structured JSON logs with comprehensive context including:
+- Request tracing IDs and correlation IDs
+- Response times and status codes
+- Error details and stack traces
+- Cache operation results
+- User agent and client information
+
+### Alerting and Dashboards
+
+The monitoring system is designed to work with:
+- **Prometheus** for metrics collection and alerting
+- **Grafana** for visualization and dashboards
+- **Alertmanager** for notification routing
+
+Pre-configured alert rules are available for:
+- High error rates (>5% for 5 minutes)
+- Service availability issues
+- Performance degradation
+- Security events (phishing blocks)
+
+### Example Usage
+
+```bash
+# Enable monitoring
+export METRICS_ENABLED=true
+export LOG_FORMAT=json
+
+# Start the application
+uv run uvicorn l1nkzip.main:app --host 0.0.0.0 --port 80
+
+# Access metrics
+curl http://localhost:80/metrics
+```
+
+### Kubernetes Integration
+
+For Kubernetes deployments, the monitoring system integrates seamlessly with:
+- **Prometheus Operator** for automated service discovery
+- **Grafana** for dashboard visualization
+- **Alertmanager** for notification management
+
+See the [self-hosting documentation](user-guide/docs/selfhosting.md) for detailed Kubernetes configuration examples.
