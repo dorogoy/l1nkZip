@@ -8,6 +8,7 @@ Maintaining and improving the L1nkZip URL shortener API. The project is currentl
 - Added health check endpoint and database connection testing
 - Improved error handling and stability
 - Implemented rate limiting protection using slowapi to prevent abuse through mass URL creation and enumeration attacks
+- Added optional Redis caching for improved performance on frequently accessed URLs
 
 ## Next steps
 - Continue dependency updates and security patches

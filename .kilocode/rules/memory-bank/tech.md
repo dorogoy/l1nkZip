@@ -7,12 +7,14 @@
 - **Pydantic Settings 2.4.0**: Settings management with environment variables
 - **SQLite**: Default database (file-based, in-memory options)
 - **Litestream**: Database replication for SQLite to S3-compatible storage
+- **Redis 5.0.1**: Optional caching layer for improved performance
 - **HTTpx 0.28.1**: Async HTTP client for PhishTank integration
 - **Jinja2 3.1.6**: Templating engine for error pages
 - **Ruff 0.12.7**: Fast Python linter and formatter
 - **Mypy 1.10.0**: Static type checking
 - **SlowAPI 0.1.9**: Rate limiting library for abuse protection
 - **Uvicorn 0.35.0**: ASGI server for FastAPI
+- **pytest-asyncio 0.25.1**: Async testing support for pytest
 - **Rich**: CLI output formatting (used in l1nkzip-cli)
 - **uv**: Python package manager (used in l1nkzip-cli and main project)
 - **Ruff**: Linting and formatting (used in l1nkzip-cli and main project)
@@ -38,6 +40,7 @@ Core runtime dependencies:
 - jinja2
 - pony
 - pydantic-settings
+- redis
 - slowapi
 - uvicorn
 - validators
@@ -95,5 +98,7 @@ Configuration is managed through environment variables with sensible defaults:
 - `TOKEN`: Admin authentication token
 - `GENERATOR_STRING`: Custom URL encoding alphabet
 - `PHISHTANK`: PhishTank integration (false, anonymous, or API key)
+- `REDIS_SERVER`: Full Redis URL for caching (optional, e.g., redis://localhost:6379/0)
+- `REDIS_TTL`: Cache TTL in seconds (optional, default: 86400 = 24 hours)
 - `RATE_LIMIT_CREATE`: Rate limit for URL creation (default: "5/minute")
 - `RATE_LIMIT_REDIRECT`: Rate limit for URL redirection (default: "60/minute")
