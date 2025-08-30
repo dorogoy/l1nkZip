@@ -37,7 +37,7 @@ async def update_phishtanks():
 
 
 @db_session
-def get_phish(url_info: Url) -> PhishTank:
+def get_phish(url_info: Url) -> PhishTank | None:
     return PhishTank.get(url=str(url_info.url))
 
 

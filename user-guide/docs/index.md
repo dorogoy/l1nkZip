@@ -33,6 +33,48 @@ httpx -m POST -j '{"url": "https://www.google.com"}' https://l1nk.zip/url
 
 You can also use non CLI apps, like [Postman](https://www.postman.com) or [Insomnia](https://insomnia.rest). Or even the included [Swagger UI][Swagger UI] that allows you to add a link quickly [from a web form](https://l1nk.zip/docs#/urls/create_url_url_post).
 
+### Official L1nkZip CLI
+
+For a dedicated command-line experience, L1nkZip has an official CLI client available at [l1nkzip-cli](https://github.com/dorogoy/l1nkzip-cli). The CLI provides a modern, rich-powered interface with beautiful output formatting.
+
+#### Installation
+
+```bash
+curl -O https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/main.py
+chmod +x main.py
+chmod +x l1nkzip
+```
+
+#### Usage Examples
+
+Shorten a URL:
+```bash
+./main.py shorten https://www.google.com
+```
+
+Get information about a short link:
+```bash
+./main.py info abc123
+```
+
+List all URLs (requires API token):
+```bash
+./main.py list --token YOUR_TOKEN
+```
+
+Update PhishTank database (admin only):
+```bash
+./main.py update-phishtank --token YOUR_TOKEN
+```
+
+#### Configuration
+
+- Set API token via `L1NKZIP_TOKEN` environment variable or `--token` flag
+- Custom API endpoint via `L1NKZIP_API_URL` environment variable
+- Defaults to `https://l1nk.zip` if not specified
+
+The CLI uses [rich](https://github.com/Textualize/rich) for beautiful output and [uv](https://github.com/astral-sh/uv) for dependency management.
+
 Of course, you can also use your preferred programming language. Here is an example in Python:
 
 ```python
@@ -65,3 +107,4 @@ It's all about options.
 [Swagger UI]: https://l1nk.zip/docs
 [litestream]: https://litestream.io
 [Github repository]: https://github.com/dorogoy/l1nkZip
+[CLI repository]: https://github.com/dorogoy/l1nkzip-cli

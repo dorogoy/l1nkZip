@@ -144,7 +144,7 @@ def create_url(url: Url) -> LinkInfo:
     If the URL is a phishing URL, it will be rejected.
     If the URL is already in the database, the information about it will be returned.
     """
-    phish = get_phish(url) if settings.phishtank else False
+    phish = get_phish(url) if settings.phishtank else None
     if phish:
         raise HTTPException(
             status_code=403,
