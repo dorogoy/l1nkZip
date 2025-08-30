@@ -11,6 +11,8 @@ The code of l1nkZip is available at its [Github repository][Github repository] u
 * Using [litestream][litestream], you will have a reliable database almost impossible to destroy, backed on any compatible and unexpensive S3 bucket.
 * Although [litestream][litestream] being, in most cases, the best choice, Postgresql is also available. Other databases like MySQL, Oracle or CockroachDB can be used [building your own images](/l1nkZip/install/#requirements).
 * Optional protection against phishing using the [PhishTank][PhishTank] database.
+* Built-in rate limiting to prevent abuse through mass URL creation and enumeration attacks.
+* Optional Redis caching for improved performance on frequently accessed URLs.
 
 ## User manual
 
@@ -102,6 +104,63 @@ Update PhishTank database (admin only):
 - Defaults to `https://l1nk.zip` if not specified
 
 The CLI uses [rich](https://github.com/Textualize/rich) for beautiful output and [uv](https://github.com/astral-sh/uv) for dependency management.
+
+## Rate Limiting
+
+L1nkZip includes built-in rate limiting to protect against abuse:
+
+### Default Limits
+- **URL Creation**: 10 requests per minute per IP address
+- **URL Redirection**: 120 requests per minute per IP address
+- **Admin Endpoints**: No rate limiting when using valid authentication token
+
+### Customization
+You can customize rate limits using environment variables:
+
+```bash
+# Custom rate limits (format: "requests/period")
+export RATE_LIMIT_CREATE="20/minute"    # URL creation limit
+export RATE_LIMIT_REDIRECT="180/minute"  # URL redirection limit
+```
+
+### Rate Limit Headers
+When rate limited, responses include informative headers:
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Remaining requests in current period
+- `X-RateLimit-Reset`: Time when limit resets (UTC timestamp)
+
+## Redis Caching
+
+For improved performance, L1nkZip supports optional Redis caching:
+
+### Configuration
+Enable caching by setting the Redis server URL:
+
+```bash
+# Enable Redis caching (Optional)
+export REDIS_SERVER=redis://localhost:6379/0
+
+# Optional: Custom cache TTL (default: 86400 seconds = 24 hours)
+export REDIS_TTL=3600  # 1 hour TTL
+```
+
+### How It Works
+- **Cache Hits**: Frequently accessed URLs are served from Redis, reducing database load
+- **Cache Misses**: URLs not in cache are fetched from database and cached automatically
+- **Visit Counting**: Visit statistics are maintained accurately even for cached requests
+- **TTL Expiration**: Cached entries automatically expire after configured time
+
+### Benefits
+- **Performance**: Faster redirects for popular URLs
+- **Scalability**: Reduced database load under high traffic
+- **Optional**: Fully disabled when Redis is not configured
+- **Configurable**: TTL can be adjusted based on usage patterns
+
+### Self-Hosting Notes
+When self-hosting with Redis:
+1. Ensure Redis server is running and accessible
+2. Set appropriate TTL based on your traffic patterns
+3. Monitor cache hit rates for performance optimization
 
 [FastApi]: https://fastapi.tiangolo.com
 [PonyORM]: https://ponyorm.org

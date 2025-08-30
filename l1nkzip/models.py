@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
@@ -99,3 +100,21 @@ def check_db_connection():
             return True
     except Exception as e:
         raise Exception(f"Database connection error: {e}")
+
+
+@db_session
+def increment_visit(link: str):
+    """Increment visit count for a link (synchronous)."""
+    link_data = Link.get(link=link)
+    if link_data:
+        link_data.visits += 1
+
+
+async def increment_visit_async(link: str):
+    """Increment visit count for a link asynchronously.
+
+    This function runs the synchronous database operation in a thread pool
+    to avoid blocking the async event loop.
+    """
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, increment_visit, link)

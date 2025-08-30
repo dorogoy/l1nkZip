@@ -15,6 +15,13 @@ L1nkZip is a FastAPI-based URL shortener with a modular architecture:
 │   HTTP Clients  │    │   Database      │    │   Configuration │
 │   (Web/API)     │    │   (SQLite/Other)│    │   (config.py)   │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Redis Cache   │
+│   (Optional)    │
+│   (cache.py)    │
+└─────────────────┘
 ```
 
 ## Source Code paths
@@ -22,6 +29,7 @@ L1nkZip is a FastAPI-based URL shortener with a modular architecture:
 - **Database models**: [`l1nkzip/models.py`](l1nkzip/models.py:1) - Pony ORM entities and database operations
 - **Configuration**: [`l1nkzip/config.py`](l1nkzip/config.py:1) - Settings and database configuration
 - **URL generation**: [`l1nkzip/generator.py`](l1nkzip/generator.py:1) - Short URL encoding/decoding
+- **Redis caching**: [`l1nkzip/cache.py`](l1nkzip/cache.py:1) - Optional Redis caching for URL redirects
 - **Phishing protection**: [`l1nkzip/phishtank.py`](l1nkzip/phishtank.py:1) - PhishTank integration
 - **Version management**: [`l1nkzip/version.py`](l1nkzip/version.py:1) - Version tracking
 
@@ -39,13 +47,16 @@ L1nkZip is a FastAPI-based URL shortener with a modular architecture:
 - **Strategy pattern**: Multiple database backends with consistent interface
 
 ## Component relationships
-- The main app depends on models for data access
+- The main app depends on models for data access and cache for performance optimization
 - Models depend on generator for URL encoding
+- Cache depends on configuration for Redis settings and TTL values
 - Configuration is centralized and injected throughout
 - PhishTank integration is optional and configurable
+- Redis caching is optional and gracefully degrades when unavailable
 
 ## Critical implementation paths
 1. URL shortening: POST `/url` → [`insert_link()`](l1nkzip/models.py:63) → [`encode_url()`](l1nkzip/generator.py:132)
-2. URL redirection: GET `/{link}` → [`set_visit()`](l1nkzip/models.py:74) → redirect
-3. Phishing check: Integrated in both creation and redirection via [`get_phish()`](l1nkzip/phishtank.py:40)
-4. Database health: GET `/health` → [`check_db_connection()`](l1nkzip/models.py:95)
+2. URL redirection: GET `/{link}` → [`cache.get()`](l1nkzip/cache.py:32) → [`set_visit()`](l1nkzip/models.py:74) → [`cache.set()`](l1nkzip/cache.py:44) → redirect
+3. Cache hit flow: GET `/{link}` → [`cache.get()`](l1nkzip/cache.py:32) → [`increment_visit_async()`](l1nkzip/models.py:112) → redirect
+4. Phishing check: Integrated in both creation and redirection via [`get_phish()`](l1nkzip/phishtank.py:40)
+5. Database health: GET `/health` → [`check_db_connection()`](l1nkzip/models.py:95)

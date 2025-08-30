@@ -19,8 +19,13 @@ class Settings(BaseSettings):
     # Change this to your own random generator string
     generator_string: str = "mn6j2c4rv8bpygw95z7hsdaetxuk3fq"
     # Rate limiting settings
-    rate_limit_create: str = "5/minute"  # Rate limit for URL creation
-    rate_limit_redirect: str = "60/minute"  # Rate limit for URL redirection
+    rate_limit_create: str = "10/minute"  # Rate limit for URL creation
+    rate_limit_redirect: str = "120/minute"  # Rate limit for URL redirection
+    # Redis caching settings
+    redis_server: Optional[str] = (
+        None  # Full Redis URL (e.g., redis://localhost:6379/0)
+    )
+    redis_ttl: int = 86400  # Default TTL for cached URLs (24 hours in seconds)
 
 
 settings = Settings()

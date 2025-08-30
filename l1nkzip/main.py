@@ -10,6 +10,7 @@ from slowapi.extension import Limiter
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
+from l1nkzip.cache import cache
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
 from l1nkzip.models import (
     GenericInfo,
@@ -18,6 +19,7 @@ from l1nkzip.models import (
     check_db_connection,
     db,
     get_visits,
+    increment_visit_async,
     insert_link,
     set_visit,
 )
@@ -272,7 +274,7 @@ def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
 
 @app.get("/{link}", tags=["urls"])
 @limiter.limit(settings.rate_limit_redirect)
-def get_url(request: Request, link: str) -> responses.RedirectResponse:
+async def get_url(request: Request, link: str) -> responses.RedirectResponse:
     """Redirect to the full URL. If the URL is a phishing URL, it will be redirected to the PhishTank page."""
     redirect: responses.RedirectResponse
     phish: Optional[PhishTank] = None
@@ -280,26 +282,65 @@ def get_url(request: Request, link: str) -> responses.RedirectResponse:
     # Validate short link format
     validate_short_link(link)
 
-    try:
-        link_data = set_visit(link)
-    except Exception as e:
-        print(f"Database error in get_url: {e}")
-        return responses.RedirectResponse("/404")
+    # Check cache first if enabled
+    cached_url = None
+    if cache.is_enabled():
+        try:
+            cached_url = await cache.get(f"redirect:{link}")
+        except Exception as e:
+            print(f"Cache error in get_url: {e}")
 
-    if settings.phishtank and link_data:
-        phish = retry_phishtank_check(link_data.url)
+    if cached_url:
+        # Cache hit - redirect immediately and update visit count asynchronously
+        try:
+            # Start async visit count update (fire and forget)
+            import asyncio
 
-    if phish:
-        redirect = responses.RedirectResponse(
-            phish.phish_detail_url or "https://phishtank.org/",
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-        )
-    elif link_data:
-        redirect = responses.RedirectResponse(
-            link_data.url, status_code=status.HTTP_301_MOVED_PERMANENTLY
-        )
+            asyncio.create_task(increment_visit_async(link))
+        except Exception as e:
+            print(f"Async visit count error: {e}")
+
+        # Check for phishing in cached URL
+        if settings.phishtank:
+            phish = retry_phishtank_check(cached_url)
+
+        if phish:
+            redirect = responses.RedirectResponse(
+                phish.phish_detail_url or "https://phishtank.org/",
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+            )
+        else:
+            redirect = responses.RedirectResponse(
+                cached_url, status_code=status.HTTP_301_MOVED_PERMANENTLY
+            )
     else:
-        redirect = responses.RedirectResponse("/404")
+        # Cache miss - use database
+        try:
+            link_data = set_visit(link)
+        except Exception as e:
+            print(f"Database error in get_url: {e}")
+            return responses.RedirectResponse("/404")
+
+        if settings.phishtank and link_data:
+            phish = retry_phishtank_check(link_data.url)
+
+        if phish:
+            redirect = responses.RedirectResponse(
+                phish.phish_detail_url or "https://phishtank.org/",
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+            )
+        elif link_data:
+            # Cache the successful lookup
+            try:
+                await cache.set(f"redirect:{link}", link_data.url)
+            except Exception as e:
+                print(f"Cache set error: {e}")
+
+            redirect = responses.RedirectResponse(
+                link_data.url, status_code=status.HTTP_301_MOVED_PERMANENTLY
+            )
+        else:
+            redirect = responses.RedirectResponse("/404")
 
     return redirect
 
