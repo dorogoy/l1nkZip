@@ -79,4 +79,4 @@ class TestRateLimiting:
         # List endpoint should not be rate limited (requires token)
         for _ in range(10):
             response = client.get("/list/__change_me__")
-            assert response.status_code == 200  # Unauthorized but not rate limited
+            assert response.status_code == 401  # Unauthorized but not rate limited
