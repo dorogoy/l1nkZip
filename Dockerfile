@@ -1,11 +1,16 @@
-FROM python:3.10-bullseye
+FROM python:3.12-slim
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+# Copy project files
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies using uv
+RUN uv sync --frozen --no-install-project --no-dev
 
 COPY ./l1nkzip /code/l1nkzip
 
-CMD ["uvicorn", "l1nkzip.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uv", "run", "uvicorn", "l1nkzip.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "80"]

@@ -1,7 +1,7 @@
 # Tech
 
 ## Technologies used
-- **Python 3.10+**: Core programming language
+- **Python 3.12+**: Core programming language
 - **FastAPI 0.115.12**: Web framework with async support and OpenAPI documentation
 - **Pony ORM 0.7.19**: Object-relational mapper supporting multiple databases
 - **Pydantic Settings 2.4.0**: Settings management with environment variables
@@ -12,17 +12,17 @@
 - **Ruff 0.12.7**: Fast Python linter and formatter
 - **Mypy 1.10.0**: Static type checking
 - **SlowAPI 0.1.9**: Rate limiting library for abuse protection
-- **Uvicorn 0.34.0**: ASGI server for FastAPI
+- **Uvicorn 0.35.0**: ASGI server for FastAPI
 - **Rich**: CLI output formatting (used in l1nkzip-cli)
-- **uv**: Python package manager (used in l1nkzip-cli)
-- **Ruff**: Linting and formatting (used in l1nkzip-cli)
+- **uv**: Python package manager (used in l1nkzip-cli and main project)
+- **Ruff**: Linting and formatting (used in l1nkzip-cli and main project)
 
 ## Development setup
 1. **Virtual environment**: Managed via Makefile with `make env_ok`
-2. **Dependency management**: `requirements.txt` for core dependencies
+2. **Dependency management**: `uv` for core dependencies (replaced pip)
 3. **Code quality**: Ruff for linting/formatting, Mypy for type checking
 4. **Testing**: pytest framework with comprehensive test coverage including generator, rate limiting, and API integration tests
-5. **Build system**: Makefile with targets for development, testing, and Docker builds
+5. **Build system**: Makefile with targets for development, testing, and Docker builds (using uv)
 
 ## Technical constraints
 - **Python 3.7+ compatibility**: Maintains backward compatibility
@@ -63,11 +63,12 @@ Optional database drivers:
   - `make check`: Run static analysis and type checking
   - `make test`: Run unit tests
   - `make run_dev`: Start development server
-  - `make build`: Build Docker image
+  - `make build`: Build Docker image (now uses uv)
 
 - **Version management**: [`update-version.sh`](update-version.sh:1) script for consistent version updates
+- **uv.lock**: Lock file for deterministic dependency installation
 
-- **Docker deployment**: Single-stage build with minimal base image
+- **Docker deployment**: Single-stage build with Python 3.12 and uv
 
 ## CLI tool usage
 The official L1nkZip CLI provides:
