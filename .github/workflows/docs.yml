@@ -32,4 +32,4 @@ jobs:
       - name: Deploy documentation
         working-directory: user-guide
         run: |
-          mkdocs gh-deploy --force --cname="$(cat docs/CNAME)"
+          mkdocs gh-deploy --force
