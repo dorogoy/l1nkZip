@@ -3,6 +3,9 @@ from typing import List
 
 from fastapi import FastAPI, HTTPException, Request, responses, status
 from fastapi.templating import Jinja2Templates
+from slowapi.extension import Limiter
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
 from l1nkzip.models import (
@@ -48,6 +51,13 @@ app = FastAPI(
     redoc_url=None,
     openapi_tags=openapi_tags,
 )
+
+# Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
+# Add rate limiting middleware
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
 
 BASE_PATH = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=f"{BASE_PATH}/templates")
@@ -115,7 +125,8 @@ def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
 
 
 @app.get("/{link}", tags=["urls"])
-def get_url(link: str) -> responses.RedirectResponse:
+@limiter.limit(settings.rate_limit_redirect)
+def get_url(request: Request, link: str) -> responses.RedirectResponse:
     """Redirect to the full URL. If the URL is a phishing URL, it will be redirected to the PhishTank page."""
     redirect: responses.RedirectResponse
     phish = False
@@ -139,7 +150,8 @@ def get_url(link: str) -> responses.RedirectResponse:
 
 
 @app.post("/url", tags=["urls"])
-def create_url(url: Url) -> LinkInfo:
+@limiter.limit(settings.rate_limit_create)
+def create_url(request: Request, url: Url) -> LinkInfo:
     """Create a short URL.
     If the URL is a phishing URL, it will be rejected.
     If the URL is already in the database, the information about it will be returned.
