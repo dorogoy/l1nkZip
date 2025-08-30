@@ -1,0 +1,94 @@
+# Tech
+
+## Technologies used
+- **Python 3.10+**: Core programming language
+- **FastAPI 0.115.12**: Web framework with async support and OpenAPI documentation
+- **Pony ORM 0.7.19**: Object-relational mapper supporting multiple databases
+- **Pydantic Settings 2.4.0**: Settings management with environment variables
+- **SQLite**: Default database (file-based, in-memory options)
+- **Litestream**: Database replication for SQLite to S3-compatible storage
+- **HTTpx 0.28.1**: Async HTTP client for PhishTank integration
+- **Jinja2 3.1.6**: Templating engine for error pages
+- **Ruff 0.12.7**: Fast Python linter and formatter
+- **Mypy 1.10.0**: Static type checking
+- **Uvicorn 0.34.0**: ASGI server for FastAPI
+- **Rich**: CLI output formatting (used in l1nkzip-cli)
+- **uv**: Python package manager (used in l1nkzip-cli)
+- **Ruff**: Linting and formatting (used in l1nkzip-cli)
+
+## Development setup
+1. **Virtual environment**: Managed via Makefile with `make env_ok`
+2. **Dependency management**: `requirements.txt` for core dependencies
+3. **Code quality**: Ruff for linting/formatting, Mypy for type checking
+4. **Testing**: Built-in unittest framework with test coverage in generator.py
+5. **Build system**: Makefile with targets for development, testing, and Docker builds
+
+## Technical constraints
+- **Python 3.7+ compatibility**: Maintains backward compatibility
+- **Database flexibility**: Supports multiple backends through Pony ORM
+- **Minimal dependencies**: Keeps package footprint small for containerization
+- **Async-first**: Leverages FastAPI's async capabilities where beneficial
+- **Type hints**: Comprehensive type annotations throughout codebase
+
+## Dependencies
+Core runtime dependencies:
+- fastapi
+- httpx
+- jinja2
+- pony
+- pydantic-settings
+- uvicorn
+- validators
+
+## Companion CLI Technologies
+The official L1nkZip CLI ([l1nkzip-cli](https://github.com/dorogoy/l1nkzip-cli)) uses:
+- **Python 3.12+**: CLI-specific runtime
+- **Rich**: Beautiful terminal output formatting
+- **uv**: Modern Python package and project manager
+- **Ruff**: Fast linting and code formatting
+- **Click**: Command-line interface creation
+- **httpx**: Async HTTP client for API communication
+
+Optional database drivers:
+- psycopg2-binary (PostgreSQL)
+- MySQL-python (MySQL)
+- cx_oracle (Oracle)
+
+## Tool usage patterns
+- **Makefile**: Primary development interface with targets:
+  - `make env_ok`: Setup virtual environment
+  - `make fmt`: Format code with Ruff
+  - `make check`: Run static analysis and type checking
+  - `make test`: Run unit tests
+  - `make run_dev`: Start development server
+  - `make build`: Build Docker image
+
+- **Version management**: [`update-version.sh`](update-version.sh:1) script for consistent version updates
+
+- **Docker deployment**: Single-stage build with minimal base image
+
+## CLI tool usage
+The official L1nkZip CLI provides:
+- `shorten <url>`: Shorten URLs from command line
+- `info <link>`: Get information about short links
+- `list`: List all URLs (requires admin token)
+- `update-phishtank`: Update PhishTank database (admin only)
+- Configurable via `L1NKZIP_TOKEN` and `L1NKZIP_API_URL` environment variables
+
+## Database support matrix
+| Database | Support Level | Driver Required | Notes |
+|----------|---------------|-----------------|-------|
+| SQLite   | Primary       | Built-in        | Default choice with Litestream |
+| PostgreSQL | Full        | psycopg2-binary | Production-ready |
+| MySQL    | Full          | MySQL-python    | Requires additional driver |
+| Oracle   | Full          | cx_oracle       | Requires additional driver |
+| CockroachDB | Full       | psycopg2-binary | PostgreSQL-compatible |
+
+## Environment configuration
+Configuration is managed through environment variables with sensible defaults:
+- `API_DOMAIN`: Domain for shortened URLs
+- `DB_TYPE`: Database type (inmemory, sqlite, postgres, mysql, oracle, cockroachdb)
+- `DB_NAME`: Database name or filename
+- `TOKEN`: Admin authentication token
+- `GENERATOR_STRING`: Custom URL encoding alphabet
+- `PHISHTANK`: PhishTank integration (false, anonymous, or API key)
