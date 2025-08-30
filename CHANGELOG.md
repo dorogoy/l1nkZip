@@ -1,3 +1,12 @@
+## [0.4.5](https://github.com/dorogoy/l1nkZip/compare/v0.4.4...v0.4.5) (2025-08-30)
+
+
+### Bug Fixes
+
+* **deps:** bump mypy from 1.10.0 to 1.17.1 ([53d0ae7](https://github.com/dorogoy/l1nkZip/commit/53d0ae78545db818f9e94295bda269d1280dc8e1))
+* **deps:** bump pydantic-settings from 2.4.0 to 2.10.1 ([98d2091](https://github.com/dorogoy/l1nkZip/commit/98d209180493617ff63f44aea1469c43fef9b8ea))
+* **deps:** bump uvicorn from 0.34.0 to 0.35.0 ([ac20c39](https://github.com/dorogoy/l1nkZip/commit/ac20c398931d0533780c838453f62b36d0143e78))
+
 ## [0.4.4](https://github.com/dorogoy/l1nkZip/compare/v0.4.3...v0.4.4) (2025-07-30)
 
 
