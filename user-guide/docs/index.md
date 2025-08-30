@@ -33,6 +33,34 @@ httpx -m POST -j '{"url": "https://www.google.com"}' https://l1nk.zip/url
 
 You can also use non CLI apps, like [Postman](https://www.postman.com) or [Insomnia](https://insomnia.rest). Or even the included [Swagger UI][Swagger UI] that allows you to add a link quickly [from a web form](https://l1nk.zip/docs#/urls/create_url_url_post).
 
+
+Of course, you can also use your preferred programming language. Here is an example in Python:
+
+```python
+import httpx
+
+url = "https://www.google.com"
+header = {"Content-Type": "application/json"}
+response = httpx.post("https://l1nk.zip/url", header=header, json={"url": url})
+print(response.json())
+```
+
+or PHP:
+
+```php
+<?php
+$ch = curl_init("https://l1nk.zip/url");
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["url" => "https://www.google.com"]));
+curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+curl_close($ch);
+echo $response;
+```
+
+
+It's all about options.
+
 ### Official L1nkZip CLI
 
 For a dedicated command-line experience, L1nkZip has an official CLI client available at [l1nkzip-cli](https://github.com/dorogoy/l1nkzip-cli). The CLI provides a modern, rich-powered interface with beautiful output formatting.
@@ -74,32 +102,6 @@ Update PhishTank database (admin only):
 - Defaults to `https://l1nk.zip` if not specified
 
 The CLI uses [rich](https://github.com/Textualize/rich) for beautiful output and [uv](https://github.com/astral-sh/uv) for dependency management.
-
-Of course, you can also use your preferred programming language. Here is an example in Python:
-
-```python
-import httpx
-
-url = "https://www.google.com"
-header = {"Content-Type": "application/json"}
-response = httpx.post("https://l1nk.zip/url", header=header, json={"url": url})
-print(response.json())
-```
-
-or PHP:
-
-```php
-<?php
-$ch = curl_init("https://l1nk.zip/url");
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["url" => "https://www.google.com"]));
-curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-curl_close($ch);
-echo $response;
-```
-
-It's all about options.
 
 [FastApi]: https://fastapi.tiangolo.com
 [PonyORM]: https://ponyorm.org
