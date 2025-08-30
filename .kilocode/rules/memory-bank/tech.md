@@ -8,6 +8,7 @@
 - **SQLite**: Default database (file-based, in-memory options)
 - **Litestream**: Database replication for SQLite to S3-compatible storage
 - **Redis 5.0.1**: Optional caching layer for improved performance
+- **Prometheus Client 0.21.0**: Metrics collection and exposure for monitoring
 - **HTTpx 0.28.1**: Async HTTP client for PhishTank integration
 - **Jinja2 3.1.6**: Templating engine for error pages
 - **Ruff 0.12.7**: Fast Python linter and formatter
@@ -39,6 +40,7 @@ Core runtime dependencies:
 - httpx
 - jinja2
 - pony
+- prometheus-client
 - pydantic-settings
 - redis
 - slowapi
@@ -100,5 +102,8 @@ Configuration is managed through environment variables with sensible defaults:
 - `PHISHTANK`: PhishTank integration (false, anonymous, or API key)
 - `REDIS_SERVER`: Full Redis URL for caching (optional, e.g., redis://localhost:6379/0)
 - `REDIS_TTL`: Cache TTL in seconds (optional, default: 86400 = 24 hours)
-- `RATE_LIMIT_CREATE`: Rate limit for URL creation (default: "5/minute")
-- `RATE_LIMIT_REDIRECT`: Rate limit for URL redirection (default: "60/minute")
+- `RATE_LIMIT_CREATE`: Rate limit for URL creation (default: "10/minute")
+- `RATE_LIMIT_REDIRECT`: Rate limit for URL redirection (default: "120/minute")
+- `METRICS_ENABLED`: Enable Prometheus metrics endpoint (default: false)
+- `LOG_LEVEL`: Logging level (default: "INFO", options: "DEBUG", "INFO", "WARN", "ERROR")
+- `LOG_FORMAT`: Log format (default: "text", options: "text", "json")

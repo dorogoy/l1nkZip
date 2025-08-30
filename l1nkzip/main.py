@@ -12,6 +12,7 @@ from slowapi.util import get_remote_address
 
 from l1nkzip.cache import cache
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
+from l1nkzip.metrics import metrics, record_request_end, record_request_start
 from l1nkzip.models import (
     GenericInfo,
     LinkInfo,
@@ -203,12 +204,24 @@ async def health_check():
         )
 
 
+@app.get("/metrics", tags=["system"], include_in_schema=False)
+def metrics_endpoint():
+    """Prometheus metrics endpoint"""
+    if not settings.metrics_enabled:
+        raise HTTPException(status_code=404, detail="Metrics not enabled")
+
+    from l1nkzip.metrics import get_metrics_response
+
+    response = get_metrics_response()
+    return responses.Response(content=response, media_type="text/plain; charset=utf-8")
+
+
 @app.get("/404", response_class=responses.HTMLResponse, include_in_schema=False)
 async def not_found(request: Request):
     return templates.TemplateResponse(
+        request,
         "404.html",
         {
-            "request": request,
             "homepage": settings.site_url,
             "api_name": settings.api_name,
         },
@@ -276,73 +289,106 @@ def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
 @limiter.limit(settings.rate_limit_redirect)
 async def get_url(request: Request, link: str) -> responses.RedirectResponse:
     """Redirect to the full URL. If the URL is a phishing URL, it will be redirected to the PhishTank page."""
-    redirect: responses.RedirectResponse
-    phish: Optional[PhishTank] = None
+    start_time = (
+        record_request_start("GET", "/{link}") if settings.metrics_enabled else None
+    )
 
-    # Validate short link format
-    validate_short_link(link)
+    try:
+        redirect: responses.RedirectResponse
+        phish: Optional[PhishTank] = None
 
-    # Check cache first if enabled
-    cached_url = None
-    if cache.is_enabled():
-        try:
-            cached_url = await cache.get(f"redirect:{link}")
-        except Exception as e:
-            print(f"Cache error in get_url: {e}")
+        # Validate short link format
+        validate_short_link(link)
 
-    if cached_url:
-        # Cache hit - redirect immediately and update visit count asynchronously
-        try:
-            # Start async visit count update (fire and forget)
-            import asyncio
-
-            asyncio.create_task(increment_visit_async(link))
-        except Exception as e:
-            print(f"Async visit count error: {e}")
-
-        # Check for phishing in cached URL
-        if settings.phishtank:
-            phish = retry_phishtank_check(cached_url)
-
-        if phish:
-            redirect = responses.RedirectResponse(
-                phish.phish_detail_url or "https://phishtank.org/",
-                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            )
-        else:
-            redirect = responses.RedirectResponse(
-                cached_url, status_code=status.HTTP_301_MOVED_PERMANENTLY
-            )
-    else:
-        # Cache miss - use database
-        try:
-            link_data = set_visit(link)
-        except Exception as e:
-            print(f"Database error in get_url: {e}")
-            return responses.RedirectResponse("/404")
-
-        if settings.phishtank and link_data:
-            phish = retry_phishtank_check(link_data.url)
-
-        if phish:
-            redirect = responses.RedirectResponse(
-                phish.phish_detail_url or "https://phishtank.org/",
-                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            )
-        elif link_data:
-            # Cache the successful lookup
+        # Check cache first if enabled
+        cached_url = None
+        if cache.is_enabled():
             try:
-                await cache.set(f"redirect:{link}", link_data.url)
+                cached_url = await cache.get(f"redirect:{link}")
+                if settings.metrics_enabled and cached_url:
+                    metrics.record_cache_operation("get", hit=True)
+                elif settings.metrics_enabled:
+                    metrics.record_cache_operation("get", hit=False)
             except Exception as e:
-                print(f"Cache set error: {e}")
+                print(f"Cache error in get_url: {e}")
+                if settings.metrics_enabled:
+                    metrics.record_cache_operation("get", success=False)
 
-            redirect = responses.RedirectResponse(
-                link_data.url, status_code=status.HTTP_301_MOVED_PERMANENTLY
-            )
+        if cached_url:
+            # Cache hit - redirect immediately and update visit count asynchronously
+            try:
+                # Start async visit count update (fire and forget)
+                import asyncio
+
+                asyncio.create_task(increment_visit_async(link))
+            except Exception as e:
+                print(f"Async visit count error: {e}")
+
+            # Check for phishing in cached URL
+            if settings.phishtank:
+                phish = retry_phishtank_check(cached_url)
+
+            if phish:
+                if settings.metrics_enabled:
+                    metrics.record_phishing_block()
+                record_request_end("GET", "/{link}", 307, "get_url", start_time)
+                redirect = responses.RedirectResponse(
+                    phish.phish_detail_url or "https://phishtank.org/",
+                    status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+                )
+            else:
+                if settings.metrics_enabled:
+                    metrics.record_redirect()
+                record_request_end("GET", "/{link}", 301, "get_url", start_time)
+                redirect = responses.RedirectResponse(
+                    cached_url, status_code=status.HTTP_301_MOVED_PERMANENTLY
+                )
         else:
-            redirect = responses.RedirectResponse("/404")
+            # Cache miss - use database
+            try:
+                link_data = set_visit(link)
+            except Exception as e:
+                print(f"Database error in get_url: {e}")
+                record_request_end("GET", "/{link}", 404, "get_url", start_time)
+                return responses.RedirectResponse("/404")
 
-    return redirect
+            if settings.phishtank and link_data:
+                phish = retry_phishtank_check(link_data.url)
+
+            if phish:
+                if settings.metrics_enabled:
+                    metrics.record_phishing_block()
+                record_request_end("GET", "/{link}", 307, "get_url", start_time)
+                redirect = responses.RedirectResponse(
+                    phish.phish_detail_url or "https://phishtank.org/",
+                    status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+                )
+            elif link_data:
+                # Cache the successful lookup
+                try:
+                    await cache.set(f"redirect:{link}", link_data.url)
+                    if settings.metrics_enabled:
+                        metrics.record_cache_operation("set", success=True)
+                except Exception as e:
+                    print(f"Cache set error: {e}")
+                    if settings.metrics_enabled:
+                        metrics.record_cache_operation("set", success=False)
+
+                if settings.metrics_enabled:
+                    metrics.record_redirect()
+                record_request_end("GET", "/{link}", 301, "get_url", start_time)
+                redirect = responses.RedirectResponse(
+                    link_data.url, status_code=status.HTTP_301_MOVED_PERMANENTLY
+                )
+            else:
+                record_request_end("GET", "/{link}", 404, "get_url", start_time)
+                redirect = responses.RedirectResponse("/404")
+
+        return redirect
+    except Exception as e:
+        print(f"Unexpected error in get_url: {e}")
+        record_request_end("GET", "/{link}", 500, "get_url", start_time)
+        return responses.RedirectResponse("/404")
 
 
 @app.post("/url", tags=["urls"])
@@ -352,29 +398,43 @@ def create_url(request: Request, url: Url) -> LinkInfo:
     If the URL is a phishing URL, it will be rejected.
     If the URL is already in the database, the information about it will be returned.
     """
-    # Validate the URL
-    validated_url = validate_url(str(url.url))
-
-    # Check for phishing
-    phish = retry_phishtank_check(validated_url) if settings.phishtank else None
-    if phish:
-        raise HTTPException(
-            status_code=403,
-            detail=f"Phishing URLs are Forbidden. More details about the URL: {phish.phish_detail_url or 'https://phishtank.org/'}",
-        )
+    start_time = (
+        record_request_start("POST", "/url") if settings.metrics_enabled else None
+    )
 
     try:
+        # Validate the URL
+        validated_url = validate_url(str(url.url))
+
+        # Check for phishing
+        phish = retry_phishtank_check(validated_url) if settings.phishtank else None
+        if phish:
+            if settings.metrics_enabled:
+                metrics.record_phishing_block()
+            record_request_end("POST", "/url", 403, "create_url", start_time)
+            raise HTTPException(
+                status_code=403,
+                detail=f"Phishing URLs are Forbidden. More details about the URL: {phish.phish_detail_url or 'https://phishtank.org/'}",
+            )
+
         link_data = insert_link(validated_url)
         from pydantic import HttpUrl
 
+        if settings.metrics_enabled:
+            metrics.record_url_created()
+
+        record_request_end("POST", "/url", 201, "create_url", start_time)
         return LinkInfo(
             link=link_data.link or "",
             full_link=HttpUrl(link_data.full_link),
             url=HttpUrl(link_data.url),
             visits=link_data.visits,
         )
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Database error in create_url: {e}")
+        record_request_end("POST", "/url", 500, "create_url", start_time)
         raise HTTPException(
             status_code=500, detail="Internal server error while creating URL"
         )

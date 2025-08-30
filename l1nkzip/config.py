@@ -26,6 +26,10 @@ class Settings(BaseSettings):
         None  # Full Redis URL (e.g., redis://localhost:6379/0)
     )
     redis_ttl: int = 86400  # Default TTL for cached URLs (24 hours in seconds)
+    # Monitoring configuration
+    metrics_enabled: bool = False  # Enable Prometheus metrics endpoint
+    log_level: str = "INFO"  # Logging level: DEBUG, INFO, WARN, ERROR
+    log_format: str = "text"  # Log format: text or json
 
 
 settings = Settings()

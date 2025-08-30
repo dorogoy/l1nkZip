@@ -40,6 +40,13 @@ For more information check the [PonyORM documentation](https://docs.ponyorm.org/
 * `DB_DSN`: Database DSN. Used for Oracle.
 * `SITE_URL`: URL of the website. Used when the API is visited from a browser.
 * `PHISHTANK`: Enable protection against phishing. Default: false. The values can also be "anonymous" or your actual [PhishTank key][PhishTank developer info]. More details below.
+* `REDIS_SERVER`: Redis server URL for caching (e.g., redis://localhost:6379/0). Optional.
+* `REDIS_TTL`: Time-to-live for cached URLs in seconds. Default: 86400 (24 hours).
+* `RATE_LIMIT_CREATE`: Rate limit for URL creation. Default: "10/minute".
+* `RATE_LIMIT_REDIRECT`: Rate limit for URL redirection. Default: "120/minute".
+* `METRICS_ENABLED`: Enable Prometheus metrics endpoint. Default: false.
+* `LOG_LEVEL`: Logging level. Default: "INFO". Options: "DEBUG", "INFO", "WARN", "ERROR".
+* `LOG_FORMAT`: Log format. Default: "text". Set to "json" for structured logging.
 
 ## Phishtank support
 
@@ -224,6 +231,64 @@ spec:
           requests:
             storage: 1Gi
 ```
+
+## Monitoring and Observability
+
+L1nkZip supports comprehensive monitoring through Prometheus metrics and structured logging.
+
+### Metrics Endpoint
+
+When `METRICS_ENABLED=true` is set, L1nkZip exposes a Prometheus metrics endpoint at `/metrics`. This includes:
+
+- HTTP request metrics (count, latency, error rates)
+- Cache performance metrics (hit/miss rates)
+- Business metrics (URLs created, redirects, phishing blocks)
+- Database connection metrics
+
+### Structured Logging
+
+Set `LOG_FORMAT=json` to enable JSON-formatted structured logging with fields including:
+- Request tracing IDs
+- Response times
+- Error details
+- Cache operations
+- Phishing detection events
+
+### Example Monitoring Configuration
+
+```yaml
+# Add to your Kubernetes deployment env vars
+- name: METRICS_ENABLED
+  value: "true"
+- name: LOG_FORMAT
+  value: "json"
+- name: LOG_LEVEL
+  value: "INFO"
+```
+
+### Grafana Dashboards
+
+Pre-built Grafana dashboards are available for:
+- API performance monitoring
+- Cache efficiency analysis
+- Business metrics tracking
+- Error rate and latency monitoring
+
+### Alerting
+
+Configure Prometheus alert rules for:
+- High error rates (>5% for 5 minutes)
+- Service availability (container down)
+- High latency (95th percentile >1 second)
+- Low cache hit rate (<70%)
+- High phishing block rates
+
+### Health Checks
+
+The health endpoint at `/health` provides:
+- Database connectivity status
+- Service availability
+- Basic dependency checks
 
 [FastApi]: https://fastapi.tiangolo.com
 [PonyORM]: https://ponyorm.org
