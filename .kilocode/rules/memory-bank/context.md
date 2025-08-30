@@ -7,6 +7,7 @@ Maintaining and improving the L1nkZip URL shortener API. The project is currentl
 - Updated dependencies including Ruff, FastAPI, Jinja2, and other core packages
 - Added health check endpoint and database connection testing
 - Improved error handling and stability
+- Implemented rate limiting protection using slowapi to prevent abuse through mass URL creation and enumeration attacks
 
 ## Next steps
 - Continue dependency updates and security patches

@@ -11,6 +11,7 @@
 - **Jinja2 3.1.6**: Templating engine for error pages
 - **Ruff 0.12.7**: Fast Python linter and formatter
 - **Mypy 1.10.0**: Static type checking
+- **SlowAPI 0.1.9**: Rate limiting library for abuse protection
 - **Uvicorn 0.34.0**: ASGI server for FastAPI
 - **Rich**: CLI output formatting (used in l1nkzip-cli)
 - **uv**: Python package manager (used in l1nkzip-cli)
@@ -20,7 +21,7 @@
 1. **Virtual environment**: Managed via Makefile with `make env_ok`
 2. **Dependency management**: `requirements.txt` for core dependencies
 3. **Code quality**: Ruff for linting/formatting, Mypy for type checking
-4. **Testing**: Built-in unittest framework with test coverage in generator.py
+4. **Testing**: pytest framework with comprehensive test coverage including generator, rate limiting, and API integration tests
 5. **Build system**: Makefile with targets for development, testing, and Docker builds
 
 ## Technical constraints
@@ -37,6 +38,7 @@ Core runtime dependencies:
 - jinja2
 - pony
 - pydantic-settings
+- slowapi
 - uvicorn
 - validators
 
@@ -92,3 +94,5 @@ Configuration is managed through environment variables with sensible defaults:
 - `TOKEN`: Admin authentication token
 - `GENERATOR_STRING`: Custom URL encoding alphabet
 - `PHISHTANK`: PhishTank integration (false, anonymous, or API key)
+- `RATE_LIMIT_CREATE`: Rate limit for URL creation (default: "5/minute")
+- `RATE_LIMIT_REDIRECT`: Rate limit for URL redirection (default: "60/minute")

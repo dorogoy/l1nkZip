@@ -47,8 +47,6 @@ License: MIT
 Link: http://code.activestate.com/recipes/576918/
 """
 
-import unittest
-
 from l1nkzip.config import settings
 
 DEFAULT_BLOCK_SIZE = 24
@@ -135,46 +133,6 @@ def encode_url(n: int, min_length: int = MIN_LENGTH) -> str:
 
 def decode_url(n: str) -> int:
     return DEFAULT_ENCODER.decode_url(n)
-
-
-class TestGenerator(unittest.TestCase):
-    def setUp(self):
-        self.encoder = UrlEncoder(
-            alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq", block_size=DEFAULT_BLOCK_SIZE
-        )
-
-    def test_encode_url(self):
-        # The result must be always the same
-        self.assertEqual(self.encoder.encode_url(23, MIN_LENGTH), "5wppq")
-
-    def test_decode_url(self):
-        # Can be decoded returning the original integer
-        self.assertEqual(self.encoder.decode_url("5wppq"), 23)
-
-    def test_encode_decode(self):
-        for i in range(100):
-            encoded = encode_url(i)
-            decoded = decode_url(encoded)
-            self.assertEqual(i, decoded)
-
-    def test_min_length(self):
-        self.assertEqual(len(encode_url(1, min_length=5)), 5)
-        self.assertEqual(len(encode_url(1000, min_length=10)), 10)
-
-    def test_alphabet(self):
-        custom_alphabet = "0123456789abcdef"
-        encoder = UrlEncoder(alphabet=custom_alphabet)
-        encoded = encoder.encode_url(1234)
-        self.assertTrue(all(char in custom_alphabet for char in encoded))
-        decoded = encoder.decode_url(encoded)
-        self.assertEqual(decoded, 1234)
-
-    def test_generator_string(self):
-        encoder2 = UrlEncoder(
-            alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fqABCD",
-            block_size=DEFAULT_BLOCK_SIZE,
-        )
-        self.assertNotEqual(encoder2.encode_url(23, MIN_LENGTH), "5wppq")
 
 
 if __name__ == "__main__":

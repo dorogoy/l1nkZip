@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     token: str = "__change_me__"
     # Change this to your own random generator string
     generator_string: str = "mn6j2c4rv8bpygw95z7hsdaetxuk3fq"
+    # Rate limiting settings
+    rate_limit_create: str = "5/minute"  # Rate limit for URL creation
+    rate_limit_redirect: str = "60/minute"  # Rate limit for URL redirection
 
 
 settings = Settings()

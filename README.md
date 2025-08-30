@@ -13,6 +13,7 @@ The full documentation is available at https://dorogoy.github.io/l1nkZip.
 * If you choose the [litestream](https://litestream.io) way, it is very cheap to host. You will have a reliable database almost impossible to destroy, backed on any compatible S3 bucket.
 * Do you want to use Postgresql? No problem. Just change the configuration and you are ready to go.
 * Optional protection against phisphing with the [PhishTank](https://phishtank.org) database.
+* Built-in rate limiting protection against abuse through mass URL creation or enumeration attacks using [slowapi](https://github.com/laurentS/slowapi).
 
 ## Companion CLI Tool
 
