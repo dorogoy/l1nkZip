@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/dorogoy/l1nkZip/compare/v0.5.0...v0.5.1) (2025-08-31)
+
+
+### Bug Fixes
+
+* Replaces mypy with ty for type checking ([c0740f0](https://github.com/dorogoy/l1nkZip/commit/c0740f08d8483ddc030d44b95641ad03e498381e))
+
 # [0.5.0](https://github.com/dorogoy/l1nkZip/compare/v0.4.5...v0.5.0) (2025-08-31)
 
 
