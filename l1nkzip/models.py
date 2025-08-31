@@ -73,14 +73,18 @@ def insert_link(url) -> Link:
         link_data.flush()
         link_data.link = build_link(link_data.id)  # type: ignore
         return link_data
-    except Exception:
+    except Exception as orig_exc:
         # If insertion failed (likely due to race condition), try to get existing URL again
         db.rollback()  # type: ignore
-        existing = Link.get(url=url)
-        if existing:
-            return existing
+        try:
+            existing = Link.get(url=url)
+            if existing:
+                return existing
+        except Exception:
+            # If Link.get fails, re-raise the original exception
+            raise orig_exc
         # If still not found, re-raise the original exception
-        raise
+        raise orig_exc
 
 
 @db_session
