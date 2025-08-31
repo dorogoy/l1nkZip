@@ -1,3 +1,22 @@
+# [0.5.0](https://github.com/dorogoy/l1nkZip/compare/v0.4.5...v0.5.0) (2025-08-31)
+
+
+### Bug Fixes
+
+* **api:** async phishing checks ([b321bb4](https://github.com/dorogoy/l1nkZip/commit/b321bb436b9e1bfa13cd235615573214b314e5cb))
+* **db:** handle race condition in insert_link ([e15e872](https://github.com/dorogoy/l1nkZip/commit/e15e8722939bb63d159f5eaa1a349c780ecf5b91))
+* **deps:** update Python version to 3.12 and migrate to uv package manager ([4069798](https://github.com/dorogoy/l1nkZip/commit/4069798f75f5f6fe607ca68ebf5c84e67a2fb3cb))
+* Improves error handling and code clarity ([401164a](https://github.com/dorogoy/l1nkZip/commit/401164aa0c6437a33d75be47d933fc636537ffa5))
+* **phishtank:** add PhishTank integration ([8d8d9de](https://github.com/dorogoy/l1nkZip/commit/8d8d9de8a0f24fd29baf34b38481157fbd6cc228))
+
+
+### Features
+
+* **api:** add comprehensive URL and admin token validation ([25d9589](https://github.com/dorogoy/l1nkZip/commit/25d9589f9d11ec751ef2894f1afae25f68c2307e))
+* **api:** add Prometheus-based monitoring for L1nkZip ([97e8d32](https://github.com/dorogoy/l1nkZip/commit/97e8d32fda44ce87e68f07a5b4c113f2fbca21f9))
+* **cache:** add Redis-based redirect caching ([9b4616c](https://github.com/dorogoy/l1nkZip/commit/9b4616c44374ac91994892d17e53f2ae0179d63e))
+* **config:** add rate limiting configuration ([8589365](https://github.com/dorogoy/l1nkZip/commit/858936546f92a596d26af71f1f9e4beab457e133))
+
 ## [0.4.5](https://github.com/dorogoy/l1nkZip/compare/v0.4.4...v0.4.5) (2025-08-30)
 
 
