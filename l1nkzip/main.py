@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 import validators
 from fastapi import FastAPI, HTTPException, Request, responses, status
 from fastapi.templating import Jinja2Templates
+from pydantic import HttpUrl
 from slowapi.extension import Limiter
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
@@ -371,8 +372,11 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                 logger.error(
                     "Database error in get_url", extra={"error": str(e), "link": link}
                 )
-                record_request_end("GET", "/{link}", 404, "get_url", start_time)
-                return responses.RedirectResponse("/404")
+                record_request_end("GET", "/{link}", 500, "get_url", start_time)
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Internal server error: database failure",
+                )
 
             if settings.phishtank and link_data:
                 phish = await retry_phishtank_check(str(link_data.url))
@@ -471,7 +475,6 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
     # Insert link
     try:
         link_data = insert_link(validated_url)
-        from pydantic import HttpUrl
 
         if settings.metrics_enabled:
             metrics.record_url_created()

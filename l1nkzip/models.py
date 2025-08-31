@@ -80,11 +80,11 @@ def insert_link(url) -> Link:
             existing = Link.get(url=url)
             if existing:
                 return existing
+            else:
+                raise orig_exc
         except Exception:
             # If Link.get fails, re-raise the original exception
             raise orig_exc
-        # If still not found, re-raise the original exception
-        raise orig_exc
 
 
 @db_session
