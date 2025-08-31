@@ -17,7 +17,44 @@ check:
 
 .PHONY: test
 test: check
-	uv run -- python -m pytest tests/ -v
+	${MAKE} test-unit
+	${MAKE} test-api
+	${MAKE} test-integration
+
+.PHONY: test-unit
+test-unit: check
+	uv run -- python -m pytest tests/unit/ -v
+
+.PHONY: test-api
+test-api: check
+	uv run -- python -m pytest tests/api/ -v
+
+.PHONY: test-integration
+test-integration: check
+	uv run -- python -m pytest tests/integration/ -v
+
+.PHONY: test-cov
+test-cov: check
+	uv run -- coverage erase
+	uv run -- python -m pytest tests/unit/ --cov=l1nkzip --cov-append --no-cov-on-fail -v
+	uv run -- python -m pytest tests/api/ --cov=l1nkzip --cov-append --no-cov-on-fail -v
+	uv run -- python -m pytest tests/integration/ --cov=l1nkzip --cov-append --no-cov-on-fail -v
+	uv run -- coverage html
+	uv run -- coverage report --show-missing
+
+.PHONY: test-cov-xml
+test-cov-xml: check
+	uv run -- coverage erase
+	uv run -- python -m pytest tests/unit/ --cov=l1nkzip --cov-append --no-cov-on-fail -v
+	uv run -- python -m pytest tests/api/ --cov=l1nkzip --cov-append --no-cov-on-fail -v
+	uv run -- python -m pytest tests/integration/ --cov=l1nkzip --cov-append --no-cov-on-fail -v
+	uv run -- coverage xml
+	uv run -- coverage report --show-missing
+
+.PHONY: coverage-html
+coverage-html: test-cov
+	@echo "Coverage report generated in htmlcov/index.html"
+	@echo "Open htmlcov/index.html in your browser to view the report"
 
 .PHONY: run_dev
 run_dev:

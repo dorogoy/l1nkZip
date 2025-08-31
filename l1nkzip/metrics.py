@@ -170,7 +170,7 @@ class MetricsCollector:
 
     def is_enabled(self) -> bool:
         """Check if metrics collection is enabled."""
-        return settings.metrics_enabled
+        return getattr(settings, "metrics_enabled", False)
 
 
 # Global metrics instance

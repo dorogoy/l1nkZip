@@ -18,6 +18,11 @@ class Cache:
     def __init__(self):
         """Initialize Redis client if REDIS_SERVER is configured."""
         self.client: Optional[redis.Redis] = None
+        self._initialize_client()
+
+    def _initialize_client(self):
+        """Initialize or reinitialize Redis client."""
+        self.client = None
         if settings.redis_server:
             try:
                 self.client = redis.from_url(settings.redis_server)
