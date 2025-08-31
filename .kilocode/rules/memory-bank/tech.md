@@ -75,6 +75,8 @@ Optional database drivers:
 
 - **Docker deployment**: Single-stage build with Python 3.12 and uv
 
+- **Python execution**: All direct Python execution must use `uv` with the prefix command `uv run --`
+
 ## CLI tool usage
 The official L1nkZip CLI provides:
 - `shorten <url>`: Shorten URLs from command line

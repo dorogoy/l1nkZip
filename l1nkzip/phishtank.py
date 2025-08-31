@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Any, Dict, List, Optional
 
 import httpx
 from fastapi import HTTPException
@@ -7,33 +8,58 @@ from l1nkzip.config import settings
 from l1nkzip.models import PhishTank, Url, db_session, utcnow_zone_aware
 
 
-async def update_phishtanks():
-    phishtank_url = "http://data.phishtank.com/data"
+def build_phishtank_url() -> str:
+    """Build PhishTank API URL based on configuration"""
+    base_url = "http://data.phishtank.com/data"
     if isinstance(settings.phishtank, str) and settings.phishtank != "anonymous":
-        phishtank_url = f"{phishtank_url}/{settings.phishtank}"
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{phishtank_url}/online-valid.json",
-            headers={
-                "User-Agent": f"phishtank/{settings.api_name}",
-                "accept-encoding": "gzip",
-            },
-            follow_redirects=True,
-        )
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=response.text)
+        return f"{base_url}/{settings.phishtank}/online-valid.json"
+    return f"{base_url}/online-valid.json"
+
+
+async def fetch_phishtank_data(
+    client: httpx.AsyncClient, url: str
+) -> List[Dict[str, Any]]:
+    """Fetch PhishTank data from API"""
+    response = await client.get(
+        url,
+        headers={
+            "User-Agent": f"phishtank/{settings.api_name}",
+            "accept-encoding": "gzip",
+        },
+        follow_redirects=True,
+    )
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+    return response.json()
+
+
+@db_session
+def process_phishtank_items(items: List[Dict[str, Any]]) -> None:
+    """Process and store PhishTank items in database"""
+    for item in items:
+        phishtank = PhishTank.get(id=item["phish_id"])
+        if phishtank:
+            phishtank.updated_at = utcnow_zone_aware()
         else:
-            with db_session:
-                for item in response.json():
-                    phishtank = PhishTank.get(id=item["phish_id"])
-                    if phishtank:
-                        phishtank.updated_at = utcnow_zone_aware()
-                    else:
-                        PhishTank(
-                            id=item["phish_id"],
-                            url=item["url"],
-                            phish_detail_url=item["phish_detail_url"],
-                        )
+            PhishTank(
+                id=item["phish_id"],
+                url=item["url"],
+                phish_detail_url=item["phish_detail_url"],
+            )
+
+
+async def update_phishtanks(client: Optional[httpx.AsyncClient] = None) -> None:
+    """Update PhishTank database from online source"""
+    url = build_phishtank_url()
+
+    # Use provided client or create new one
+    if client is None:
+        async with httpx.AsyncClient() as new_client:
+            items = await fetch_phishtank_data(new_client, url)
+            process_phishtank_items(items)
+    else:
+        items = await fetch_phishtank_data(client, url)
+        process_phishtank_items(items)
 
 
 @db_session
