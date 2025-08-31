@@ -3,17 +3,14 @@ py_files = $(wildcard l1nkzip/*.py)
 
 .PHONY: fmt
 fmt:
-	uv run -- ruff check --fix $(py_dirs)
-	uv run -- ruff format $(py_dirs)
+	uv run ruff format .
+	uv run ruff check --fix .
 
 .PHONY: check
 check:
-	uv run -- python -m mypy \
-		--check-untyped-defs \
-		--ignore-missing-imports \
-		$(py_dirs)
-	uv run -- ruff check $(py_dirs)
-	uv run -- ruff format --check $(py_dirs)
+	uv run ruff check .
+	uv run ruff format --check .
+	uv run ty check
 
 .PHONY: test
 test: check
@@ -22,15 +19,15 @@ test: check
 	${MAKE} test-integration
 
 .PHONY: test-unit
-test-unit: check
+test-unit:
 	uv run -- python -m pytest tests/unit/ -v
 
 .PHONY: test-api
-test-api: check
+test-api:
 	uv run -- python -m pytest tests/api/ -v
 
 .PHONY: test-integration
-test-integration: check
+test-integration:
 	uv run -- python -m pytest tests/integration/ -v
 
 .PHONY: test-cov
@@ -69,3 +66,6 @@ push/%: build
 	docker push dorogoy/l1nkzip:$(notdir $@)
 	docker push dorogoy/l1nkzip:latest
 
+.PHONY: clean
+clean:
+	rm -rf .venv

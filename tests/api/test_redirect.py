@@ -67,7 +67,7 @@ class TestRedirectEndpoint:
         short_link = create_data["link"]
 
         # Multiple redirects
-        for i in range(3):
+        for _i in range(3):
             response = test_client.get(f"/{short_link}", follow_redirects=False)
             assert response.status_code == 301
             assert response.headers["location"] == "https://example.com/"
@@ -138,7 +138,7 @@ class TestRedirectEndpoint:
         short_link = create_data["link"]
 
         # Multiple redirects should work with test rate limits
-        for i in range(5):
+        for _i in range(5):
             response = test_client.get(f"/{short_link}", follow_redirects=False)
             assert response.status_code == 301
 
@@ -178,9 +178,7 @@ class TestRedirectEndpoint:
             short_link = create_data["link"]
 
             # Redirect
-            redirect_response = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response.status_code == 301
             # URLs with spaces and special characters may be URL-encoded in the response
             import urllib.parse

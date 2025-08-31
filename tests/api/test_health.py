@@ -47,7 +47,7 @@ class TestHealthEndpoint:
 
     def test_health_endpoint_not_rate_limited(self, test_client):
         """Test that health endpoint is not rate limited."""
-        for i in range(20):  # Make many requests
+        for _i in range(20):  # Make many requests
             response = test_client.get("/health")
             assert response.status_code == 200
 
@@ -90,8 +90,7 @@ class TestHealthEndpoint:
 
         # Should not include cache headers for health endpoint
         assert (
-            "cache-control" not in response.headers
-            or "no-cache" in response.headers.get("cache-control", "").lower()
+            "cache-control" not in response.headers or "no-cache" in response.headers.get("cache-control", "").lower()
         )
 
     def test_health_endpoint_performance(self, test_client):
@@ -145,9 +144,7 @@ class TestHealthEndpoint:
 
         # All requests should succeed
         assert len(errors) == 0, f"Errors occurred: {errors}"
-        assert all(status == 200 for status in results), (
-            f"Not all requests succeeded: {results}"
-        )
+        assert all(status == 200 for status in results), f"Not all requests succeeded: {results}"
 
     def test_health_endpoint_with_query_parameters(self, test_client):
         """Test health endpoint with query parameters."""
@@ -174,9 +171,7 @@ class TestHealthEndpoint:
         assert response.status_code == 200
         assert response.json() == "OK"
 
-    def test_health_endpoint_response_time_metrics(
-        self, test_client, metrics_collector
-    ):
+    def test_health_endpoint_response_time_metrics(self, test_client, metrics_collector):
         """Test that health endpoint response time is recorded in metrics."""
         response = test_client.get("/health")
         assert response.status_code == 200
@@ -184,13 +179,7 @@ class TestHealthEndpoint:
         # Health endpoint doesn't record response time metrics by design
         # This test verifies that the health endpoint works without metrics overhead
         duration_samples = metrics_collector.http_request_duration_seconds._samples()
-        health_duration_samples = [
-            sample
-            for sample in duration_samples
-            if sample[1].get("endpoint") == "health_check"
-        ]
+        health_duration_samples = [sample for sample in duration_samples if sample[1].get("endpoint") == "health_check"]
 
         # Health check should not have duration metrics since it doesn't use record_request_start/end
-        assert len(health_duration_samples) == 0, (
-            "Health check duration metrics should not be recorded by design"
-        )
+        assert len(health_duration_samples) == 0, "Health check duration metrics should not be recorded by design"

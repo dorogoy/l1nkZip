@@ -1,8 +1,8 @@
 from datetime import timedelta
 from typing import Any, Dict, List, Optional
 
-import httpx
 from fastapi import HTTPException
+import httpx
 
 from l1nkzip.config import settings
 from l1nkzip.models import PhishTank, Url, db_session, utcnow_zone_aware
@@ -16,9 +16,7 @@ def build_phishtank_url() -> str:
     return f"{base_url}/online-valid.json"
 
 
-async def fetch_phishtank_data(
-    client: httpx.AsyncClient, url: str
-) -> List[Dict[str, Any]]:
+async def fetch_phishtank_data(client: httpx.AsyncClient, url: str) -> List[Dict[str, Any]]:
     """Fetch PhishTank data from API"""
     response = await client.get(
         url,
@@ -71,9 +69,7 @@ def get_phish(url_info: Url) -> PhishTank | None:
 
 @db_session
 def delete_old_phishes(days: int) -> int:
-    phishes = PhishTank.select(
-        lambda p: p.updated_at < utcnow_zone_aware() - timedelta(days=days)
-    )
+    phishes = PhishTank.select(lambda p: p.updated_at < utcnow_zone_aware() - timedelta(days=days))
     delete_count = phishes.count()
     phishes.delete(bulk=True)
     return delete_count

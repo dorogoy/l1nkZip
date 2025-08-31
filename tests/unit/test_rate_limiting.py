@@ -1,5 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 
 @pytest.fixture
@@ -33,7 +33,7 @@ class TestRateLimiting:
         url_data = {"url": "https://example.com"}
 
         # With high rate limits for testing, multiple requests should succeed
-        for i in range(10):
+        for _i in range(10):
             response = client.post("/url", json=url_data)
             assert response.status_code == 200
 

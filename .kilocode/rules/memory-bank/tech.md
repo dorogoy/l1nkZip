@@ -13,7 +13,7 @@
 - **Jinja2 3.1.6**: Templating engine for error pages
 - **Python logging**: Structured logging framework with JSON/text formatters and configurable levels
 - **Ruff 0.12.7**: Fast Python linter and formatter
-- **Mypy 1.10.0**: Static type checking
+- **ty >=0.0.1a19**: Static type checking (replaced mypy)
 - **SlowAPI 0.1.9**: Rate limiting library for abuse protection
 - **Uvicorn 0.35.0**: ASGI server for FastAPI
 - **pytest-asyncio 0.25.1**: Async testing support for pytest
@@ -24,7 +24,7 @@
 ## Development setup
 1. **Virtual environment**: Managed via Makefile with `make env_ok`
 2. **Dependency management**: `uv` for core dependencies (replaced pip)
-3. **Code quality**: Ruff for linting/formatting, Mypy for type checking
+3. **Code quality**: Ruff for linting/formatting, ty for type checking (replaced mypy)
 4. **Testing**: pytest framework with comprehensive test coverage including generator, rate limiting, and API integration tests
 5. **Build system**: Makefile with targets for development, testing, and Docker builds (using uv)
 

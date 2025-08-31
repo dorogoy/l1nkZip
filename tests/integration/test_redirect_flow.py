@@ -22,12 +22,8 @@ class TestRedirectFlow:
         redirects_metrics = list(metrics_collector.redirects_total.collect())
         requests_metrics = list(metrics_collector.http_requests_total.collect())
 
-        initial_redirects = (
-            redirects_metrics[0].samples[0].value if redirects_metrics else 0
-        )
-        initial_requests = (
-            requests_metrics[0].samples[0].value if requests_metrics else 0
-        )
+        initial_redirects = redirects_metrics[0].samples[0].value if redirects_metrics else 0
+        initial_requests = requests_metrics[0].samples[0].value if requests_metrics else 0
 
         # Redirect
         redirect_response = test_client.get(f"/{short_link}")
@@ -56,9 +52,7 @@ class TestRedirectFlow:
             final_requests = requests_metrics[0].samples[0].value
             assert final_requests >= initial_requests
 
-    def test_redirect_flow_with_caching(
-        self, test_client, mock_redis, metrics_collector
-    ):
+    def test_redirect_flow_with_caching(self, test_client, mock_redis, metrics_collector):
         """Test redirect flow with Redis caching."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
             # Clear modules to ensure settings are reloaded
@@ -81,9 +75,7 @@ class TestRedirectFlow:
             cache.client = mock_redis
 
             # Create a URL first
-            create_response = redis_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = redis_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
@@ -184,9 +176,7 @@ class TestRedirectFlow:
         # Record initial metrics - check if metrics exist first
         requests_metrics = list(metrics_collector.http_requests_total.collect())
         initial_requests = (
-            requests_metrics[0].samples[0].value
-            if requests_metrics and requests_metrics[0].samples
-            else 0
+            requests_metrics[0].samples[0].value if requests_metrics and requests_metrics[0].samples else 0
         )
 
         # Try to redirect non-existent link
@@ -211,7 +201,7 @@ class TestRedirectFlow:
         short_link = create_data["link"]
 
         # Multiple redirects quickly
-        for i in range(10):
+        for _i in range(10):
             response = test_client.get(f"/{short_link}")
             # Check if we get a successful redirect (301) or a redirect to 404 page
             if response.status_code == 301:
@@ -248,7 +238,7 @@ class TestRedirectFlow:
 
         # Make concurrent requests
         threads = []
-        for i in range(5):  # Reduced from 10 to minimize database locking issues
+        for _i in range(5):  # Reduced from 10 to minimize database locking issues
             thread = threading.Thread(target=make_redirect)
             threads.append(thread)
             thread.start()
@@ -297,8 +287,6 @@ class TestRedirectFlow:
         # Create a URL
         create_response = test_client.post("/url", json={"url": "https://example.com"})
         assert create_response.status_code == 200
-        create_data = create_response.json()
-        short_link = create_data["link"]
 
         # Check that database operations were recorded
         db_ops = list(metrics_collector.db_query_duration_seconds.collect())
@@ -343,9 +331,7 @@ class TestRedirectFlow:
                 if redirect_response.status_code in [302, 307]:
                     assert "/404" in redirect_response.headers["location"]
 
-    def test_redirect_flow_cache_eviction(
-        self, test_client, mock_redis, metrics_collector
-    ):
+    def test_redirect_flow_cache_eviction(self, test_client, mock_redis, metrics_collector):
         """Test redirect flow with cache eviction scenarios."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
             # Clear modules to ensure settings are reloaded
@@ -368,9 +354,7 @@ class TestRedirectFlow:
             cache.client = mock_redis
 
             # Create a URL first
-            create_response = redis_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = redis_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
@@ -394,9 +378,7 @@ class TestRedirectFlow:
             cache_operations = list(metrics_collector.cache_operations_total.collect())
             assert len(cache_operations) > 0
 
-    def test_redirect_flow_comprehensive(
-        self, test_client, metrics_collector, mock_redis
-    ):
+    def test_redirect_flow_comprehensive(self, test_client, metrics_collector, mock_redis):
         """Test comprehensive redirect flow with all components."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
             # Clear modules to ensure settings are reloaded
@@ -419,9 +401,7 @@ class TestRedirectFlow:
             cache.client = mock_redis
 
             # Create a URL first
-            create_response = redis_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = redis_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
@@ -430,12 +410,8 @@ class TestRedirectFlow:
             redirects_metrics = list(metrics_collector.redirects_total.collect())
             requests_metrics = list(metrics_collector.http_requests_total.collect())
 
-            initial_redirects = (
-                redirects_metrics[0].samples[0].value if redirects_metrics else 0
-            )
-            initial_requests = (
-                requests_metrics[0].samples[0].value if requests_metrics else 0
-            )
+            initial_redirects = redirects_metrics[0].samples[0].value if redirects_metrics else 0
+            initial_requests = requests_metrics[0].samples[0].value if requests_metrics else 0
 
             # Redirect
             redirect_response = redis_client.get(f"/{short_link}")

@@ -5,6 +5,7 @@ Maintaining and improving the L1nkZip URL shortener API. The project is currentl
 
 ## Recent changes
 - Updated dependencies including Ruff, FastAPI, Jinja2, and other core packages
+- **Replaced mypy with ty for type checking** and updated linting configuration
 - Added health check endpoint and database connection testing
 - Improved error handling and stability
 - Implemented rate limiting protection using slowapi to prevent abuse through mass URL creation and enumeration attacks

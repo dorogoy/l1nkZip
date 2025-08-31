@@ -8,7 +8,6 @@ dependencies = [
     "fastapi==0.115.12",
     "httpx==0.28.1",
     "jinja2==3.1.6",
-    "mypy==1.17.1",
     "pony==0.7.19",
     "prometheus-client==0.21.0",
     "psycopg2-binary>=2.9.10",
@@ -19,6 +18,52 @@ dependencies = [
     "redis==5.0.1",
     "ruff==0.12.7",
     "slowapi==0.1.9",
+    "ty>=0.0.1a19",
     "uvicorn==0.35.0",
     "validators==0.34.0",
 ]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = [
+  ".git",
+  ".venv",
+  "venv",
+  ".ruff_cache",
+  ".pytest_cache",
+  "alembic/versions",  # migrations often violate style intentionally
+]
+
+[tool.ruff.lint]
+# Enable focused, widely-accepted rule sets:
+# F: pyflakes, E/W: pycodestyle, I: isort, N: naming, B: bugbear
+select = ["F", "E", "W", "I", "N", "B"]
+ignore = []
+
+# Treat warnings as issues we want to fix eventually, but keep this set stable and conservative.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.pep8-naming]
+# Allow these mixedCase names as they are column names.
+ignore-names = ["qualification_AI_tools", "qualification_AI_tools_asked"]
+
+[tool.ruff.lint.isort]
+# Import sorting configuration
+known-first-party = ["l1nkzip", "tests"]
+combine-as-imports = true
+force-sort-within-sections = true
+lines-after-imports = 2
+order-by-type = true
+case-sensitive = false
+
+[tool.ty.environment]
+python = "./.venv"
+
+[tool.ty.src]
+include = ["./l1nkzip", "./tests", "./user-guide"]
+exclude = ["./alembic"]
+
+[tool.ty.rules]
+index-out-of-bounds = "ignore"

@@ -50,6 +50,7 @@ Link: http://code.activestate.com/recipes/576918/
 from l1nkzip.config import settings
 from l1nkzip.logging import get_logger
 
+
 logger = get_logger(__name__)
 
 DEFAULT_BLOCK_SIZE = 24
@@ -57,9 +58,7 @@ MIN_LENGTH = 5
 
 
 class UrlEncoder(object):
-    def __init__(
-        self, alphabet=settings.generator_string, block_size=DEFAULT_BLOCK_SIZE
-    ):
+    def __init__(self, alphabet=settings.generator_string, block_size=DEFAULT_BLOCK_SIZE):
         self.alphabet = alphabet
         self.block_size = block_size
         self.mask = (1 << block_size) - 1

@@ -68,9 +68,7 @@ class TestCache:
 
                 result = await test_cache.set("test_key", "test_value")
                 assert result is True
-                test_cache.client.set.assert_called_once_with(
-                    "test_key", "test_value", ex=3600
-                )
+                test_cache.client.set.assert_called_once_with("test_key", "test_value", ex=3600)
 
     @pytest.mark.asyncio
     async def test_get_handles_exceptions(self):
@@ -163,6 +161,4 @@ class TestIntegrationWithFastAPI:
         # Test set operation
         result = await test_cache.set("redirect:test123", "https://example.com")
         assert result is True
-        mock_redis.set.assert_called_once_with(
-            "redirect:test123", "https://example.com", ex=86400
-        )
+        mock_redis.set.assert_called_once_with("redirect:test123", "https://example.com", ex=86400)

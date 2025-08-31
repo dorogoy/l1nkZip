@@ -126,9 +126,9 @@ class MetricsCollector:
         ).inc()
 
         if duration is not None:
-            self.http_request_duration_seconds.labels(
-                method=method, endpoint=endpoint, handler=handler
-            ).observe(duration)
+            self.http_request_duration_seconds.labels(method=method, endpoint=endpoint, handler=handler).observe(
+                duration
+            )
 
     def record_url_created(self):
         """Record URL creation."""
@@ -142,18 +142,14 @@ class MetricsCollector:
         """Record phishing URL block."""
         self.phishing_blocks_total.inc()
 
-    def record_cache_operation(
-        self, operation: str, hit: Optional[bool] = None, success: bool = True
-    ):
+    def record_cache_operation(self, operation: str, hit: Optional[bool] = None, success: bool = True):
         """Record cache operation metrics."""
         if hit is True:
             self.cache_hits_total.labels(operation=operation).inc()
         elif hit is False:
             self.cache_misses_total.labels(operation=operation).inc()
 
-        self.cache_operations_total.labels(
-            operation=operation, success=str(success).lower()
-        ).inc()
+        self.cache_operations_total.labels(operation=operation, success=str(success).lower()).inc()
 
     def record_db_operation(self, operation: str, duration: Optional[float] = None):
         """Record database operation metrics."""

@@ -113,9 +113,7 @@ class TestAdminEndpoints:
         response = test_client.get("/phishtank/update/")
         assert response.status_code == 404
 
-    @pytest.mark.skip(
-        reason="PhishTank is disabled by default and requires complex mocking"
-    )
+    @pytest.mark.skip(reason="PhishTank is disabled by default and requires complex mocking")
     def test_phishtank_update_with_mock(self, test_client, admin_token, mock_phishtank):
         """Test PhishTank update with mocked service."""
         response = test_client.get(f"/phishtank/update/{admin_token}")
@@ -127,13 +125,13 @@ class TestAdminEndpoints:
     def test_admin_endpoints_rate_limiting(self, test_client, admin_token):
         """Test that admin endpoints are not rate limited."""
         # Multiple requests to list endpoint
-        for i in range(10):
+        for _i in range(10):
             response = test_client.get(f"/list/{admin_token}")
             assert response.status_code == 200
 
         # Multiple requests to phishtank update endpoint
         # PhishTank is disabled by default, so expect 501
-        for i in range(10):
+        for _i in range(10):
             response = test_client.get(f"/phishtank/update/{admin_token}")
             assert response.status_code == 501
 
@@ -176,9 +174,7 @@ class TestAdminEndpoints:
 
         # Perform some redirects
         for _ in range(3):
-            redirect_response = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response.status_code == 301
 
         # Check info
@@ -236,9 +232,7 @@ class TestAdminEndpoints:
                 info_data = info_response.json()
                 assert info_data["url"] == url
 
-    def test_admin_endpoints_metrics_integration(
-        self, test_client, admin_token, metrics_collector
-    ):
+    def test_admin_endpoints_metrics_integration(self, test_client, admin_token, metrics_collector):
         """Test that admin endpoints metrics are recorded."""
         # List URLs
         response = test_client.get(f"/list/{admin_token}")

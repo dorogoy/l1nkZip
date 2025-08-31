@@ -16,9 +16,7 @@ from l1nkzip.generator import (
 @pytest.fixture
 def test_encoder():
     """Test encoder fixture"""
-    return UrlEncoder(
-        alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq", block_size=DEFAULT_BLOCK_SIZE
-    )
+    return UrlEncoder(alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq", block_size=DEFAULT_BLOCK_SIZE)
 
 
 def test_encode_url(test_encoder):

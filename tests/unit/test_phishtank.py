@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import HTTPException
+import pytest
 
 from l1nkzip.phishtank import (
     build_phishtank_url,
@@ -98,8 +98,10 @@ class TestFetchPhishtankData:
         with pytest.raises(HTTPException) as exc_info:
             await fetch_phishtank_data(mock_client, url)
 
-        assert exc_info.value.status_code == 404
-        assert exc_info.value.detail == "Not Found"
+        exc = exc_info.value
+        assert isinstance(exc, HTTPException)
+        assert exc.status_code == 404
+        assert exc.detail == "Not Found"
 
     @pytest.mark.asyncio
     async def test_fetch_network_error(self):
@@ -136,9 +138,7 @@ class TestProcessPhishtankItems:
         process_phishtank_items(items)
 
         # Verify PhishTank was created
-        mock_phishtank_class.assert_called_once_with(
-            id=1, url="http://phish.com", phish_detail_url="http://detail.com"
-        )
+        mock_phishtank_class.assert_called_once_with(id=1, url="http://phish.com", phish_detail_url="http://detail.com")
 
     @patch("l1nkzip.phishtank.PhishTank")
     @patch("l1nkzip.phishtank.utcnow_zone_aware")
@@ -196,9 +196,7 @@ class TestUpdatePhishtanks:
     @patch("l1nkzip.phishtank.build_phishtank_url")
     @patch("l1nkzip.phishtank.fetch_phishtank_data")
     @patch("l1nkzip.phishtank.process_phishtank_items")
-    async def test_update_with_provided_client(
-        self, mock_process, mock_fetch, mock_build_url
-    ):
+    async def test_update_with_provided_client(self, mock_process, mock_fetch, mock_build_url):
         """Test update with provided HTTP client"""
         mock_build_url.return_value = "http://test.com/data"
         mock_fetch.return_value = [{"phish_id": 1, "url": "http://test.com"}]
@@ -208,18 +206,14 @@ class TestUpdatePhishtanks:
 
         mock_build_url.assert_called_once()
         mock_fetch.assert_called_once_with(mock_client, "http://test.com/data")
-        mock_process.assert_called_once_with(
-            [{"phish_id": 1, "url": "http://test.com"}]
-        )
+        mock_process.assert_called_once_with([{"phish_id": 1, "url": "http://test.com"}])
 
     @pytest.mark.asyncio
     @patch("l1nkzip.phishtank.build_phishtank_url")
     @patch("l1nkzip.phishtank.fetch_phishtank_data")
     @patch("l1nkzip.phishtank.process_phishtank_items")
     @patch("l1nkzip.phishtank.httpx.AsyncClient")
-    async def test_update_without_client(
-        self, mock_async_client_class, mock_process, mock_fetch, mock_build_url
-    ):
+    async def test_update_without_client(self, mock_async_client_class, mock_process, mock_fetch, mock_build_url):
         """Test update without provided client (creates new one)"""
         mock_build_url.return_value = "http://test.com/data"
         mock_fetch.return_value = [{"phish_id": 1, "url": "http://test.com"}]
@@ -231,9 +225,7 @@ class TestUpdatePhishtanks:
 
         mock_build_url.assert_called_once()
         mock_fetch.assert_called_once_with(mock_client, "http://test.com/data")
-        mock_process.assert_called_once_with(
-            [{"phish_id": 1, "url": "http://test.com"}]
-        )
+        mock_process.assert_called_once_with([{"phish_id": 1, "url": "http://test.com"}])
 
 
 class TestGetPhish:

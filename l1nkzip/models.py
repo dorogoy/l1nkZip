@@ -9,6 +9,7 @@ from pydantic import BaseModel, HttpUrl
 from l1nkzip import generator
 from l1nkzip.config import settings
 
+
 db = Database()
 
 
@@ -40,14 +41,13 @@ class Link(db.Entity):  # type: ignore
     id = PrimaryKey(int, size=32, auto=True)
     link = Optional(str, index=True, unique=True)
     url = Required(str, index=True)
-    created_at = Required(
-        datetime, sql_type="TIMESTAMP WITH TIME ZONE", default=utcnow_zone_aware
-    )
+    created_at = Required(datetime, sql_type="TIMESTAMP WITH TIME ZONE", default=utcnow_zone_aware)
     visits = Required(int, default=0)
 
     @property
     def full_link(self) -> str:
-        return str(Path(settings.api_domain, self.link))
+        link_str = str(self.link) if self.link is not None else ""
+        return str(Path(settings.api_domain, link_str))
 
 
 class PhishTank(db.Entity):  # type: ignore
@@ -55,9 +55,7 @@ class PhishTank(db.Entity):  # type: ignore
     id = PrimaryKey(int, size=32)
     url = Required(str, index=True)
     phish_detail_url = Optional(str)
-    updated_at = Required(
-        datetime, sql_type="TIMESTAMP WITH TIME ZONE", default=utcnow_zone_aware
-    )
+    updated_at = Required(datetime, sql_type="TIMESTAMP WITH TIME ZONE", default=utcnow_zone_aware)
 
 
 @db_session
@@ -84,7 +82,7 @@ def insert_link(url) -> Link:
                 raise orig_exc
         except Exception:
             # If Link.get fails, re-raise the original exception
-            raise orig_exc
+            raise orig_exc from None
 
 
 @db_session
@@ -115,7 +113,7 @@ def check_db_connection():
             db.select("SELECT 1")
             return True
     except Exception as e:
-        raise Exception(f"Database connection error: {e}")
+        raise Exception(f"Database connection error: {e}") from e
 
 
 @db_session

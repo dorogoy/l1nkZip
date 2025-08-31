@@ -12,6 +12,7 @@ import redis.asyncio as redis
 from l1nkzip.config import settings
 from l1nkzip.logging import get_logger
 
+
 logger = get_logger(__name__)
 
 

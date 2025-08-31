@@ -98,9 +98,7 @@ class TestShortenEndpoint:
 
         # Test extra fields
         # FastAPI allows extra fields by default, so this should be 200
-        response = test_client.post(
-            "/url", json={"url": "https://example.com", "extra": "field"}
-        )
+        response = test_client.post("/url", json={"url": "https://example.com", "extra": "field"})
         assert response.status_code == 200
 
     def test_shorten_content_type(self, test_client):

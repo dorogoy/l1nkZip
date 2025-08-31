@@ -1,7 +1,8 @@
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 from l1nkzip.main import app
+
 
 client = TestClient(app)
 

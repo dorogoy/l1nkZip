@@ -26,9 +26,7 @@ class TestCachingIntegration:
         # Check that cache operations counter is present but has value 0
         assert "l1nkzip_cache_operations_total" in metrics_output
 
-    def test_caching_enabled_with_redis_url(
-        self, test_client, mock_redis, metrics_collector
-    ):
+    def test_caching_enabled_with_redis_url(self, test_client, mock_redis, metrics_collector):
         """Test that caching is enabled when REDIS_SERVER is set."""
         # Temporarily enable Redis for the existing test client
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
@@ -38,17 +36,13 @@ class TestCachingIntegration:
             cache.client = mock_redis
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
 
             # First redirect (cache miss)
-            redirect_response1 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response1 = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response1.status_code == 301
             assert redirect_response1.headers["location"] == "https://example.com/"
 
@@ -66,17 +60,13 @@ class TestCachingIntegration:
             cache.client = mock_redis
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
 
             # First redirect (cache miss)
-            redirect_response1 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response1 = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response1.status_code == 301
             assert redirect_response1.headers["location"] == "https://example.com/"
 
@@ -84,9 +74,7 @@ class TestCachingIntegration:
             mock_redis.get.return_value = "https://example.com/"
 
             # Second redirect (cache hit)
-            redirect_response2 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response2 = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response2.status_code == 301
             assert redirect_response2.headers["location"] == "https://example.com/"
 
@@ -111,9 +99,7 @@ class TestCachingIntegration:
         import asyncio
 
         # Call cache.set directly with custom TTL
-        asyncio.run(
-            cache.set(f"redirect:{short_link}", "https://example.com/", ttl=3600)
-        )
+        asyncio.run(cache.set(f"redirect:{short_link}", "https://example.com/", ttl=3600))
 
         # Check that Redis set was called with custom TTL
         assert mock_redis.set.called
@@ -143,9 +129,7 @@ class TestCachingIntegration:
             from l1nkzip.cache import cache
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
@@ -156,9 +140,7 @@ class TestCachingIntegration:
                 patch.object(cache, "set", side_effect=Exception("Redis error")),
             ):
                 # Redirect should still work (fallback to database)
-                redirect_response = test_client.get(
-                    f"/{short_link}", follow_redirects=False
-                )
+                redirect_response = test_client.get(f"/{short_link}", follow_redirects=False)
                 assert redirect_response.status_code == 301
                 assert redirect_response.headers["location"] == "https://example.com/"
 
@@ -174,9 +156,7 @@ class TestCachingIntegration:
             cache.client = mock_redis
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
@@ -193,7 +173,7 @@ class TestCachingIntegration:
 
             # Make fewer concurrent requests to avoid database locking
             threads = []
-            for i in range(2):  # Reduced to 2 to minimize locking issues
+            for _i in range(2):  # Reduced to 2 to minimize locking issues
                 thread = threading.Thread(target=make_redirect)
                 threads.append(thread)
                 thread.start()
@@ -204,14 +184,10 @@ class TestCachingIntegration:
 
             # Allow for some database locking issues
             assert len(errors) == 0, f"Errors occurred: {errors}"
-            success_count = sum(
-                1 for status in results if status in [301, 307]
-            )  # Allow 307 redirects
+            success_count = sum(1 for status in results if status in [301, 307])  # Allow 307 redirects
             assert success_count >= 1, f"Too many failures: {results}"
 
-    def test_cache_metrics_integration(
-        self, test_client, mock_redis, metrics_collector
-    ):
+    def test_cache_metrics_integration(self, test_client, mock_redis, metrics_collector):
         """Test that cache operations are recorded in metrics."""
         # Temporarily enable Redis for the existing test client
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
@@ -221,9 +197,7 @@ class TestCachingIntegration:
             cache.client = mock_redis
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
@@ -234,9 +208,7 @@ class TestCachingIntegration:
             initial_misses_value = 0
 
             # First redirect (cache miss)
-            redirect_response1 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response1 = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response1.status_code == 301
             assert redirect_response1.headers["location"] == "https://example.com/"
 
@@ -244,9 +216,7 @@ class TestCachingIntegration:
             mock_redis.get.return_value = "https://example.com/"
 
             # Second redirect (cache hit)
-            redirect_response2 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response2 = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response2.status_code == 301
             assert redirect_response2.headers["location"] == "https://example.com/"
 
@@ -256,15 +226,9 @@ class TestCachingIntegration:
             final_cache_misses = list(metrics_collector.cache_misses_total.collect())
 
             # Get final values
-            final_ops_value = (
-                final_cache_ops[0].samples[0].value if final_cache_ops else 0
-            )
-            final_hits_value = (
-                final_cache_hits[0].samples[0].value if final_cache_hits else 0
-            )
-            final_misses_value = (
-                final_cache_misses[0].samples[0].value if final_cache_misses else 0
-            )
+            final_ops_value = final_cache_ops[0].samples[0].value if final_cache_ops else 0
+            final_hits_value = final_cache_hits[0].samples[0].value if final_cache_hits else 0
+            final_misses_value = final_cache_misses[0].samples[0].value if final_cache_misses else 0
 
             assert final_ops_value > initial_ops_value
             assert final_hits_value == initial_hits_value + 1
@@ -280,17 +244,13 @@ class TestCachingIntegration:
             cache.client = mock_redis
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
 
             # Redirect to trigger caching
-            redirect_response = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response.status_code == 301
             assert redirect_response.headers["location"] == "https://example.com/"
 
@@ -329,23 +289,19 @@ class TestCachingIntegration:
 
             # Cache all URLs
             for short_link in short_links:
-                redirect_response = test_client.get(
-                    f"/{short_link}", follow_redirects=False
-                )
+                redirect_response = test_client.get(f"/{short_link}", follow_redirects=False)
                 assert redirect_response.status_code == 301
 
             # Verify all URLs were cached
             assert mock_redis.set.call_count == 3
 
             # Set up mock to return cached values for second requests
-            for i, url in enumerate(urls):
+            for _i, url in enumerate(urls):
                 mock_redis.get.return_value = url + "/"
 
             # Verify cache hits work for all
             for short_link in short_links:
-                redirect_response = test_client.get(
-                    f"/{short_link}", follow_redirects=False
-                )
+                redirect_response = test_client.get(f"/{short_link}", follow_redirects=False)
                 assert redirect_response.status_code == 301
 
     def test_cache_performance(self, test_client, mock_redis):
@@ -360,18 +316,14 @@ class TestCachingIntegration:
             cache.client = mock_redis
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
 
             # First redirect (cache miss)
             start_time = time.time()
-            redirect_response1 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response1 = test_client.get(f"/{short_link}", follow_redirects=False)
             cache_miss_time = time.time() - start_time
             assert redirect_response1.status_code == 301
             assert redirect_response1.headers["location"] == "https://example.com/"
@@ -381,9 +333,7 @@ class TestCachingIntegration:
 
             # Second redirect (cache hit)
             start_time = time.time()
-            redirect_response2 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response2 = test_client.get(f"/{short_link}", follow_redirects=False)
             cache_hit_time = time.time() - start_time
             assert redirect_response2.status_code == 301
             assert redirect_response2.headers["location"] == "https://example.com/"
@@ -391,12 +341,8 @@ class TestCachingIntegration:
             # Cache hit should be faster (though this depends on mock implementation)
             # In real scenarios, cache hits are significantly faster
             # In testing with mocks, we just verify that both are reasonably fast
-            assert cache_hit_time < 0.1, (
-                f"Cache hit time should be fast: {cache_hit_time}"
-            )
-            assert cache_miss_time < 0.1, (
-                f"Cache miss time should be fast: {cache_miss_time}"
-            )
+            assert cache_hit_time < 0.1, f"Cache hit time should be fast: {cache_hit_time}"
+            assert cache_miss_time < 0.1, f"Cache miss time should be fast: {cache_miss_time}"
 
     def test_cache_with_database_fallback(self, test_client, mock_redis):
         """Test that system falls back to database when cache fails."""
@@ -408,9 +354,7 @@ class TestCachingIntegration:
             cache.client = mock_redis
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://example.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://example.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
@@ -418,9 +362,7 @@ class TestCachingIntegration:
             # Mock cache to return None (cache miss)
             with patch.object(cache, "get", return_value=None):
                 # Redirect should still work (fallback to database)
-                redirect_response = test_client.get(
-                    f"/{short_link}", follow_redirects=False
-                )
+                redirect_response = test_client.get(f"/{short_link}", follow_redirects=False)
                 assert redirect_response.status_code == 301
                 assert redirect_response.headers["location"] == "https://example.com/"
 
@@ -437,36 +379,25 @@ class TestCachingIntegration:
             initial_ops_value = 0
             initial_hits_value = 0
             initial_misses_value = 0
-            initial_db_value = 0
 
             # Create URL
-            create_response = test_client.post(
-                "/url", json={"url": "https://comprehensive.com"}
-            )
+            create_response = test_client.post("/url", json={"url": "https://comprehensive.com"})
             assert create_response.status_code == 200
             create_data = create_response.json()
             short_link = create_data["link"]
 
             # First redirect (cache miss)
-            redirect_response1 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response1 = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response1.status_code == 301
-            assert (
-                redirect_response1.headers["location"] == "https://comprehensive.com/"
-            )
+            assert redirect_response1.headers["location"] == "https://comprehensive.com/"
 
             # Set up mock to return cached value for second request
             mock_redis.get.return_value = "https://comprehensive.com/"
 
             # Second redirect (cache hit)
-            redirect_response2 = test_client.get(
-                f"/{short_link}", follow_redirects=False
-            )
+            redirect_response2 = test_client.get(f"/{short_link}", follow_redirects=False)
             assert redirect_response2.status_code == 301
-            assert (
-                redirect_response2.headers["location"] == "https://comprehensive.com/"
-            )
+            assert redirect_response2.headers["location"] == "https://comprehensive.com/"
 
             # Verify all components worked
             assert mock_redis.get.called or mock_redis.set.called  # Redis was used
@@ -475,19 +406,11 @@ class TestCachingIntegration:
             final_cache_ops = list(metrics_collector.cache_operations_total.collect())
             final_cache_hits = list(metrics_collector.cache_hits_total.collect())
             final_cache_misses = list(metrics_collector.cache_misses_total.collect())
-            final_db_ops = list(metrics_collector.db_query_duration_seconds.collect())
 
             # Get final values
-            final_ops_value = (
-                final_cache_ops[0].samples[0].value if final_cache_ops else 0
-            )
-            final_hits_value = (
-                final_cache_hits[0].samples[0].value if final_cache_hits else 0
-            )
-            final_misses_value = (
-                final_cache_misses[0].samples[0].value if final_cache_misses else 0
-            )
-            final_db_value = len(final_db_ops[0].samples) if final_db_ops else 0
+            final_ops_value = final_cache_ops[0].samples[0].value if final_cache_ops else 0
+            final_hits_value = final_cache_hits[0].samples[0].value if final_cache_hits else 0
+            final_misses_value = final_cache_misses[0].samples[0].value if final_cache_misses else 0
 
             assert final_ops_value > initial_ops_value
             assert final_hits_value == initial_hits_value + 1

@@ -4,8 +4,8 @@ Integration tests for URL creation flow.
 
 from unittest.mock import patch
 
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 
 class TestCreationFlow:
@@ -102,9 +102,6 @@ class TestCreationFlow:
             response = redis_client.post("/url", json={"url": "https://example.com"})
             assert response.status_code == 200
 
-            data = response.json()
-            short_link = data["link"]
-
             # Verify cache operations were recorded
             cache_operations = list(metrics_collector.cache_operations_total.collect())
             assert len(cache_operations) > 0
@@ -172,9 +169,7 @@ class TestCreationFlow:
 
         def create_url(url_suffix):
             try:
-                response = test_client.post(
-                    "/url", json={"url": f"https://example{url_suffix}.com"}
-                )
+                response = test_client.post("/url", json={"url": f"https://example{url_suffix}.com"})
                 results.append(response.status_code)
             except Exception as e:
                 errors.append(str(e))
@@ -200,11 +195,6 @@ class TestCreationFlow:
         """Test that URL creation response time is recorded."""
         response = test_client.post("/url", json={"url": "https://example.com"})
         assert response.status_code == 200
-
-        # Check that response time metrics were recorded
-        duration_samples = list(
-            metrics_collector.http_request_duration_seconds.collect()
-        )
 
         # Just verify that the response was successful and fast
         # The metrics collection might not be enabled or might not capture all endpoints
@@ -259,8 +249,6 @@ class TestCreationFlow:
                 if redirect_response.status_code in [302, 307]:
                     assert "/404" in redirect_response.headers["location"]
 
-    def test_creation_flow_comprehensive(
-        self, test_client, metrics_collector, mock_redis, mock_phishtank
-    ):
+    def test_creation_flow_comprehensive(self, test_client, metrics_collector, mock_redis, mock_phishtank):
         """Test comprehensive URL creation flow with all components."""
         pytest.skip("Comprehensive test causes database binding issues")

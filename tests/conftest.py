@@ -4,10 +4,10 @@ Pytest configuration and shared fixtures for L1nkZip tests.
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi.testclient import TestClient
 from prometheus_client import Counter, Gauge, Histogram
 from prometheus_client.core import CollectorRegistry
+import pytest
 
 from l1nkzip.config import Settings
 

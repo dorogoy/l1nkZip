@@ -1,16 +1,16 @@
 import asyncio
-import re
 from pathlib import Path
+import re
 from typing import List, Optional
 from urllib.parse import urlparse
 
-import validators
 from fastapi import FastAPI, HTTPException, Request, responses, status
 from fastapi.templating import Jinja2Templates
 from pydantic import HttpUrl
 from slowapi.extension import Limiter
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
+import validators
 
 from l1nkzip.cache import cache
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
@@ -34,6 +34,7 @@ from l1nkzip.phishtank import (
     update_phishtanks,
 )
 from l1nkzip.version import VERSION_NUMBER
+
 
 logger = get_logger(__name__)
 
@@ -64,12 +65,12 @@ def validate_url(url: str) -> str:
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Invalid URL format",
             )
-    except Exception:
+    except Exception as e:
         # validators.url() raises ValidationError for invalid URLs
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Invalid URL format",
-        )
+        ) from e
 
     # Parse URL to check scheme
     parsed = urlparse(url)
@@ -100,9 +101,7 @@ def validate_url(url: str) -> str:
 def validate_admin_token(token: str) -> str:
     """Validate admin token"""
     if not token or len(token) < 16:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
     # Check for allowed characters (alphanumeric + special)
     if not re.match(r"^[a-zA-Z0-9!@#$%^&*()_+-=]+$", token):
@@ -117,9 +116,7 @@ def validate_admin_token(token: str) -> str:
 def validate_short_link(link: str) -> str:
     """Validate short link format"""
     if not link or not re.match(r"^[a-zA-Z0-9_-]{4,20}$", link):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid short link format"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid short link format")
     return link
 
 
@@ -170,7 +167,8 @@ if not db.provider:
 
 app = FastAPI(
     title=settings.api_name,
-    description="Simple API URL shortener that removes all the crap. Here you don't need an account or tokens to shorten a URL.",
+    description="Simple API URL shortener that removes all the crap. Here you don't need an "
+    "account or tokens to shorten a URL.",
     summary="Uncompromised URL shortener",
     version=VERSION_NUMBER,
     license_info={
@@ -196,9 +194,7 @@ templates = Jinja2Templates(directory=f"{BASE_PATH}/templates")
 async def root() -> responses.RedirectResponse:
     redirect: responses.RedirectResponse
     if settings.site_url:
-        redirect = responses.RedirectResponse(
-            settings.site_url, status_code=status.HTTP_301_MOVED_PERMANENTLY
-        )
+        redirect = responses.RedirectResponse(settings.site_url, status_code=status.HTTP_301_MOVED_PERMANENTLY)
     else:
         redirect = responses.RedirectResponse("/404")
     return redirect
@@ -210,10 +206,8 @@ async def health_check():
     try:
         if check_db_connection():
             return "OK"
-    except Exception:
-        raise HTTPException(
-            status_code=503, detail="Service unavailable - Database connection failed"
-        )
+    except Exception as e:
+        raise HTTPException(status_code=503, detail="Service unavailable - Database connection failed") from e
 
 
 @app.get("/metrics", tags=["system"], include_in_schema=False)
@@ -255,14 +249,10 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
         # Note: update_phishtanks is synchronous, not async
         await update_phishtanks()
         deleted_phishes = delete_old_phishes(days=cleanup_days)
-        return GenericInfo(
-            detail=f"PhishTank list updated. {deleted_phishes} entries have been deleted"
-        )
+        return GenericInfo(detail=f"PhishTank list updated. {deleted_phishes} entries have been deleted")
     except Exception as e:
         logger.error("PhishTank update error", extra={"error": str(e), "token": token})
-        raise HTTPException(
-            status_code=500, detail="Failed to update PhishTank database"
-        )
+        raise HTTPException(status_code=500, detail="Failed to update PhishTank database") from e
 
 
 @app.get("/list/{token}", tags=["urls"])
@@ -295,18 +285,14 @@ def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
             "Database error in get_list",
             extra={"error": str(e), "token": token, "limit": limit},
         )
-        raise HTTPException(
-            status_code=500, detail="Internal server error while retrieving URL list"
-        )
+        raise HTTPException(status_code=500, detail="Internal server error while retrieving URL list") from e
 
 
 @app.get("/{link}", tags=["urls"])
 @limiter.limit(settings.rate_limit_redirect)
 async def get_url(request: Request, link: str) -> responses.RedirectResponse:
     """Redirect to the full URL. If the URL is a phishing URL, it will be redirected to the PhishTank page."""
-    start_time = (
-        record_request_start("GET", "/{link}") if settings.metrics_enabled else None
-    )
+    start_time = record_request_start("GET", "/{link}") if settings.metrics_enabled else None
 
     try:
         redirect: responses.RedirectResponse
@@ -325,9 +311,7 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                 elif settings.metrics_enabled:
                     metrics.record_cache_operation("get", hit=False)
             except Exception as e:
-                logger.error(
-                    "Cache error in get_url", extra={"error": str(e), "link": link}
-                )
+                logger.error("Cache error in get_url", extra={"error": str(e), "link": link})
                 if settings.metrics_enabled:
                     metrics.record_cache_operation("get", success=False)
 
@@ -339,9 +323,7 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
 
                 asyncio.create_task(increment_visit_async(link))
             except Exception as e:
-                logger.error(
-                    "Async visit count error", extra={"error": str(e), "link": link}
-                )
+                logger.error("Async visit count error", extra={"error": str(e), "link": link})
 
             # Check for phishing in cached URL
             if settings.phishtank:
@@ -352,31 +334,25 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                     metrics.record_phishing_block()
                 record_request_end("GET", "/{link}", 307, "get_url", start_time)
                 redirect = responses.RedirectResponse(
-                    str(phish.phish_detail_url)
-                    if phish and phish.phish_detail_url
-                    else "https://phishtank.org/",
+                    str(phish.phish_detail_url) if phish and phish.phish_detail_url else "https://phishtank.org/",
                     status_code=status.HTTP_307_TEMPORARY_REDIRECT,
                 )
             else:
                 if settings.metrics_enabled:
                     metrics.record_redirect()
                 record_request_end("GET", "/{link}", 301, "get_url", start_time)
-                redirect = responses.RedirectResponse(
-                    cached_url, status_code=status.HTTP_301_MOVED_PERMANENTLY
-                )
+                redirect = responses.RedirectResponse(cached_url, status_code=status.HTTP_301_MOVED_PERMANENTLY)
         else:
             # Cache miss - use database
             try:
                 link_data = set_visit(link)
             except Exception as e:
-                logger.error(
-                    "Database error in get_url", extra={"error": str(e), "link": link}
-                )
+                logger.error("Database error in get_url", extra={"error": str(e), "link": link})
                 record_request_end("GET", "/{link}", 500, "get_url", start_time)
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Internal server error: database failure",
-                )
+                ) from e
 
             if settings.phishtank and link_data:
                 phish = await retry_phishtank_check(str(link_data.url))
@@ -386,9 +362,7 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                     metrics.record_phishing_block()
                 record_request_end("GET", "/{link}", 307, "get_url", start_time)
                 redirect = responses.RedirectResponse(
-                    str(phish.phish_detail_url)
-                    if phish and phish.phish_detail_url
-                    else "https://phishtank.org/",
+                    str(phish.phish_detail_url) if phish and phish.phish_detail_url else "https://phishtank.org/",
                     status_code=status.HTTP_307_TEMPORARY_REDIRECT,
                 )
             elif link_data:
@@ -398,27 +372,21 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                     if settings.metrics_enabled:
                         metrics.record_cache_operation("set", success=True)
                 except Exception as e:
-                    logger.error(
-                        "Cache set error", extra={"error": str(e), "link": link}
-                    )
+                    logger.error("Cache set error", extra={"error": str(e), "link": link})
                     if settings.metrics_enabled:
                         metrics.record_cache_operation("set", success=False)
 
                 if settings.metrics_enabled:
                     metrics.record_redirect()
                 record_request_end("GET", "/{link}", 301, "get_url", start_time)
-                redirect = responses.RedirectResponse(
-                    str(link_data.url), status_code=status.HTTP_301_MOVED_PERMANENTLY
-                )
+                redirect = responses.RedirectResponse(str(link_data.url), status_code=status.HTTP_301_MOVED_PERMANENTLY)
             else:
                 record_request_end("GET", "/{link}", 404, "get_url", start_time)
                 redirect = responses.RedirectResponse("/404")
 
         return redirect
     except Exception as e:
-        logger.error(
-            "Unexpected error in get_url", extra={"error": str(e), "link": link}
-        )
+        logger.error("Unexpected error in get_url", extra={"error": str(e), "link": link})
         record_request_end("GET", "/{link}", 500, "get_url", start_time)
         return responses.RedirectResponse("/404")
 
@@ -430,9 +398,7 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
     If the URL is a phishing URL, it will be rejected.
     If the URL is already in the database, the information about it will be returned.
     """
-    start_time = (
-        record_request_start("POST", "/url") if settings.metrics_enabled else None
-    )
+    start_time = record_request_start("POST", "/url") if settings.metrics_enabled else None
 
     # Validate the URL
     try:
@@ -445,13 +411,11 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
             extra={"error": str(e), "url": str(url.url) if url else None},
         )
         record_request_end("POST", "/url", 422, "create_url", start_time)
-        raise HTTPException(status_code=422, detail="Invalid URL provided")
+        raise HTTPException(status_code=422, detail="Invalid URL provided") from e
 
     # Check for phishing
     try:
-        phish = (
-            await retry_phishtank_check(validated_url) if settings.phishtank else None
-        )
+        phish = await retry_phishtank_check(validated_url) if settings.phishtank else None
         if phish:
             if settings.metrics_enabled:
                 metrics.record_phishing_block()
@@ -468,9 +432,7 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
             extra={"error": str(e), "url": validated_url},
         )
         record_request_end("POST", "/url", 500, "create_url", start_time)
-        raise HTTPException(
-            status_code=500, detail="Internal server error during phishing check"
-        )
+        raise HTTPException(status_code=500, detail="Internal server error during phishing check") from e
 
     # Insert link
     try:
@@ -484,9 +446,7 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
             link=str(link_data.link) if link_data.link is not None else "",
             full_link=HttpUrl(link_data.full_link),
             url=HttpUrl(str(link_data.url)),
-            visits=int(link_data.visits)
-            if link_data.visits is not None and str(link_data.visits).isdigit()
-            else 0,
+            visits=int(link_data.visits) if link_data.visits is not None and str(link_data.visits).isdigit() else 0,
         )
     except Exception as e:
         logger.error(
@@ -494,6 +454,4 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
             extra={"error": str(e), "url": validated_url},
         )
         record_request_end("POST", "/url", 500, "create_url", start_time)
-        raise HTTPException(
-            status_code=500, detail="Internal server error while creating URL"
-        )
+        raise HTTPException(status_code=500, detail="Internal server error while creating URL") from e
