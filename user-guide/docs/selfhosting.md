@@ -232,6 +232,92 @@ spec:
             storage: 1Gi
 ```
 
+## Docker Compose Example
+
+This example shows how to run L1nkZip with PostgreSQL and Redis using Docker Compose:
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: l1nkzip
+      POSTGRES_USER: l1nkzip
+      POSTGRES_PASSWORD: your-postgres-password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U l1nkzip -d l1nkzip"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  l1nkzip:
+    image: dorogoy/l1nkzip:latest
+    ports:
+      - "8000:80"
+    environment:
+      # Required environment variables
+      API_DOMAIN: "http://localhost:8000"
+      DB_TYPE: "postgres"
+      DB_NAME: "l1nkzip"
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_USER: "l1nkzip"
+      DB_PASSWORD: "your-postgres-password"
+      TOKEN: "your-secret-admin-token"
+      GENERATOR_STRING: "your-custom-alphabet-here"
+
+      # Optional environment variables
+      PHISHTANK: "anonymous"
+      REDIS_SERVER: "redis://redis:6379/0"
+      REDIS_TTL: "86400"
+      RATE_LIMIT_CREATE: "10/minute"
+      RATE_LIMIT_REDIRECT: "120/minute"
+      METRICS_ENABLED: "true"
+      LOG_LEVEL: "INFO"
+      LOG_FORMAT: "json"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+To use this configuration:
+
+1. Create a `docker-compose.yml` file with the above content
+2. Replace the placeholder values:
+   - `your-postgres-password`: A strong password for PostgreSQL
+   - `your-secret-admin-token`: A secure token for admin operations
+   - `your-custom-alphabet`: A shuffled string of characters for URL generation (e.g., "aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789")
+3. Run: `docker-compose up -d`
+
+The API will be available at `http://localhost:8000` with:
+- PostgreSQL database for persistent storage
+- Redis caching for improved performance
+- JSON structured logging
+- Prometheus metrics at `/metrics`
+- Health checks at `/health`
+
 ## Monitoring and Observability
 
 L1nkZip supports comprehensive monitoring through Prometheus metrics and structured logging.
