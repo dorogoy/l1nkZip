@@ -1,3 +1,4 @@
+import asyncio
 import re
 from pathlib import Path
 from typing import List, Optional
@@ -113,12 +114,12 @@ def validate_short_link(link: str) -> str:
     """Validate short link format"""
     if not link or not re.match(r"^[a-zA-Z0-9_-]{4,20}$", link):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Invalid short link format"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid short link format"
         )
     return link
 
 
-def retry_phishtank_check(url: str, max_retries: int = 3) -> Optional[PhishTank]:
+async def retry_phishtank_check(url: str, max_retries: int = 3) -> Optional[PhishTank]:
     """Check URL against PhishTank with retry logic"""
     from pydantic import HttpUrl
 
@@ -138,9 +139,7 @@ def retry_phishtank_check(url: str, max_retries: int = 3) -> Optional[PhishTank]
                 print(f"PhishTank check failed after {max_retries} attempts: {e}")
                 return None
             # Exponential backoff
-            import time
-
-            time.sleep(2**attempt)
+            await asyncio.sleep(2**attempt)
     return None
 
 
@@ -328,14 +327,16 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
 
             # Check for phishing in cached URL
             if settings.phishtank:
-                phish = retry_phishtank_check(cached_url)
+                phish = await retry_phishtank_check(cached_url)
 
             if phish:
                 if settings.metrics_enabled:
                     metrics.record_phishing_block()
                 record_request_end("GET", "/{link}", 307, "get_url", start_time)
                 redirect = responses.RedirectResponse(
-                    phish.phish_detail_url or "https://phishtank.org/",
+                    str(phish.phish_detail_url)
+                    if phish and phish.phish_detail_url
+                    else "https://phishtank.org/",
                     status_code=status.HTTP_307_TEMPORARY_REDIRECT,
                 )
             else:
@@ -355,20 +356,22 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                 return responses.RedirectResponse("/404")
 
             if settings.phishtank and link_data:
-                phish = retry_phishtank_check(link_data.url)
+                phish = await retry_phishtank_check(str(link_data.url))
 
             if phish:
                 if settings.metrics_enabled:
                     metrics.record_phishing_block()
                 record_request_end("GET", "/{link}", 307, "get_url", start_time)
                 redirect = responses.RedirectResponse(
-                    phish.phish_detail_url or "https://phishtank.org/",
+                    str(phish.phish_detail_url)
+                    if phish and phish.phish_detail_url
+                    else "https://phishtank.org/",
                     status_code=status.HTTP_307_TEMPORARY_REDIRECT,
                 )
             elif link_data:
                 # Cache the successful lookup
                 try:
-                    await cache.set(f"redirect:{link}", link_data.url)
+                    await cache.set(f"redirect:{link}", str(link_data.url))
                     if settings.metrics_enabled:
                         metrics.record_cache_operation("set", success=True)
                 except Exception as e:
@@ -380,7 +383,7 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                     metrics.record_redirect()
                 record_request_end("GET", "/{link}", 301, "get_url", start_time)
                 redirect = responses.RedirectResponse(
-                    link_data.url, status_code=status.HTTP_301_MOVED_PERMANENTLY
+                    str(link_data.url), status_code=status.HTTP_301_MOVED_PERMANENTLY
                 )
             else:
                 record_request_end("GET", "/{link}", 404, "get_url", start_time)
@@ -395,7 +398,7 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
 
 @app.post("/url", tags=["urls"])
 @limiter.limit(settings.rate_limit_create)
-def create_url(request: Request, url: Url) -> LinkInfo:
+async def create_url(request: Request, url: Url) -> LinkInfo:
     """Create a short URL.
     If the URL is a phishing URL, it will be rejected.
     If the URL is already in the database, the information about it will be returned.
@@ -404,12 +407,21 @@ def create_url(request: Request, url: Url) -> LinkInfo:
         record_request_start("POST", "/url") if settings.metrics_enabled else None
     )
 
+    # Validate the URL
     try:
-        # Validate the URL
         validated_url = validate_url(str(url.url))
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Validation error in create_url: {e}")
+        record_request_end("POST", "/url", 422, "create_url", start_time)
+        raise HTTPException(status_code=422, detail="Invalid URL provided")
 
-        # Check for phishing
-        phish = retry_phishtank_check(validated_url) if settings.phishtank else None
+    # Check for phishing
+    try:
+        phish = (
+            await retry_phishtank_check(validated_url) if settings.phishtank else None
+        )
         if phish:
             if settings.metrics_enabled:
                 metrics.record_phishing_block()
@@ -418,7 +430,17 @@ def create_url(request: Request, url: Url) -> LinkInfo:
                 status_code=403,
                 detail=f"Phishing URLs are Forbidden. More details about the URL: {phish.phish_detail_url or 'https://phishtank.org/'}",
             )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Phishing check error in create_url: {e}")
+        record_request_end("POST", "/url", 500, "create_url", start_time)
+        raise HTTPException(
+            status_code=500, detail="Internal server error during phishing check"
+        )
 
+    # Insert link
+    try:
         link_data = insert_link(validated_url)
         from pydantic import HttpUrl
 
@@ -427,13 +449,13 @@ def create_url(request: Request, url: Url) -> LinkInfo:
 
         record_request_end("POST", "/url", 201, "create_url", start_time)
         return LinkInfo(
-            link=link_data.link or "",
+            link=str(link_data.link) if link_data.link is not None else "",
             full_link=HttpUrl(link_data.full_link),
-            url=HttpUrl(link_data.url),
-            visits=link_data.visits,
+            url=HttpUrl(str(link_data.url)),
+            visits=int(link_data.visits)
+            if link_data.visits is not None and str(link_data.visits).isdigit()
+            else 0,
         )
-    except HTTPException:
-        raise
     except Exception as e:
         print(f"Database error in create_url: {e}")
         record_request_end("POST", "/url", 500, "create_url", start_time)
