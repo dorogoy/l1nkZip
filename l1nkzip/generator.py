@@ -48,6 +48,9 @@ Link: http://code.activestate.com/recipes/576918/
 """
 
 from l1nkzip.config import settings
+from l1nkzip.logging import get_logger
+
+logger = get_logger(__name__)
 
 DEFAULT_BLOCK_SIZE = 24
 MIN_LENGTH = 5
@@ -144,4 +147,13 @@ if __name__ == "__main__":
         assert a == e
         assert b == d
         c = (" " * (7 - len(c))) + c
-        print("%6d %12d %s %12d %6d" % (a, b, c, d, e))
+        logger.debug(
+            "Generator test",
+            extra={
+                "original": a,
+                "encoded": b,
+                "encoded_str": c.strip(),
+                "decoded": d,
+                "final": e,
+            },
+        )
