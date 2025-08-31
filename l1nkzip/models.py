@@ -62,13 +62,25 @@ class PhishTank(db.Entity):  # type: ignore
 
 @db_session
 def insert_link(url) -> Link:
+    # First try to get existing URL
     already_exists = Link.get(url=url)
     if already_exists:
         return already_exists
-    link_data = Link(url=url)
-    link_data.flush()
-    link_data.link = build_link(link_data.id)
-    return link_data
+
+    # Try to create new link with proper transaction handling
+    try:
+        link_data = Link(url=url)
+        link_data.flush()
+        link_data.link = build_link(link_data.id)  # type: ignore
+        return link_data
+    except Exception:
+        # If insertion failed (likely due to race condition), try to get existing URL again
+        db.rollback()  # type: ignore
+        existing = Link.get(url=url)
+        if existing:
+            return existing
+        # If still not found, re-raise the original exception
+        raise
 
 
 @db_session
