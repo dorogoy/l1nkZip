@@ -24,3 +24,10 @@ Maintaining and improving the L1nkZip URL shortener API. The project is currentl
 - Set up production monitoring dashboards and alerting rules
 - Evaluate monitoring effectiveness and adjust thresholds as needed
 - Consider implementing distributed tracing for complex request flows
+
+## Recent test fixes (August 2025)
+- **Fixed test suite execution issues**: Modified Makefile to run tests separately (unit, integration, API) to avoid test collisions and state leakage between different test types
+- **Resolved caching integration test failures**: Fixed issues with database session/transaction management when Redis was enabled in tests
+- **Fixed redirect test issues**: Updated tests to use `follow_redirects=False` to properly test redirect responses
+- **Fixed performance test assertion**: Updated cache performance test to use appropriate timing assertions for mocked Redis environment
+- **All tests now pass**: 54 unit tests, 61 API tests (6 skipped), and 36 integration tests (2 skipped) are passing

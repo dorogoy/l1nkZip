@@ -23,9 +23,11 @@ class TestCache:
     def test_cache_enabled_when_redis_server_set(self):
         """Test that cache is enabled when REDIS_SERVER is set."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
-            test_cache = Cache()
-            assert test_cache.client is not None
-            assert test_cache.is_enabled()
+            with patch("redis.asyncio.from_url") as mock_from_url:
+                mock_from_url.return_value = "mock_redis_client"
+                test_cache = Cache()
+                assert test_cache.client is not None
+                assert test_cache.is_enabled()
 
     @pytest.mark.asyncio
     async def test_get_returns_none_when_cache_disabled(self):
@@ -99,6 +101,8 @@ class TestAsyncVisitCounting:
     @pytest.mark.asyncio
     async def test_increment_visit_async_calls_sync_function(self):
         """Test that increment_visit_async properly calls the sync function."""
+        # We need to patch the sync function that's called inside the async function
+        # Need to patch where the function is used, not where it's defined
         with patch("l1nkzip.models.increment_visit") as mock_increment:
             mock_increment.return_value = None
 
@@ -111,6 +115,8 @@ class TestAsyncVisitCounting:
     @pytest.mark.asyncio
     async def test_increment_visit_async_handles_exceptions(self):
         """Test that increment_visit_async handles exceptions gracefully."""
+        # We need to patch the sync function that's called inside the async function
+        # Need to patch where the function is used, not where it's defined
         with patch("l1nkzip.models.increment_visit") as mock_increment:
             mock_increment.side_effect = Exception("Database error")
 

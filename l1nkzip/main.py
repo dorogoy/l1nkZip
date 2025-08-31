@@ -152,8 +152,10 @@ def sqlite_litestream(db, connection):
     cursor.execute("PRAGMA wal_autocheckpoint = 0;")
 
 
-db.bind(**ponyorm_settings[settings.db_type])
-db.generate_mapping(create_tables=True)
+# Only bind database if not already bound
+if not db.provider:
+    db.bind(**ponyorm_settings[settings.db_type])
+    db.generate_mapping(create_tables=True)
 
 
 app = FastAPI(

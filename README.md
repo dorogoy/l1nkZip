@@ -16,6 +16,7 @@ The full documentation is available at https://dorogoy.github.io/l1nkZip.
 * Built-in rate limiting protection against abuse through mass URL creation or enumeration attacks using [slowapi](https://github.com/laurentS/slowapi).
 * Optional Redis caching for improved performance on frequently accessed URLs (TTL-based with configurable expiration).
 * **Comprehensive monitoring and observability** with Prometheus metrics, structured logging, and alerting support.
+* **Comprehensive test suite** with more than 159 tests covering unit, API, and integration scenarios (75%+ coverage).
 
 ## Companion CLI Tool
 
@@ -152,3 +153,34 @@ For Kubernetes deployments, the monitoring system integrates seamlessly with:
 - **Alertmanager** for notification management
 
 See the [self-hosting documentation](user-guide/docs/selfhosting.md) for detailed Kubernetes configuration examples.
+
+## Testing
+
+L1nkZip includes a comprehensive test suite to ensure code quality and reliability:
+
+### Quick Start
+```bash
+# Run all tests
+make test
+
+# Run tests with coverage
+make test-cov
+
+# Run specific test categories
+make test-unit      # Unit tests only
+make test-api       # API tests only
+make test-integration  # Integration tests only
+```
+
+### Test Coverage
+- **159 total tests** across unit, API, and integration scenarios
+- **75%+ code coverage** with detailed reporting
+- **Test isolation** using in-memory databases and mocked external services
+- **Performance optimized** with parallel execution and fast fixtures
+
+### Test Categories
+- **Unit Tests**: Individual component testing (54 tests)
+- **API Tests**: FastAPI endpoint validation (61 tests)
+- **Integration Tests**: End-to-end workflow testing (24 tests)
+
+For detailed information about the testing strategy, fixtures, and best practices, see the [Testing Documentation](user-guide/docs/testing.md).

@@ -119,19 +119,24 @@ class TestMetricsCollector:
         metrics_output = collector.get_metrics()
         assert b"l1nkzip_rate_limit_exceeded_total" in metrics_output
 
-    @patch("l1nkzip.config.settings.metrics_enabled", True)
     def test_record_request_start_end_enabled(self):
         """Test request start/end recording when metrics are enabled."""
-        # Record request start
-        start_time = record_request_start("GET", "/health")
-        assert start_time is not None
+        # Create a fresh metrics instance for this test
+        test_metrics = MetricsCollector()
 
-        # Record request end
-        record_request_end("GET", "/health", 200, "health_check", start_time)
+        # Patch both the settings and the global metrics instance
+        with patch("l1nkzip.config.settings.metrics_enabled", True):
+            with patch("l1nkzip.metrics.metrics", test_metrics):
+                # Record request start
+                start_time = record_request_start("GET", "/health")
+                assert start_time is not None
 
-        # Check that metrics were recorded
-        metrics_output = metrics.get_metrics()
-        assert b"l1nkzip_http_requests_total" in metrics_output
+                # Record request end
+                record_request_end("GET", "/health", 200, "health_check", start_time)
+
+                # Check that metrics were recorded
+                metrics_output = test_metrics.get_metrics()
+                assert b"l1nkzip_http_requests_total" in metrics_output
 
     @patch("l1nkzip.config.settings.metrics_enabled", False)
     def test_record_request_start_end_disabled(self):
@@ -163,13 +168,15 @@ class TestMetricsCollector:
 
     def test_is_enabled(self):
         """Test the is_enabled method."""
-        collector = MetricsCollector()
-
+        # Test with True - create the collector after patching
         with patch("l1nkzip.config.settings.metrics_enabled", True):
-            assert collector.is_enabled() is True
+            test_collector = MetricsCollector()
+            assert test_collector.is_enabled() is True
 
+        # Test with False - create the collector after patching
         with patch("l1nkzip.config.settings.metrics_enabled", False):
-            assert collector.is_enabled() is False
+            test_collector = MetricsCollector()
+            assert test_collector.is_enabled() is False
 
 
 class TestMetricsIntegration:
