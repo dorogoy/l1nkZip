@@ -10,6 +10,9 @@ from typing import Optional
 import redis.asyncio as redis
 
 from l1nkzip.config import settings
+from l1nkzip.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class Cache:
@@ -27,7 +30,7 @@ class Cache:
             try:
                 self.client = redis.from_url(settings.redis_server)
             except Exception as e:
-                print(f"Failed to connect to Redis: {e}")
+                logger.error("Failed to connect to Redis", extra={"error": str(e)})
                 self.client = None
 
     async def get(self, key: str) -> Optional[str]:
@@ -45,7 +48,7 @@ class Cache:
         try:
             return await self.client.get(key)
         except Exception as e:
-            print(f"Redis get error: {e}")
+            logger.error("Redis get error", extra={"error": str(e), "key": key})
             return None
 
     async def set(self, key: str, value: str, ttl: Optional[int] = None) -> bool:
@@ -67,7 +70,7 @@ class Cache:
             await self.client.set(key, value, ex=ttl_value)
             return True
         except Exception as e:
-            print(f"Redis set error: {e}")
+            logger.error("Redis set error", extra={"error": str(e), "key": key})
             return False
 
     async def delete(self, key: str) -> bool:
@@ -86,7 +89,7 @@ class Cache:
             await self.client.delete(key)
             return True
         except Exception as e:
-            print(f"Redis delete error: {e}")
+            logger.error("Redis delete error", extra={"error": str(e), "key": key})
             return False
 
     def is_enabled(self) -> bool:

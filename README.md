@@ -111,12 +111,45 @@ LOG_FORMAT=text         # text or json for structured logging
 
 ### Structured Logging
 
-When `LOG_FORMAT=json` is set, L1nkZip outputs structured JSON logs with comprehensive context including:
-- Request tracing IDs and correlation IDs
-- Response times and status codes
-- Error details and stack traces
-- Cache operation results
-- User agent and client information
+L1nkZip implements a comprehensive structured logging system that integrates seamlessly with the observability goals. The logging system supports both text and JSON formats and provides consistent error logging across all components.
+
+#### Configuration
+
+```bash
+# Logging level (DEBUG, INFO, WARN, ERROR, CRITICAL)
+LOG_LEVEL=INFO
+
+# Log format (text or json)
+LOG_FORMAT=text
+```
+
+#### Features
+
+- **Consistent Error Logging**: All error conditions now use proper logging instead of print statements
+- **Structured Context**: JSON logs include relevant context like error details, request information, and operation metadata
+- **Component-Specific Loggers**: Each module has its own logger for better organization
+- **Configurable Format**: Switch between human-readable text and machine-parseable JSON
+- **Performance Optimized**: Logging operations are lightweight and don't impact request processing
+
+#### Log Levels Used
+
+- **DEBUG**: Detailed debugging information (e.g., generator test output)
+- **INFO**: General information about system operation
+- **WARNING**: Warning conditions that don't prevent operation (e.g., PhishTank retry failures)
+- **ERROR**: Error conditions that may affect functionality (e.g., Redis connection failures, database errors)
+
+#### Example JSON Log Entry
+
+```json
+{
+  "timestamp": "2025-08-31T10:43:36.586Z",
+  "level": "ERROR",
+  "logger": "l1nkzip.cache",
+  "message": "Redis get error",
+  "error": "Connection refused",
+  "key": "redirect:abc123"
+}
+```
 
 ### Alerting and Dashboards
 

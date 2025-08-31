@@ -13,6 +13,7 @@ from slowapi.util import get_remote_address
 
 from l1nkzip.cache import cache
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
+from l1nkzip.logging import get_logger
 from l1nkzip.metrics import metrics, record_request_end, record_request_start
 from l1nkzip.models import (
     GenericInfo,
@@ -32,6 +33,8 @@ from l1nkzip.phishtank import (
     update_phishtanks,
 )
 from l1nkzip.version import VERSION_NUMBER
+
+logger = get_logger(__name__)
 
 
 # Validation helper functions
@@ -136,7 +139,14 @@ async def retry_phishtank_check(url: str, max_retries: int = 3) -> Optional[Phis
         except Exception as e:
             if attempt == max_retries - 1:
                 # Log error and continue without phishing check
-                print(f"PhishTank check failed after {max_retries} attempts: {e}")
+                logger.warning(
+                    "PhishTank check failed after retries",
+                    extra={
+                        "max_retries": max_retries,
+                        "error": str(e),
+                        "url": str(url) if url else None,
+                    },
+                )
                 return None
             # Exponential backoff
             await asyncio.sleep(2**attempt)
@@ -248,7 +258,7 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
             detail=f"PhishTank list updated. {deleted_phishes} entries have been deleted"
         )
     except Exception as e:
-        print(f"PhishTank update error: {e}")
+        logger.error("PhishTank update error", extra={"error": str(e), "token": token})
         raise HTTPException(
             status_code=500, detail="Failed to update PhishTank database"
         )
@@ -280,7 +290,10 @@ def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
             for visit in visits
         ]
     except Exception as e:
-        print(f"Database error in get_list: {e}")
+        logger.error(
+            "Database error in get_list",
+            extra={"error": str(e), "token": token, "limit": limit},
+        )
         raise HTTPException(
             status_code=500, detail="Internal server error while retrieving URL list"
         )
@@ -311,7 +324,9 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                 elif settings.metrics_enabled:
                     metrics.record_cache_operation("get", hit=False)
             except Exception as e:
-                print(f"Cache error in get_url: {e}")
+                logger.error(
+                    "Cache error in get_url", extra={"error": str(e), "link": link}
+                )
                 if settings.metrics_enabled:
                     metrics.record_cache_operation("get", success=False)
 
@@ -323,7 +338,9 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
 
                 asyncio.create_task(increment_visit_async(link))
             except Exception as e:
-                print(f"Async visit count error: {e}")
+                logger.error(
+                    "Async visit count error", extra={"error": str(e), "link": link}
+                )
 
             # Check for phishing in cached URL
             if settings.phishtank:
@@ -351,7 +368,9 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
             try:
                 link_data = set_visit(link)
             except Exception as e:
-                print(f"Database error in get_url: {e}")
+                logger.error(
+                    "Database error in get_url", extra={"error": str(e), "link": link}
+                )
                 record_request_end("GET", "/{link}", 404, "get_url", start_time)
                 return responses.RedirectResponse("/404")
 
@@ -375,7 +394,9 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
                     if settings.metrics_enabled:
                         metrics.record_cache_operation("set", success=True)
                 except Exception as e:
-                    print(f"Cache set error: {e}")
+                    logger.error(
+                        "Cache set error", extra={"error": str(e), "link": link}
+                    )
                     if settings.metrics_enabled:
                         metrics.record_cache_operation("set", success=False)
 
@@ -391,7 +412,9 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
 
         return redirect
     except Exception as e:
-        print(f"Unexpected error in get_url: {e}")
+        logger.error(
+            "Unexpected error in get_url", extra={"error": str(e), "link": link}
+        )
         record_request_end("GET", "/{link}", 500, "get_url", start_time)
         return responses.RedirectResponse("/404")
 
@@ -413,7 +436,10 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
     except HTTPException as e:
         raise e
     except Exception as e:
-        print(f"Validation error in create_url: {e}")
+        logger.error(
+            "Validation error in create_url",
+            extra={"error": str(e), "url": str(url.url) if url else None},
+        )
         record_request_end("POST", "/url", 422, "create_url", start_time)
         raise HTTPException(status_code=422, detail="Invalid URL provided")
 
@@ -433,7 +459,10 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Phishing check error in create_url: {e}")
+        logger.error(
+            "Phishing check error in create_url",
+            extra={"error": str(e), "url": validated_url},
+        )
         record_request_end("POST", "/url", 500, "create_url", start_time)
         raise HTTPException(
             status_code=500, detail="Internal server error during phishing check"
@@ -457,7 +486,10 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
             else 0,
         )
     except Exception as e:
-        print(f"Database error in create_url: {e}")
+        logger.error(
+            "Database error in create_url",
+            extra={"error": str(e), "url": validated_url},
+        )
         record_request_end("POST", "/url", 500, "create_url", start_time)
         raise HTTPException(
             status_code=500, detail="Internal server error while creating URL"

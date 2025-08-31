@@ -14,6 +14,9 @@ Maintaining and improving the L1nkZip URL shortener API. The project is currentl
 - Integrated metrics collection into URL creation and redirect endpoints
 - Added structured JSON logging with configurable format and levels
 - Created comprehensive test suite for metrics functionality
+- **Replaced inconsistent print() statements with proper structured logging** across all modules (cache.py, main.py, generator.py)
+- **Created centralized logging module** with JSON and text formatters supporting configurable log levels
+- **Enhanced error logging consistency** with contextual information and proper log levels (ERROR, WARNING, DEBUG)
 
 ## Next steps
 - Continue dependency updates and security patches

@@ -31,6 +31,7 @@ L1nkZip is a FastAPI-based URL shortener with a modular architecture:
 - **URL generation**: [`l1nkzip/generator.py`](l1nkzip/generator.py:1) - Short URL encoding/decoding
 - **Redis caching**: [`l1nkzip/cache.py`](l1nkzip/cache.py:1) - Optional Redis caching for URL redirects
 - **Prometheus metrics**: [`l1nkzip/metrics.py`](l1nkzip/metrics.py:1) - Metrics collection and exposure
+- **Structured logging**: [`l1nkzip/logging.py`](l1nkzip/logging.py:1) - Centralized logging configuration with JSON/text formatters
 - **Phishing protection**: [`l1nkzip/phishtank.py`](l1nkzip/phishtank.py:1) - PhishTank integration
 - **Version management**: [`l1nkzip/version.py`](l1nkzip/version.py:1) - Version tracking
 
@@ -48,14 +49,16 @@ L1nkZip is a FastAPI-based URL shortener with a modular architecture:
 - **Strategy pattern**: Multiple database backends with consistent interface
 
 ## Component relationships
-- The main app depends on models for data access, cache for performance optimization, and metrics for observability
+- The main app depends on models for data access, cache for performance optimization, metrics for observability, and logging for structured error reporting
 - Models depend on generator for URL encoding
-- Cache depends on configuration for Redis settings and TTL values
+- Cache depends on configuration for Redis settings and TTL values, and logging for error reporting
 - Metrics depend on configuration for enabling/disabling and collection settings
+- Logging depends on configuration for log level and format settings
 - Configuration is centralized and injected throughout
 - PhishTank integration is optional and configurable
 - Redis caching is optional and gracefully degrades when unavailable
 - Prometheus metrics are optional and only enabled when configured
+- Structured logging is always available and configurable via environment variables
 
 ## Critical implementation paths
 1. URL shortening: POST `/url` → [`record_request_start()`](l1nkzip/metrics.py:185) → [`insert_link()`](l1nkzip/models.py:63) → [`encode_url()`](l1nkzip/generator.py:132) → [`record_url_created()`](l1nkzip/metrics.py:133) → [`record_request_end()`](l1nkzip/metrics.py:194)

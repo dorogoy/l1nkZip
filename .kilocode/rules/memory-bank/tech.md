@@ -11,6 +11,7 @@
 - **Prometheus Client 0.21.0**: Metrics collection and exposure for monitoring
 - **HTTpx 0.28.1**: Async HTTP client for PhishTank integration
 - **Jinja2 3.1.6**: Templating engine for error pages
+- **Python logging**: Structured logging framework with JSON/text formatters and configurable levels
 - **Ruff 0.12.7**: Fast Python linter and formatter
 - **Mypy 1.10.0**: Static type checking
 - **SlowAPI 0.1.9**: Rate limiting library for abuse protection
