@@ -53,13 +53,15 @@ async def update_phishtanks(client: Optional[httpx.AsyncClient] = None) -> None:
     url = build_phishtank_url()
 
     # Use provided client or create new one
+    async def fetch_and_process(client_obj):
+        items = await fetch_phishtank_data(client_obj, url)
+        process_phishtank_items(items)
+
     if client is None:
         async with httpx.AsyncClient() as new_client:
-            items = await fetch_phishtank_data(new_client, url)
-            process_phishtank_items(items)
+            await fetch_and_process(new_client)
     else:
-        items = await fetch_phishtank_data(client, url)
-        process_phishtank_items(items)
+        await fetch_and_process(client)
 
 
 @db_session
