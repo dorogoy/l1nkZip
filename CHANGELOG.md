@@ -1,3 +1,11 @@
+## [0.5.2](https://github.com/dorogoy/l1nkZip/compare/v0.5.1...v0.5.2) (2026-02-01)
+
+
+### Bug Fixes
+
+* **deps:** bump fastapi from 0.115.12 to 0.120.0 ([5f8f8b6](https://github.com/dorogoy/l1nkZip/commit/5f8f8b6f7c3fb4d8d476ca1a1cf15eb872504f9d))
+* **deps:** bump pytest-asyncio from 0.25.1 to 1.2.0 ([249595e](https://github.com/dorogoy/l1nkZip/commit/249595e68e00ef84dcb6007996a2574490304cfc))
+
 ## [0.5.1](https://github.com/dorogoy/l1nkZip/compare/v0.5.0...v0.5.1) (2025-08-31)
 
 
