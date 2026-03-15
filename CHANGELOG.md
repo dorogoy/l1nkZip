@@ -1,3 +1,10 @@
+## [0.5.3](https://github.com/dorogoy/l1nkZip/compare/v0.5.2...v0.5.3) (2026-03-15)
+
+
+### Bug Fixes
+
+* **deps:** bump prometheus-client from 0.21.0 to 0.24.1 ([9957859](https://github.com/dorogoy/l1nkZip/commit/995785956df3afe5b398b377a18ef0b3591491bf))
+
 ## [0.5.2](https://github.com/dorogoy/l1nkZip/compare/v0.5.1...v0.5.2) (2026-02-01)
 
 
