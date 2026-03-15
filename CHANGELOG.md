@@ -1,3 +1,10 @@
+## [0.5.5](https://github.com/dorogoy/l1nkZip/compare/v0.5.4...v0.5.5) (2026-03-15)
+
+
+### Bug Fixes
+
+* **deps:** bump pytest-cov from 6.0.0 to 7.0.0 ([9c1779c](https://github.com/dorogoy/l1nkZip/commit/9c1779c527391927b82af2a3564dc9002a3dc05b))
+
 ## [0.5.4](https://github.com/dorogoy/l1nkZip/compare/v0.5.3...v0.5.4) (2026-03-15)
 
 
