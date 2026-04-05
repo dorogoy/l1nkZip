@@ -1,3 +1,10 @@
+## [0.5.7](https://github.com/dorogoy/l1nkZip/compare/v0.5.6...v0.5.7) (2026-04-05)
+
+
+### Bug Fixes
+
+* **deps:** bump pytest from 8.4.1 to 9.0.2 ([4f380b6](https://github.com/dorogoy/l1nkZip/commit/4f380b66547d63f45eb51f8e56967bd3a8c083a3))
+
 ## [0.5.6](https://github.com/dorogoy/l1nkZip/compare/v0.5.5...v0.5.6) (2026-04-05)
 
 
