@@ -1,3 +1,10 @@
+## [0.5.6](https://github.com/dorogoy/l1nkZip/compare/v0.5.5...v0.5.6) (2026-04-05)
+
+
+### Bug Fixes
+
+* **deps:** bump pytest-asyncio from 1.2.0 to 1.3.0 ([e2cb242](https://github.com/dorogoy/l1nkZip/commit/e2cb24239064b3da4ba8bce93b781996f3cb4d2e))
+
 ## [0.5.5](https://github.com/dorogoy/l1nkZip/compare/v0.5.4...v0.5.5) (2026-03-15)
 
 
