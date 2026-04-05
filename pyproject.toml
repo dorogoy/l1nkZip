@@ -32,7 +32,11 @@ extend-exclude = [
   "venv",
   ".ruff_cache",
   ".pytest_cache",
-  "alembic/versions",  # migrations often violate style intentionally
+  "alembic/versions",
+  ".agent",
+  ".claude",
+  ".opencode",
+  "_bmad",
 ]
 
 [tool.ruff.lint]
