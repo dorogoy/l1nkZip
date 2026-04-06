@@ -5,6 +5,15 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.5.9](https://github.com/dorogoy/l1nkZip/compare/v0.5.8...v0.5.9) (2026-04-06)
+
+
+### Bug Fixes
+
+* **deps:** bump pytest-cov from 7.0.0 to 7.1.0 ([84e9967](https://github.com/dorogoy/l1nkZip/commit/84e99671474363d971fa879f835bdc7b0cb2a87a))
+* **deps:** bump redis from 5.0.1 to 7.4.0 ([42ecd03](https://github.com/dorogoy/l1nkZip/commit/42ecd03b4ecc995162d19d08c4dc9698886e7b43))
+* **deps:** bump uvicorn from 0.41.0 to 0.44.0 ([d6a0d83](https://github.com/dorogoy/l1nkZip/commit/d6a0d832fed19d02f9480ee256b9a3d2a960bee3))
+
 ## [0.5.7](https://github.com/dorogoy/l1nkZip/compare/v0.5.6...v0.5.7) (2026-04-05)
 
 
