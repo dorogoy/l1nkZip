@@ -5,6 +5,15 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.5.10](https://github.com/dorogoy/l1nkZip/compare/v0.5.9...v0.5.10) (2026-04-18)
+
+
+### Bug Fixes
+
+* **deps:** bump prometheus-client from 0.24.1 to 0.25.0 ([fec780a](https://github.com/dorogoy/l1nkZip/commit/fec780af411234084a7816d37227da5d93a0c4f7))
+* **deps:** bump ruff from 0.12.7 to 0.15.10 ([1fe8fbe](https://github.com/dorogoy/l1nkZip/commit/1fe8fbe42ee15a72867f46a1c2fdd0e7f4b2f694))
+* **deps:** bump validators from 0.34.0 to 0.35.0 ([64f8875](https://github.com/dorogoy/l1nkZip/commit/64f887542b3663a34073cca8e95ff2f59d5b07fe))
+
 ## [0.5.9](https://github.com/dorogoy/l1nkZip/compare/v0.5.8...v0.5.9) (2026-04-06)
 
 
