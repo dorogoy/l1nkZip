@@ -3,13 +3,13 @@ py_files = $(wildcard l1nkzip/*.py)
 
 .PHONY: fmt
 fmt:
-	uv run ruff format .
-	uv run ruff check --fix .
+	uv run ruff format --exclude .agents .
+	uv run ruff check --fix --exclude .agents .
 
 .PHONY: check
 check:
-	uv run ruff check .
-	uv run ruff format --check .
+	uv run ruff check --exclude .agents .
+	uv run ruff format --check --exclude .agents .
 	uv run ty check
 
 .PHONY: test
