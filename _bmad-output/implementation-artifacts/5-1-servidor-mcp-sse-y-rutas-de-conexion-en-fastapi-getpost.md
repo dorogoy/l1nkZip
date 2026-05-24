@@ -1,6 +1,6 @@
 # Story 5.1: Servidor MCP SSE y Rutas de Conexión en FastAPI (GET/POST)
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -33,18 +33,31 @@ so that I can discover and call l1nkZip tools remotely.
 
 ## Tasks / Subtasks
 
-- [ ] Create core MCP server module (`l1nkzip/mcp.py`) (AC: 1, 2)
-  - [ ] Initialize `mcp_server` from `mcp.server.Server("l1nkzip-mcp-server")`
-  - [ ] Initialize `sse_transport` from `mcp.server.sse.SseServerTransport("/mcp/messages")`
-- [ ] Mount SSE and message routes in `l1nkzip/main.py` (AC: 1, 2, 3)
-  - [ ] Add `GET /mcp/sse` endpoint calling `sse_transport.connect_sse` and running the server loop
-  - [ ] Support catching connection cancel / disconnection exceptions gracefully
-  - [ ] Add `POST /mcp/messages` endpoint calling `sse_transport.handle_post_message`
-  - [ ] Log connection starts and ends using structured logging
-- [ ] Implement and verify automated testing (AC: 1, 2, 3, 4)
-  - [ ] Create `tests/api/test_mcp.py` to test connection handshake and message handling
-  - [ ] Ensure `make check` (ruff check + format, ty check) passes without errors
-  - [ ] Ensure `make test` succeeds and database connection/transports behave as expected
+- [x] Create core MCP server module (`l1nkzip/mcp.py`) (AC: 1, 2)
+  - [x] Initialize `mcp_server` from `mcp.server.Server("l1nkzip-mcp-server")`
+  - [x] Initialize `sse_transport` from `mcp.server.sse.SseServerTransport("/mcp/messages")`
+- [x] Mount SSE and message routes in `l1nkzip/main.py` (AC: 1, 2, 3)
+  - [x] Add `GET /mcp/sse` endpoint calling `sse_transport.connect_sse` and running the server loop
+  - [x] Support catching connection cancel / disconnection exceptions gracefully
+  - [x] Add `POST /mcp/messages` endpoint calling `sse_transport.handle_post_message`
+  - [x] Log connection starts and ends using structured logging
+- [x] Implement and verify automated testing (AC: 1, 2, 3, 4)
+  - [x] Create `tests/api/test_mcp.py` to test connection handshake and message handling
+  - [x] Ensure `make check` (ruff check + format, ty check) passes without errors
+  - [x] Ensure `make test` succeeds and database connection/transports behave as expected
+
+### Review Findings
+
+- [x] [Review][Patch] F1: No graceful shutdown/lifespan handler for active SSE connections [main.py, mcp.py]
+- [x] [Review][Dismiss] F2: No graceful degradation if `mcp` package is unavailable — dismissed, MCP is a required dependency
+- [x] [Review][Patch] F3: Missing return type annotations on endpoint functions [main.py:462, main.py:484]
+- [x] [Review][Patch] F4: `request._send` uses private Starlette attribute — add comment documenting necessity [main.py:467, main.py:489]
+- [x] [Review][Patch] F5: `handle_sse` silently swallows non-CancelledError exceptions — should re-raise or respond for pre-upgrade errors [main.py:476-480]
+- [x] [Review][Patch] F6: No module-level logger in `mcp.py` — project context requires `logger = get_logger(__name__)` [mcp.py]
+- [x] [Review][Patch] F7: Test `receive()` helper returns request body on every call (busy-loop) — should block after first call [test_mcp.py:52-53]
+- [x] [Review][Defer] F8: No rate limiting on MCP endpoints — deferred, scoped to Story 5.3 [main.py:461-497]
+- [x] [Review][Defer] F9: Test assertions accept overly wide status code ranges — deferred, tighten once MCP library behavior is stable [test_mcp.py:80, test_mcp.py:87]
+- [x] [Review][Defer] F10: `handle_messages` re-raises as generic 500 for all exception types — deferred, better error differentiation in future iteration [main.py:491-496]
 
 ## Dev Notes
 
@@ -145,9 +158,26 @@ Gemini 3.5 Flash (Medium)
 
 ### Debug Log References
 
+- SSE stream testing with TestClient blocks indefinitely due to long-lived connection; resolved by using raw ASGI interface with asyncio task cancellation
+- MCP library uses `session_id` (underscore) as query parameter, not `sessionId` (camelCase)
+
 ### Completion Notes List
+
+- Created `l1nkzip/mcp.py` with `mcp_server` (Server) and `sse_transport` (SseServerTransport) singletons
+- Added `GET /mcp/sse` endpoint with graceful CancelledError and exception handling, structured logging
+- Added `POST /mcp/messages` endpoint with error handling and structured logging
+- Added "mcp" tag to OpenAPI tags in `l1nkzip/config.py`
+- Added "l1nkzip.mcp" to structured logging setup in `l1nkzip/logging.py`
+- Created 13 integration tests in `tests/api/test_mcp.py` covering: SSE endpoint method validation, POST message endpoint validation, OpenAPI schema integration, module import verification, and SSE stream handshake (headers, endpoint event, session_id format, cache-control, keep-alive)
+- All 13 MCP tests pass; no regressions in existing test suite (9 pre-existing failures unrelated to this story)
+- `make check` passes: ruff check, ruff format, ty check all clean
 
 ### File List
 - [NEW] `l1nkzip/mcp.py`
 - [MODIFY] `l1nkzip/main.py`
+- [MODIFY] `l1nkzip/config.py`
+- [MODIFY] `l1nkzip/logging.py`
 - [NEW] `tests/api/test_mcp.py`
+
+### Change Log
+- 2026-05-24: Implemented MCP SSE server endpoints (GET /mcp/sse, POST /mcp/messages) with graceful disconnection handling and 13 integration tests

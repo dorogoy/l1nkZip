@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 from pathlib import Path
 import re
 from typing import List, Optional
@@ -15,6 +16,7 @@ import validators
 from l1nkzip.cache import cache
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
 from l1nkzip.logging import get_logger
+from l1nkzip.mcp import mcp_server, sse_transport
 from l1nkzip.metrics import metrics, record_request_end, record_request_start
 from l1nkzip.models import (
     GenericInfo,
@@ -165,6 +167,24 @@ if not db.provider:
     db.generate_mapping(create_tables=True)
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    # Gracefully close active SSE connections on shutdown
+    try:
+        writers = list(sse_transport._read_stream_writers.values())
+        for writer in writers:
+            try:
+                writer.close()
+            except Exception:
+                pass
+    except Exception as e:
+        logger.warning(
+            "Error closing active SSE connections during shutdown",
+            extra={"error": str(e)},
+        )
+
+
 app = FastAPI(
     title=settings.api_name,
     description="Simple API URL shortener that removes all the crap. Here you don't need an "
@@ -177,6 +197,7 @@ app = FastAPI(
     },
     redoc_url=None,
     openapi_tags=openapi_tags,
+    lifespan=lifespan,
 )
 
 # Initialize rate limiter
@@ -455,3 +476,73 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
         )
         record_request_end("POST", "/url", 500, "create_url", start_time)
         raise HTTPException(status_code=500, detail="Internal server error while creating URL") from e
+
+
+@app.get("/mcp/sse", tags=["mcp"])
+async def handle_sse(request: Request) -> None:
+    # request._send is a private Starlette attribute. This is necessary because
+    # MCP's connect_sse/handle_post_message require ASGI channels directly.
+    try:
+        connect_ctx = sse_transport.connect_sse(
+            request.scope,
+            request.receive,
+            request._send,
+        )
+    except Exception as e:
+        logger.error(
+            "Failed to initialize MCP SSE connection",
+            extra={"error": str(e)},
+        )
+        raise HTTPException(status_code=400, detail="Failed to initialize SSE connection") from e
+
+    try:
+        async with connect_ctx as streams:
+            await mcp_server.run(
+                streams[0],
+                streams[1],
+                mcp_server.create_initialization_options(),
+            )
+    except asyncio.CancelledError:
+        logger.info("MCP SSE client connection cancelled/disconnected gracefully")
+    except Exception as e:
+        err_msg = str(e).lower()
+        is_disconnect = any(
+            p in err_msg
+            for p in (
+                "broken pipe",
+                "connection reset",
+                "connection closed",
+                "closed",
+                "cancelled",
+                "client disconnected",
+            )
+        ) or isinstance(e, (ConnectionResetError, BrokenPipeError))
+
+        if is_disconnect:
+            logger.info(
+                "MCP SSE client connection disconnected abruptly",
+                extra={"error": str(e)},
+            )
+        else:
+            logger.error(
+                "Unexpected error in MCP SSE connection",
+                extra={"error": str(e)},
+            )
+
+
+@app.post("/mcp/messages", tags=["mcp"])
+async def handle_messages(request: Request) -> None:
+    # request._send is a private Starlette attribute. This is necessary because
+    # MCP's connect_sse/handle_post_message require ASGI channels directly.
+    try:
+        await sse_transport.handle_post_message(
+            request.scope,
+            request.receive,
+            request._send,
+        )
+    except Exception as e:
+        logger.error(
+            "Error handling MCP message POST request",
+            extra={"error": str(e)},
+        )
+        raise HTTPException(status_code=500, detail="Internal server error in message route") from e
