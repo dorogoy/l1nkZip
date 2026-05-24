@@ -43,6 +43,10 @@ openapi_tags: list[dict[str, Any]] = [
         "description": "Operations with PhishTank management. The **token** parameter is the secret "
         "token from the configuration to allow the update of the PhishTank database.",
     },
+    {
+        "name": "mcp",
+        "description": "Model Context Protocol (MCP) endpoints for AI agent integration via SSE transport.",
+    },
 ]
 
 

@@ -114,6 +114,7 @@ def setup_logging() -> None:
     loggers = [
         "l1nkzip.cache",
         "l1nkzip.main",
+        "l1nkzip.mcp",
         "l1nkzip.models",
         "l1nkzip.generator",
         "l1nkzip.phishtank",
