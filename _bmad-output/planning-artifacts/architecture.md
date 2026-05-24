@@ -27,7 +27,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 ### Requirements Overview
 
 **Functional Requirements:**
-38 FRs across 9 capability areas. The core architectural flow is a request pipeline: URL creation (encode → store → respond) and URL redirection (lookup → count visit → redirect). Supporting capabilities — caching, metrics, logging, phishing checks, rate limiting — are cross-cutting concerns that layer onto the core pipeline.
+41 FRs across 10 capability areas. The core architectural flow is a request pipeline: URL creation (encode → store → respond) and URL redirection (lookup → count visit → redirect). Supporting capabilities — caching, metrics, logging, phishing checks, rate limiting, and MCP — are cross-cutting concerns that layer onto the core pipeline.
 
 **Non-Functional Requirements:**
 Performance NFRs are the primary architectural driver: redirect < 100ms p95 (cache miss), < 10ms (cache hit), creation < 200ms p95. Integration NFRs mandate graceful degradation for all optional components. Security NFRs require token-based auth, URL validation, and rate limiting as middleware.
@@ -35,7 +35,7 @@ Performance NFRs are the primary architectural driver: redirect < 100ms p95 (cac
 **Scale & Complexity:**
 - Primary domain: Backend API (REST)
 - Complexity level: Low
-- Estimated architectural components: 6-8 (app, models, generator, cache, metrics, logging, config, phishtank)
+- Estimated architectural components: 7-9 (app, models, generator, cache, metrics, logging, config, phishtank, mcp)
 
 ### Technical Constraints & Dependencies
 
@@ -161,6 +161,18 @@ Backend API (REST) — Python/FastAPI. Already implemented and in production.
 
 **Rationale:** Replaces ad-hoc `print()` statements with proper structured logging. JSON format enables integration with log aggregation tools (ELK, Loki). Single configuration point via `LOG_LEVEL` and `LOG_FORMAT` environment variables.
 
+### AD8: Model Context Protocol (MCP) Server via SSE
+
+**Decision:** Expose a Model Context Protocol (MCP) server directly inside the FastAPI application using the Server-Sent Events (SSE) transport protocol.
+
+**Rationale:** Aligns with the future expansion goal of enabling direct usage by AI agents without local installations. By embedding the MCP server inside the existing FastAPI monolith and utilizing SSE, we avoid running a separate process or service, which preserves our single-process monolithic decision (AD1). SSE is native to HTTP/1.1 and HTTP/2 and easily supported by FastAPI, enabling remote tool discovery and execution via standard web endpoints.
+
+**Implications:**
+- Adds an optional dependency on the `mcp` Python SDK (or custom SSE handling).
+- Exposes two new routes: GET `/mcp/sse` (initiates the SSE session) and POST `/mcp/messages` (receives incoming client requests for that session).
+- MCP tools will act as a thin presentation layer over existing business logic (calling functions in `models.py` and `generator.py`), ensuring complete reuse of rate-limiting, database access, and validation rules.
+- Administrative tools (e.g., listing all URLs) will validate the standard admin token (passed via query parameter, header, or payload) to maintain parity with `/urls` (FR41).
+
 ## Implementation Patterns & Consistency Rules
 
 ### Naming Patterns
@@ -255,6 +267,7 @@ l1nkZip/
 │   ├── generator.py            # URL encoding/decoding (bit-shuffling)
 │   ├── logging.py              # Centralized structured logging
 │   ├── main.py                 # FastAPI app, routes, middleware
+│   ├── mcp.py                  # Model Context Protocol (MCP) server (optional)
 │   ├── metrics.py              # Prometheus metrics definitions
 │   ├── models.py               # Pony ORM entities + CRUD operations
 │   ├── phishtank.py            # PhishTank integration (optional)
@@ -283,17 +296,17 @@ l1nkZip/
 ### Component Boundaries & Communication
 
 ```
-Request → Middleware Stack → Route Handler → Response
+Request → Middleware Stack → Route Handler / MCP Server → Response
            ├── Rate Limiting (SlowAPI)
            └── Metrics Collection
            
-Route Handler → config.py (Settings via DI)
-              → models.py (Pony ORM → Database)
-              → cache.py (Redis, optional)
-              → generator.py (URL encoding)
-              → phishtank.py (PhishTank, optional)
-              → metrics.py (Prometheus, optional)
-              → logging.py (Structured logging)
+Route Handler & MCP Server → config.py (Settings via DI)
+                           → models.py (Pony ORM → Database)
+                           → cache.py (Redis, optional)
+                           → generator.py (URL encoding)
+                           → phishtank.py (PhishTank, optional)
+                           → metrics.py (Prometheus, optional)
+                           → logging.py (Structured logging)
 ```
 
 ### FR-to-Module Mapping
@@ -310,6 +323,7 @@ Route Handler → config.py (Settings via DI)
 | Database & Storage | `models.py`, `config.py` | — |
 | Configuration & Deployment | `config.py`, `Dockerfile`, `Makefile` | — |
 | CLI Integration | External: l1nkzip-cli | `main.py` (API endpoints) |
+| AI Agent Integration (MCP) | `mcp.py`, `main.py` | `models.py`, `generator.py`, `config.py` (token auth) |
 
 ## Architecture Validation Result
 
