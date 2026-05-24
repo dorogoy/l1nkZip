@@ -216,8 +216,7 @@ His clients never know l1nkZip exists — it's invisible infrastructure that "ju
 ### Phase 3 — Expansion (Future)
 
 - Custom URL slugs (user-chosen short codes)
-- Analytics dashboard with visit patterns and geo data
-- Web UI for URL management
+- AI Agent Integration: Direct usage by AI agents via Model Context Protocol (MCP) using SSE (Server-Sent Events) transport, allowing zero-installation tool discovery and execution via a remote URL
 - Distributed tracing for complex request flows
 - Multi-instance horizontal scaling support
 - API versioning strategy
@@ -302,6 +301,12 @@ His clients never know l1nkZip exists — it's invisible infrastructure that "ju
 - FR36: CLI users can retrieve information about existing short links
 - FR37: CLI users can list all shortened URLs (admin)
 - FR38: CLI users can update the PhishTank database (admin)
+
+### AI Agent Integration (MCP)
+
+- FR39: The system can expose a Model Context Protocol (MCP) server over Server-Sent Events (SSE) transport
+- FR40: The system can expose URL management capabilities as MCP tools (e.g., creating and retrieving short links)
+- FR41: The system can protect administrative MCP tools (e.g., listing all URLs) using the standard token authentication mechanism
 
 ## Non-Functional Requirements
 
