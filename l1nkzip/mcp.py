@@ -48,6 +48,25 @@ async def handle_list_tools() -> list[types.Tool]:
                 "required": ["link"],
             },
         ),
+        types.Tool(
+            name="list_urls",
+            description="List shortened URLs with their stats. Requires admin authorization (token).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "description": "Admin authorization token.",
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of URLs to return (1-1000).",
+                        "default": 100,
+                    },
+                },
+                "required": ["token"],
+            },
+        ),
     ]
 
 
@@ -57,6 +76,8 @@ async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent
         return await _handle_shorten_url(arguments)
     if name == "get_original_url":
         return await _handle_get_original_url(arguments)
+    if name == "list_urls":
+        return await _handle_list_urls(arguments)
     raise ValueError(f"Unknown tool: {name}")
 
 
@@ -225,6 +246,52 @@ async def _handle_get_original_url(arguments: dict) -> list[types.TextContent]:
         asyncio.create_task(_safe_increment_visit(increment_visit_async, validated_link))
 
     return [types.TextContent(type="text", text=original_url)]
+
+
+async def _handle_list_urls(arguments: dict) -> list[types.TextContent]:
+    import json
+
+    from fastapi import HTTPException
+
+    from l1nkzip.main import validate_admin_token
+    from l1nkzip.models import get_visits
+
+    if not isinstance(arguments, dict):
+        raise ValueError("Invalid arguments: expected object")
+
+    token = arguments.get("token")
+    if not isinstance(token, str):
+        raise ValueError("Unauthorized")
+
+    try:
+        validate_admin_token(token)
+    except HTTPException:
+        raise ValueError("Unauthorized") from None
+    except Exception:
+        raise ValueError("Unauthorized") from None
+
+    if token != settings.token:
+        raise ValueError("Unauthorized")
+
+    limit = arguments.get("limit", 100)
+    if isinstance(limit, bool) or not isinstance(limit, int):
+        raise ValueError("Invalid limit: must be an integer")
+    if limit < 1 or limit > 1000:
+        raise ValueError("Limit must be between 1 and 1000")
+
+    loop = asyncio.get_running_loop()
+    try:
+        link_list = await loop.run_in_executor(None, get_visits, limit)
+    except Exception as e:
+        logger.error("MCP list_urls retrieval failed", extra={"error": str(e), "limit": limit})
+        raise ValueError("Failed to retrieve URL list") from e
+
+    try:
+        data = [item.model_dump(mode="json") for item in link_list]
+    except Exception as e:
+        logger.error("MCP list_urls serialization failed", extra={"error": str(e), "limit": limit})
+        raise ValueError("Failed to retrieve URL list") from e
+    return [types.TextContent(type="text", text=json.dumps(data, default=str))]
 
 
 async def _safe_increment_visit(increment_fn, link: str) -> None:
