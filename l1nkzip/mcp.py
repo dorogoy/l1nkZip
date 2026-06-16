@@ -1,4 +1,5 @@
 import asyncio
+import secrets
 
 from mcp.server import Server
 from mcp.server.sse import SseServerTransport
@@ -270,7 +271,7 @@ async def _handle_list_urls(arguments: dict) -> list[types.TextContent]:
     except Exception:
         raise ValueError("Unauthorized") from None
 
-    if token != config.settings.token:
+    if not secrets.compare_digest(token, config.settings.token):
         raise ValueError("Unauthorized")
 
     limit = arguments.get("limit", 100)

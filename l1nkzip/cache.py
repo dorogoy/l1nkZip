@@ -21,18 +21,26 @@ class Cache:
 
     def __init__(self):
         """Initialize Redis client if REDIS_SERVER is configured."""
-        self.client: Optional[redis.Redis] = None
-        self._initialize_client()
+        self._client: Optional[redis.Redis] = None
 
-    def _initialize_client(self):
-        """Initialize or reinitialize Redis client."""
-        self.client = None
-        if config.settings.redis_server:
+    @property
+    def client(self) -> Optional[redis.Redis]:
+        """Get or lazily initialize the Redis client.
+
+        The client is created on first access so that ``config.settings`` is
+        read at runtime rather than at import time, which keeps test patches
+        effective and avoids connection side effects on module import.
+        """
+        if self._client is None and config.settings.redis_server:
             try:
-                self.client = redis.from_url(config.settings.redis_server, decode_responses=True)
+                self._client = redis.from_url(config.settings.redis_server, decode_responses=True)
             except Exception as e:
                 logger.error("Failed to connect to Redis", extra={"error": str(e)})
-                self.client = None
+        return self._client
+
+    @client.setter
+    def client(self, value: Optional[redis.Redis]) -> None:
+        self._client = value
 
     async def get(self, key: str) -> Optional[str]:
         """Get value from cache.

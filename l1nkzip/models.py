@@ -1,6 +1,5 @@
 import asyncio
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import List
 
 from pony.orm import Database, Optional, PrimaryKey, Required, db_session
@@ -46,7 +45,8 @@ class Link(db.Entity):  # type: ignore
     @property
     def full_link(self) -> str:
         link_str = str(self.link) if self.link is not None else ""
-        return str(Path(config.settings.api_domain, link_str))
+        api_domain = config.settings.api_domain.rstrip("/")
+        return f"{api_domain}/{link_str}"
 
 
 class PhishTank(db.Entity):  # type: ignore
