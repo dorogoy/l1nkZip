@@ -5,6 +5,21 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.6.0](https://github.com/dorogoy/l1nkZip/compare/v0.5.10...v0.6.0) (2026-06-16)
+
+
+### Features
+
+* add list_urls admin MCP tool with token auth ([0e80d06](https://github.com/dorogoy/l1nkZip/commit/0e80d06efe06eec1b2590b71d18c302dd1fac2ad))
+* expose public MCP tools for URL shortening and retrieval ([3ba5d87](https://github.com/dorogoy/l1nkZip/commit/3ba5d878b84fda84b71487e1f605e8eeb752cf70))
+* **mcp:** implement SSE transport endpoints and integration tests ([fa93eb4](https://github.com/dorogoy/l1nkZip/commit/fa93eb474e0d61a2c95f655880a7b05b7a771fab))
+
+
+### Documentation
+
+* document MCP integration and refresh test counts ([18cf5af](https://github.com/dorogoy/l1nkZip/commit/18cf5af38497b4227ebdc6071221c98d577d4a85))
+* update architecture and PRD to include MCP integration (AD8) ([cdbf466](https://github.com/dorogoy/l1nkZip/commit/cdbf466d01a447cba6f9f9c468caefcb503fe202))
+
 ## [0.5.10](https://github.com/dorogoy/l1nkZip/compare/v0.5.9...v0.5.10) (2026-04-18)
 
 
