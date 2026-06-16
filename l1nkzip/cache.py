@@ -29,7 +29,7 @@ class Cache:
         self.client = None
         if settings.redis_server:
             try:
-                self.client = redis.from_url(settings.redis_server)
+                self.client = redis.from_url(settings.redis_server, decode_responses=True)
             except Exception as e:
                 logger.error("Failed to connect to Redis", extra={"error": str(e)})
                 self.client = None
