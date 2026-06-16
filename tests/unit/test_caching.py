@@ -49,34 +49,37 @@ class TestCache:
     async def test_get_with_enabled_cache(self):
         """Test get operation with enabled cache."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
+            mock_client = AsyncMock()
+            mock_client.get.return_value = "cached_value"
             test_cache = Cache()
-            test_cache.client = AsyncMock()
-            test_cache.client.get.return_value = "cached_value"
+            test_cache.client = mock_client
 
             result = await test_cache.get("test_key")
             assert result == "cached_value"
-            test_cache.client.get.assert_called_once_with("test_key")
+            mock_client.get.assert_called_once_with("test_key")
 
     @pytest.mark.asyncio
     async def test_set_with_enabled_cache(self):
         """Test set operation with enabled cache."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
             with patch("l1nkzip.config.settings.redis_ttl", 3600):
+                mock_client = AsyncMock()
+                mock_client.set.return_value = True
                 test_cache = Cache()
-                test_cache.client = AsyncMock()
-                test_cache.client.set.return_value = True
+                test_cache.client = mock_client
 
                 result = await test_cache.set("test_key", "test_value")
                 assert result is True
-                test_cache.client.set.assert_called_once_with("test_key", "test_value", ex=3600)
+                mock_client.set.assert_called_once_with("test_key", "test_value", ex=3600)
 
     @pytest.mark.asyncio
     async def test_get_handles_exceptions(self):
         """Test that get handles Redis exceptions gracefully."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
+            mock_client = AsyncMock()
+            mock_client.get.side_effect = Exception("Redis error")
             test_cache = Cache()
-            test_cache.client = AsyncMock()
-            test_cache.client.get.side_effect = Exception("Redis error")
+            test_cache.client = mock_client
 
             result = await test_cache.get("test_key")
             assert result is None
@@ -85,9 +88,10 @@ class TestCache:
     async def test_set_handles_exceptions(self):
         """Test that set handles Redis exceptions gracefully."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
+            mock_client = AsyncMock()
+            mock_client.set.side_effect = Exception("Redis error")
             test_cache = Cache()
-            test_cache.client = AsyncMock()
-            test_cache.client.set.side_effect = Exception("Redis error")
+            test_cache.client = mock_client
 
             result = await test_cache.set("test_key", "test_value")
             assert result is False
