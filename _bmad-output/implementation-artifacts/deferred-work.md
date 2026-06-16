@@ -11,6 +11,10 @@
 - MCP handlers import and catch `fastapi.HTTPException` from `l1nkzip.main` validators (`l1nkzip/mcp.py:64, 101`) — pre-existing structural coupling; refactoring `validate_url`/`validate_short_link` to return a neutral result would touch existing HTTP endpoints.
 - Unknown tool raises bare `ValueError` (`l1nkzip/mcp.py:60`) — deferred until the MCP SDK error contract is verified.
 
+## Deferred from: code review of spec-docs-mcp-feature-documentation (2026-06-16)
+
+- Pre-existing broken intra-site links in `user-guide/docs/index.md:10,12,20` use `/l1nkZip/install`, but the Self-hosting page slug is `/l1nkZip/selfhosting/` (`/install` returns 404 on the live site, verified via curl). Not introduced by the MCP docs change; the new `mcp.md` already uses the correct `/l1nkZip/selfhosting`. Fix: update the three index.md links to `/l1nkZip/selfhosting`.
+
 ## Deferred from: code review of story 5-3-herramientas-mcp-administrativas-y-seguridad-por-token (2026-06-16)
 
 - Timing side-channel on `token != settings.token` (`l1nkzip/mcp.py:273`) — pre-existing pattern in all admin endpoints (`main.py:263,283`); requires transversal fix using `hmac.compare_digest`.

@@ -13,6 +13,7 @@ The code of l1nkZip is available at its [Github repository][Github repository] u
 * Optional protection against phishing using the [PhishTank][PhishTank] database.
 * Built-in rate limiting to prevent abuse through mass URL creation and enumeration attacks.
 * Optional Redis caching for improved performance on frequently accessed URLs.
+* Built-in [Model Context Protocol (MCP)][MCP] server so AI agents can shorten and resolve links directly. See the [MCP Integration](/l1nkZip/mcp) page.
 
 ## User manual
 
@@ -162,6 +163,7 @@ When self-hosting with Redis:
 2. Set appropriate TTL based on your traffic patterns
 3. Monitor cache hit rates for performance optimization
 
+[MCP]: https://modelcontextprotocol.io
 [FastApi]: https://fastapi.tiangolo.com
 [PonyORM]: https://ponyorm.org
 [PhishTank]: https://phishtank.org
