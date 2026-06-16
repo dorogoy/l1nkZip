@@ -1,5 +1,7 @@
 import asyncio
+from contextlib import contextmanager
 import re
+import sys
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -8,14 +10,8 @@ import pytest
 from l1nkzip.config import Settings
 
 
+@contextmanager
 def _get_app():
-    import sys
-
-    modules_to_clear = ["l1nkzip.config", "l1nkzip.models", "l1nkzip.main"]
-    for module in modules_to_clear:
-        if module in sys.modules:
-            del sys.modules[module]
-
     test_settings = Settings()
     test_settings.db_type = "inmemory"
     test_settings.redis_server = None
@@ -24,16 +20,19 @@ def _get_app():
     test_settings.rate_limit_create = "1000/minute"
     test_settings.rate_limit_redirect = "2000/minute"
 
+    # Reload main so it picks up the patched settings at import time.
+    sys.modules.pop("l1nkzip.main", None)
+
     with patch("l1nkzip.config.settings", test_settings):
         from l1nkzip.main import app
 
-    return app
+        yield app
 
 
 @pytest.fixture
 def mcp_test_client():
-    app = _get_app()
-    yield TestClient(app)
+    with _get_app() as app:
+        yield TestClient(app)
 
 
 async def _collect_sse_messages(app, path: str = "/mcp/sse", timeout: float = 2.0):
@@ -146,8 +145,8 @@ class TestMCPModuleImports:
 
 class TestMCPSSEStreamIntegration:
     def test_sse_stream_handshake(self):
-        app = _get_app()
-        messages = asyncio.run(_collect_sse_messages(app, timeout=0.5))
+        with _get_app() as app:
+            messages = asyncio.run(_collect_sse_messages(app, timeout=0.5))
 
         response_start = next(m for m in messages if m["type"] == "http.response.start")
         assert response_start["status"] == 200
@@ -163,8 +162,8 @@ class TestMCPSSEStreamIntegration:
         assert re.search(session_pattern, full_body), f"No session_id found in: {full_body[:500]}"
 
     def test_sse_stream_has_cache_control(self):
-        app = _get_app()
-        messages = asyncio.run(_collect_sse_messages(app, timeout=0.5))
+        with _get_app() as app:
+            messages = asyncio.run(_collect_sse_messages(app, timeout=0.5))
 
         response_start = next(m for m in messages if m["type"] == "http.response.start")
         headers_dict = {k.decode(): v.decode() for k, v in response_start["headers"]}
@@ -172,8 +171,8 @@ class TestMCPSSEStreamIntegration:
         assert "no-store" in cache_control or "no-cache" in cache_control
 
     def test_sse_stream_connection_keep_alive(self):
-        app = _get_app()
-        messages = asyncio.run(_collect_sse_messages(app, timeout=0.5))
+        with _get_app() as app:
+            messages = asyncio.run(_collect_sse_messages(app, timeout=0.5))
 
         response_start = next(m for m in messages if m["type"] == "http.response.start")
         headers_dict = {k.decode(): v.decode() for k, v in response_start["headers"]}

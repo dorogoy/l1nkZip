@@ -79,24 +79,13 @@ class TestCreationFlow:
     def test_creation_with_caching(self, test_client, mock_redis, metrics_collector):
         """Test URL creation flow with Redis caching."""
         with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
-            # Clear modules to ensure settings are reloaded
-            import sys
-
-            modules_to_clear = ["l1nkzip.config", "l1nkzip.cache"]
-            for module in modules_to_clear:
-                if module in sys.modules:
-                    del sys.modules[module]
-
-            # Import fresh modules
-            from l1nkzip.main import app
-
-            # Create new test client with Redis enabled
-            redis_client = TestClient(app)
-
-            # Import cache module and set mock client after initialization
             from l1nkzip.cache import cache
 
             cache.client = mock_redis
+
+            from l1nkzip.main import app
+
+            redis_client = TestClient(app)
 
             # Create URL
             response = redis_client.post("/url", json={"url": "https://example.com"})

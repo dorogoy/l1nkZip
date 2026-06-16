@@ -9,7 +9,7 @@ from typing import Optional
 
 import redis.asyncio as redis
 
-from l1nkzip.config import settings
+from l1nkzip import config
 from l1nkzip.logging import get_logger
 
 
@@ -27,9 +27,9 @@ class Cache:
     def _initialize_client(self):
         """Initialize or reinitialize Redis client."""
         self.client = None
-        if settings.redis_server:
+        if config.settings.redis_server:
             try:
-                self.client = redis.from_url(settings.redis_server, decode_responses=True)
+                self.client = redis.from_url(config.settings.redis_server, decode_responses=True)
             except Exception as e:
                 logger.error("Failed to connect to Redis", extra={"error": str(e)})
                 self.client = None
@@ -67,7 +67,7 @@ class Cache:
             return False
 
         try:
-            ttl_value = ttl or settings.redis_ttl
+            ttl_value = ttl or config.settings.redis_ttl
             await self.client.set(key, value, ex=ttl_value)
             return True
         except Exception as e:

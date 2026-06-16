@@ -7,6 +7,7 @@ us to validate behavior without driving the full SSE/JSON-RPC transport.
 """
 
 import asyncio
+from contextlib import contextmanager
 import json
 import logging
 import re
@@ -20,11 +21,6 @@ from l1nkzip.config import Settings
 
 
 def _get_handlers():
-    modules_to_clear = ["l1nkzip.config", "l1nkzip.models", "l1nkzip.main", "l1nkzip.mcp"]
-    for module in modules_to_clear:
-        if module in sys.modules:
-            del sys.modules[module]
-
     test_settings = Settings()
     test_settings.db_type = "inmemory"
     test_settings.redis_server = None
@@ -32,20 +28,20 @@ def _get_handlers():
     test_settings.phishtank = None
     test_settings.rate_limit_create = "1000/minute"
     test_settings.rate_limit_redirect = "2000/minute"
+
+    # Reload main so handlers are wired with the patched settings.
+    sys.modules.pop("l1nkzip.main", None)
+    sys.modules.pop("l1nkzip.mcp", None)
 
     with patch("l1nkzip.config.settings", test_settings):
         from l1nkzip.main import app  # noqa: F401 - imports app to wire mcp handlers
         from l1nkzip.mcp import handle_call_tool, handle_list_tools
 
-    return handle_list_tools, handle_call_tool
+        return handle_list_tools, handle_call_tool
 
 
+@contextmanager
 def _get_app():
-    modules_to_clear = ["l1nkzip.config", "l1nkzip.models", "l1nkzip.main", "l1nkzip.mcp"]
-    for module in modules_to_clear:
-        if module in sys.modules:
-            del sys.modules[module]
-
     test_settings = Settings()
     test_settings.db_type = "inmemory"
     test_settings.redis_server = None
@@ -54,10 +50,12 @@ def _get_app():
     test_settings.rate_limit_create = "1000/minute"
     test_settings.rate_limit_redirect = "2000/minute"
 
+    sys.modules.pop("l1nkzip.main", None)
+
     with patch("l1nkzip.config.settings", test_settings):
         from l1nkzip.main import app
 
-    return app
+        yield app
 
 
 @pytest.fixture
@@ -179,7 +177,7 @@ class TestShortenUrlTool:
             phish_detail_url = "https://phishtank.org/detail/test"
 
         with (
-            patch("l1nkzip.mcp.settings.phishtank", "test-api-key"),
+            patch("l1nkzip.config.settings.phishtank", "test-api-key"),
             patch("l1nkzip.main.retry_phishtank_check") as mock_retry,
         ):
             mock_retry.return_value = FakePhish()
@@ -264,7 +262,7 @@ class TestGetOriginalUrlTool:
         short_link = full_link.replace("https://l1nk.zip/", "")
 
         with (
-            patch("l1nkzip.mcp.settings.phishtank", "test-api-key"),
+            patch("l1nkzip.config.settings.phishtank", "test-api-key"),
             patch("l1nkzip.main.retry_phishtank_check") as mock_retry,
         ):
             mock_retry.return_value = FakePhish()
@@ -288,7 +286,7 @@ def list_urls_handlers(test_settings):
     import l1nkzip.main  # noqa: F401
     from l1nkzip.mcp import handle_call_tool, handle_list_tools
 
-    with patch("l1nkzip.mcp.settings", test_settings):
+    with patch("l1nkzip.config.settings", test_settings):
         yield handle_list_tools, handle_call_tool
 
 
@@ -550,8 +548,8 @@ async def _drive_sse_messages(app, timeout: float = 3.0):
 
 class TestListUrlsSSEIntegration:
     def test_missing_token_returns_error_over_sse(self):
-        app = _get_app()
-        blob = asyncio.run(_drive_sse_messages(app))
+        with _get_app() as app:
+            blob = asyncio.run(_drive_sse_messages(app))
 
         assert '"id": 2' in blob or '"id":2' in blob
         assert '"isError":true' in blob
