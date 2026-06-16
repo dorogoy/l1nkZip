@@ -16,7 +16,8 @@ The full documentation is available at https://dorogoy.github.io/l1nkZip.
 * Built-in rate limiting protection against abuse through mass URL creation or enumeration attacks using [slowapi](https://github.com/laurentS/slowapi).
 * Optional Redis caching for improved performance on frequently accessed URLs (TTL-based with configurable expiration).
 * **Comprehensive monitoring and observability** with Prometheus metrics, structured logging, and alerting support.
-* **Comprehensive test suite** with more than 159 tests covering unit, API, and integration scenarios (75%+ coverage).
+* **Built-in MCP (Model Context Protocol) server** over SSE, letting AI agents shorten and resolve links directly via discoverable tools.
+* **Comprehensive test suite** with more than 229 tests covering unit, API, and integration scenarios (75%+ coverage).
 
 ## Companion CLI Tool
 
@@ -187,6 +188,27 @@ For Kubernetes deployments, the monitoring system integrates seamlessly with:
 
 See the [self-hosting documentation](user-guide/docs/selfhosting.md) for detailed Kubernetes configuration examples.
 
+## MCP Integration
+
+L1nkZip embeds a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so AI agents and LLM-powered clients can discover and invoke its URL management capabilities directly. The server uses the Server-Sent Events (SSE) transport and speaks JSON-RPC 2.0. MCP is always enabled — there is no environment variable to toggle it.
+
+### Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/mcp/sse` | `GET` | Opens a persistent SSE stream and returns the message endpoint URL |
+| `/mcp/messages` | `POST` | Receives JSON-RPC 2.0 messages from the client |
+
+A session starts with a `GET` to `/mcp/sse`, which emits an `endpoint` event pointing to `/mcp/messages?session_id=<id>`. The client then POSTs JSON-RPC messages to that URL.
+
+### Available Tools
+
+- **`shorten_url`** *(public)* — shortens a long URL (requires `url`). Applies PhishTank protection (if enabled) like the REST API.
+- **`get_original_url`** *(public)* — retrieves the destination for a short link (requires `link`). Serves from cache and records a visit.
+- **`list_urls`** *(admin)* — lists shortened URLs with stats. Requires the admin `TOKEN` (optional `limit`, default 100, range 1–1000).
+
+See the [MCP Integration documentation](https://dorogoy.github.io/l1nkZip/mcp) for connection examples and the full tool schemas.
+
 ## Testing
 
 L1nkZip includes a comprehensive test suite to ensure code quality and reliability:
@@ -206,14 +228,14 @@ make test-integration  # Integration tests only
 ```
 
 ### Test Coverage
-- **159 total tests** across unit, API, and integration scenarios
+- **229 total tests** across unit, API, and integration scenarios
 - **75%+ code coverage** with detailed reporting
 - **Test isolation** using in-memory databases and mocked external services
 - **Performance optimized** with parallel execution and fast fixtures
 
 ### Test Categories
-- **Unit Tests**: Individual component testing (54 tests)
-- **API Tests**: FastAPI endpoint validation (61 tests)
-- **Integration Tests**: End-to-end workflow testing (24 tests)
+- **Unit Tests**: Individual component testing (72 tests)
+- **API Tests**: FastAPI endpoint validation (119 tests)
+- **Integration Tests**: End-to-end workflow testing (38 tests)
 
-For detailed information about the testing strategy, fixtures, and best practices, see the [Testing Documentation](user-guide/docs/testing.md).
+For detailed information about the testing strategy, fixtures, and best practices, see the [Testing Documentation](https://dorogoy.github.io/l1nkZip).

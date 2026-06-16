@@ -23,6 +23,7 @@ theme:
         name: Switch to dark mode
 nav:
   - Getting started: index.md
+  - MCP Integration: mcp.md
   - Self-hosting: selfhosting.md
 markdown_extensions:
   - pymdownx.highlight:
