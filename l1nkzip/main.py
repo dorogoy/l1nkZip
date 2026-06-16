@@ -46,7 +46,7 @@ def validate_url(url: str) -> str:
     """Validate and sanitize URL input"""
     if not url or not isinstance(url, str):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="URL is required and must be a string",
         )
 
@@ -56,7 +56,7 @@ def validate_url(url: str) -> str:
     # Check length
     if len(url) > 2048:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="URL is too long (maximum 2048 characters)",
         )
 
@@ -64,13 +64,13 @@ def validate_url(url: str) -> str:
     try:
         if not validators.url(url):
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Invalid URL format",
             )
     except Exception as e:
         # validators.url() raises ValidationError for invalid URLs
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Invalid URL format",
         ) from e
 
@@ -78,7 +78,7 @@ def validate_url(url: str) -> str:
     parsed = urlparse(url)
     if parsed.scheme not in ["http", "https"]:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Only HTTP and HTTPS URLs are allowed",
         )
 
@@ -86,14 +86,14 @@ def validate_url(url: str) -> str:
     dangerous_schemes = ["javascript", "data", "file", "vbscript"]
     if parsed.scheme in dangerous_schemes:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Dangerous URL scheme not allowed",
         )
 
     # Additional validation for malformed URLs
     if not parsed.netloc or parsed.netloc == "":
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Invalid URL format - missing domain",
         )
 
