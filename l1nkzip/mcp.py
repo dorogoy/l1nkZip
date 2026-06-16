@@ -4,8 +4,8 @@ from mcp.server import Server
 from mcp.server.sse import SseServerTransport
 import mcp.types as types
 
+from l1nkzip import config
 from l1nkzip.cache import cache
-from l1nkzip.config import settings
 from l1nkzip.logging import get_logger
 from l1nkzip.metrics import metrics
 
@@ -103,14 +103,14 @@ async def _handle_shorten_url(arguments: dict) -> list[types.TextContent]:
     except Exception as e:
         raise ValueError(f"Invalid URL: {e}") from e
 
-    if settings.phishtank:
+    if config.settings.phishtank:
         try:
             phish = await retry_phishtank_check(validated_url)
         except Exception as e:
             logger.warning("PhishTank check failed in shorten_url", extra={"error": str(e), "url": validated_url})
             phish = None
         if phish:
-            if settings.metrics_enabled:
+            if config.settings.metrics_enabled:
                 try:
                     metrics.record_phishing_block()
                 except Exception as metric_exc:
@@ -129,13 +129,13 @@ async def _handle_shorten_url(arguments: dict) -> list[types.TextContent]:
     if not link:
         raise ValueError("Failed to create short URL: invalid link data")
 
-    if settings.metrics_enabled:
+    if config.settings.metrics_enabled:
         try:
             metrics.record_url_created()
         except Exception as metric_exc:
             logger.warning("metrics.record_url_created failed", extra={"error": str(metric_exc)})
 
-    api_domain = settings.api_domain
+    api_domain = config.settings.api_domain
     if not api_domain:
         raise ValueError("api_domain is not configured")
     short_url = f"{api_domain.rstrip('/')}/{link}"
@@ -174,14 +174,14 @@ async def _handle_get_original_url(arguments: dict) -> list[types.TextContent]:
             cached_url = await cache.get(f"redirect:{validated_link}")
             if isinstance(cached_url, bytes):
                 cached_url = cached_url.decode()
-            if settings.metrics_enabled:
+            if config.settings.metrics_enabled:
                 metrics.record_cache_operation("get", hit=bool(cached_url))
             if cached_url:
                 original_url = cached_url
                 cache_hit = True
         except Exception as e:
             logger.error("Cache get error in get_original_url", extra={"error": str(e), "link": validated_link})
-            if settings.metrics_enabled:
+            if config.settings.metrics_enabled:
                 try:
                     metrics.record_cache_operation("get", success=False)
                 except Exception as metric_exc:
@@ -208,27 +208,27 @@ async def _handle_get_original_url(arguments: dict) -> list[types.TextContent]:
         if cache.is_enabled():
             try:
                 await cache.set(f"redirect:{validated_link}", original_url)
-                if settings.metrics_enabled:
+                if config.settings.metrics_enabled:
                     metrics.record_cache_operation("set", success=True)
             except Exception as e:
                 logger.error(
                     "Cache set error in get_original_url",
                     extra={"error": str(e), "link": validated_link},
                 )
-                if settings.metrics_enabled:
+                if config.settings.metrics_enabled:
                     try:
                         metrics.record_cache_operation("set", success=False)
                     except Exception as metric_exc:
                         logger.warning("metrics.record_cache_operation failed", extra={"error": str(metric_exc)})
 
-    if settings.phishtank:
+    if config.settings.phishtank:
         try:
             phish = await retry_phishtank_check(original_url)
         except Exception as e:
             logger.warning("PhishTank check failed in get_original_url", extra={"error": str(e), "url": original_url})
             phish = None
         if phish:
-            if settings.metrics_enabled:
+            if config.settings.metrics_enabled:
                 try:
                     metrics.record_phishing_block()
                 except Exception as metric_exc:
@@ -236,7 +236,7 @@ async def _handle_get_original_url(arguments: dict) -> list[types.TextContent]:
             detail = str(getattr(phish, "phish_detail_url", "")) or "https://phishtank.org/"
             raise ValueError(f"URL is flagged as phishing. Details: {detail}")
 
-    if settings.metrics_enabled:
+    if config.settings.metrics_enabled:
         try:
             metrics.record_redirect()
         except Exception as metric_exc:
@@ -270,7 +270,7 @@ async def _handle_list_urls(arguments: dict) -> list[types.TextContent]:
     except Exception:
         raise ValueError("Unauthorized") from None
 
-    if token != settings.token:
+    if token != config.settings.token:
         raise ValueError("Unauthorized")
 
     limit = arguments.get("limit", 100)

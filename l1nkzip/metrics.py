@@ -15,7 +15,7 @@ from prometheus_client import (
 )
 from prometheus_client.core import CollectorRegistry
 
-from l1nkzip.config import settings
+from l1nkzip import config
 
 
 class MetricsCollector:
@@ -166,7 +166,7 @@ class MetricsCollector:
 
     def is_enabled(self) -> bool:
         """Check if metrics collection is enabled."""
-        return getattr(settings, "metrics_enabled", False)
+        return getattr(config.settings, "metrics_enabled", False)
 
 
 # Global metrics instance

@@ -5,6 +5,7 @@ Pytest configuration and shared fixtures for L1nkZip tests.
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi.testclient import TestClient
+from pony.orm import db_session
 from prometheus_client import Counter, Gauge, Histogram
 from prometheus_client.core import CollectorRegistry
 import pytest
@@ -29,20 +30,17 @@ def test_settings():
 @pytest.fixture
 def test_client(test_settings):
     """Test client with in-memory database and test settings."""
-    # Clear modules first to ensure clean import
+    # Reload main so settings captured at import time use the patched values.
     import sys
 
-    modules_to_clear = ["l1nkzip.config", "l1nkzip.models", "l1nkzip.main"]
-    for module in modules_to_clear:
-        if module in sys.modules:
-            del sys.modules[module]
+    for module in ("l1nkzip.main",):
+        sys.modules.pop(module, None)
 
-    # Patch settings before importing
+    # Patch settings for the whole test and import a fresh app instance.
     with patch("l1nkzip.config.settings", test_settings):
-        # Import fresh modules
         from l1nkzip.main import app
 
-        return TestClient(app)
+        yield TestClient(app)
 
 
 @pytest.fixture
@@ -156,21 +154,17 @@ def mock_phishtank():
 @pytest.fixture
 async def async_test_client(test_settings):
     """Async test client for async tests."""
+    import sys
+
+    for module in ("l1nkzip.main",):
+        sys.modules.pop(module, None)
+
     with patch("l1nkzip.config.settings", test_settings):
-        # Clear modules to ensure settings are reloaded
-        import sys
-
-        modules_to_clear = ["l1nkzip.config", "l1nkzip.models", "l1nkzip.main"]
-        for module in modules_to_clear:
-            if module in sys.modules:
-                del sys.modules[module]
-
-        # Import fresh modules
         from fastapi.testclient import TestClient
 
         from l1nkzip.main import app
 
-        return TestClient(app)
+        yield TestClient(app)
 
 
 # Test data fixtures
@@ -215,3 +209,26 @@ def invalid_tokens():
         " ",
         "",
     ]
+
+
+@pytest.fixture(autouse=True)
+def _cleanup_test_state():
+    """Reset shared global state after each test to keep tests isolated."""
+    yield
+
+    # Reset the Redis cache client so cache-enabled tests don't leak state.
+    from l1nkzip.cache import cache
+
+    cache.client = None
+
+    # Clear the in-memory database tables.
+    from l1nkzip.models import Link, PhishTank
+
+    try:
+        with db_session:
+            Link.select().delete(bulk=True)
+            PhishTank.select().delete(bulk=True)
+    except Exception:
+        # If the DB is not bound (e.g. unit tests that never import main),
+        # there is nothing to clean up.
+        pass

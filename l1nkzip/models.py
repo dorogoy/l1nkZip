@@ -6,8 +6,7 @@ from typing import List
 from pony.orm import Database, Optional, PrimaryKey, Required, db_session
 from pydantic import BaseModel, HttpUrl
 
-from l1nkzip import generator
-from l1nkzip.config import settings
+from l1nkzip import config, generator
 
 
 db = Database()
@@ -47,7 +46,7 @@ class Link(db.Entity):  # type: ignore
     @property
     def full_link(self) -> str:
         link_str = str(self.link) if self.link is not None else ""
-        return str(Path(settings.api_domain, link_str))
+        return str(Path(config.settings.api_domain, link_str))
 
 
 class PhishTank(db.Entity):  # type: ignore
