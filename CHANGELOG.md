@@ -5,6 +5,16 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.6.1](https://github.com/dorogoy/l1nkZip/compare/v0.6.0...v0.6.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* address review feedback on test isolation PR ([9689349](https://github.com/dorogoy/l1nkZip/commit/96893496231c2e28dbef258137ad43a0d1c193e1))
+* **deps:** bump fastapi from 0.135.3 to 0.137.1 ([b8f1e56](https://github.com/dorogoy/l1nkZip/commit/b8f1e56f125b2d901ea00a52e631dc4b8ccb574c))
+* **deps:** bump ruff from 0.15.11 to 0.15.12 ([e12bc9e](https://github.com/dorogoy/l1nkZip/commit/e12bc9ed3083a0e059e03736b97b48d8ea9822dc))
+* **version:** read version from pyproject.toml ([674d528](https://github.com/dorogoy/l1nkZip/commit/674d528f6e49ad1187378cc754b99615588781c1))
+
 ## [0.6.0](https://github.com/dorogoy/l1nkZip/compare/v0.5.10...v0.6.0) (2026-06-16)
 
 
