@@ -18,7 +18,7 @@ dependencies = [
     "pytest-cov==7.1.0",
     "redis==7.4.0",
     "ruff==0.15.12",
-    "slowapi==0.1.9",
+    "slowapi==0.1.10",
     "ty>=0.0.1a19",
     "uvicorn==0.44.0",
     "validators==0.35.0",
