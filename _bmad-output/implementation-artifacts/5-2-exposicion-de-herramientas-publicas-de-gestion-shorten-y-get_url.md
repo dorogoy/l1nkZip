@@ -65,6 +65,7 @@ Here is how tools are registered using the low-level MCP SDK decorators:
 ```python
 import mcp.types as types
 
+
 @mcp_server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     return [
@@ -76,14 +77,15 @@ async def handle_list_tools() -> list[types.Tool]:
                 "properties": {
                     "url": {
                         "type": "string",
-                        "description": "The long URL to shorten (must start with http:// or https://)"
+                        "description": "The long URL to shorten (must start with http:// or https://)",
                     }
                 },
-                "required": ["url"]
-            }
+                "required": ["url"],
+            },
         ),
         # ... get_original_url Tool definition
     ]
+
 
 @mcp_server.call_tool()
 async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent]:
