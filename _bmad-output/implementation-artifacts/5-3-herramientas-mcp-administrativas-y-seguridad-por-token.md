@@ -135,7 +135,6 @@ async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent
 
 ```python
 import json
-
 data = [item.model_dump(mode="json") for item in link_list]
 return [types.TextContent(type="text", text=json.dumps(data, default=str))]
 ```

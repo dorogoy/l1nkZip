@@ -38,6 +38,7 @@ extend-exclude = [
   ".claude",
   ".opencode",
   "_bmad",
+  "_bmad-output",
 ]
 
 [tool.ruff.lint]

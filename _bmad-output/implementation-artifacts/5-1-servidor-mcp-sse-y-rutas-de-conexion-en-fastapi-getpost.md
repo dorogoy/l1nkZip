@@ -84,11 +84,12 @@ so that I can discover and call l1nkZip tools remotely.
    import asyncio
    from l1nkzip.mcp import mcp_server, sse_transport
 
-
    @app.get("/mcp/sse", tags=["mcp"])
    async def handle_sse(request: Request):
        try:
-           async with sse_transport.connect_sse(request.scope, request.receive, request._send) as streams:
+           async with sse_transport.connect_sse(
+               request.scope, request.receive, request._send
+           ) as streams:
                await mcp_server.run(
                    streams[0],
                    streams[1],
@@ -97,15 +98,22 @@ so that I can discover and call l1nkZip tools remotely.
        except asyncio.CancelledError:
            logger.info("MCP SSE client connection cancelled/disconnected gracefully")
        except Exception as e:
-           logger.warning("Unexpected disconnect in MCP SSE connection", extra={"error": str(e)})
-
+           logger.warning(
+               "Unexpected disconnect in MCP SSE connection",
+               extra={"error": str(e)}
+           )
 
    @app.post("/mcp/messages", tags=["mcp"])
    async def handle_messages(request: Request):
        try:
-           await sse_transport.handle_post_message(request.scope, request.receive, request._send)
+           await sse_transport.handle_post_message(
+               request.scope, request.receive, request._send
+           )
        except Exception as e:
-           logger.error("Error handling MCP message POST request", extra={"error": str(e)})
+           logger.error(
+               "Error handling MCP message POST request",
+               extra={"error": str(e)}
+           )
            raise HTTPException(status_code=500, detail="Internal server error in message route")
    ```
 
