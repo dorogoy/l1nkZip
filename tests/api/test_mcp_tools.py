@@ -436,7 +436,7 @@ class TestListUrlsTool:
         assert mock_get.called
 
 
-async def _drive_sse_messages(app, timeout: float = 3.0):
+async def _drive_sse_messages(app, timeout: float = 3.0, tool_arguments: dict | None = None):
     sse_scope = {
         "type": "http",
         "method": "GET",
@@ -533,7 +533,7 @@ async def _drive_sse_messages(app, timeout: float = 3.0):
             "jsonrpc": "2.0",
             "id": 2,
             "method": "tools/call",
-            "params": {"name": "list_urls", "arguments": {}},
+            "params": {"name": "list_urls", "arguments": tool_arguments or {}},
         }
     )
     blob = await wait_for_response(2)
@@ -547,9 +547,9 @@ async def _drive_sse_messages(app, timeout: float = 3.0):
 
 
 class TestListUrlsSSEIntegration:
-    def test_missing_token_returns_error_over_sse(self):
+    def test_invalid_token_returns_unauthorized_over_sse(self):
         with _get_app() as app:
-            blob = asyncio.run(_drive_sse_messages(app))
+            blob = asyncio.run(_drive_sse_messages(app, tool_arguments={"token": "wrong-token"}))
 
         assert '"id": 2' in blob or '"id":2' in blob
         assert '"isError":true' in blob
