@@ -5,6 +5,18 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.6.2](https://github.com/dorogoy/l1nkZip/compare/v0.6.1...v0.6.2) (2026-08-13)
+
+
+### Bug Fixes
+
+* **deps:** bump idna from 3.10 to 3.15 ([b376a0c](https://github.com/dorogoy/l1nkZip/commit/b376a0c2ca4aea390c121eb1453f4f847090804b))
+* **deps:** bump mcp from 1.1.3 to 1.28.1 ([#236](https://github.com/dorogoy/l1nkZip/issues/236)) ([a3976dd](https://github.com/dorogoy/l1nkZip/commit/a3976dd65b4fa628afdaeff44f6149d3811f4ad4))
+* **deps:** bump python-dotenv from 1.1.1 to 1.2.2 ([99c6a51](https://github.com/dorogoy/l1nkZip/commit/99c6a51d4b7430d363f1cb1a592975b05c00efbe))
+* **deps:** bump ruff from 0.15.12 to 0.16.2 ([#227](https://github.com/dorogoy/l1nkZip/issues/227)) ([c8950c1](https://github.com/dorogoy/l1nkZip/commit/c8950c14ceb01056f681c827ab6d80771abbeeb5))
+* **deps:** bump slowapi from 0.1.9 to 0.1.10 ([90f9d00](https://github.com/dorogoy/l1nkZip/commit/90f9d0067ee24b2b57e375227a995576a0aa30bc))
+* **deps:** upgrade fastapi, starlette and pydantic to latest ([b661c77](https://github.com/dorogoy/l1nkZip/commit/b661c7794f02195fa33f4a095be64f9e3d9811ee))
+
 ## [0.6.1](https://github.com/dorogoy/l1nkZip/compare/v0.6.0...v0.6.1) (2026-06-16)
 
 
