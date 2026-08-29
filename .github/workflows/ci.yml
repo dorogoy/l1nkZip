@@ -17,6 +17,8 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
+      - name: Check uv.lock freshness
+        run: uv lock --check
       - name: test root
         run: |
           make test
