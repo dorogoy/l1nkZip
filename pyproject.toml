@@ -20,7 +20,7 @@ dependencies = [
     "ruff==0.16.4",
     "slowapi==0.1.10",
     "ty>=0.0.1a19",
-    "uvicorn==0.44.0",
+    "uvicorn==0.52.4",
     "validators==0.35.0",
 ]
 
