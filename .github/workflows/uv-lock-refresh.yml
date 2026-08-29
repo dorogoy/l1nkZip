@@ -1,0 +1,62 @@
+name: uv.lock auto-refresh
+
+# Keeps uv.lock in sync with pyproject.toml. Two paths:
+#  1. push to master: heal any staleness left by a merge (e.g. a release-please
+#     PR merged before its lock refresh landed, or manual version edits).
+#  2. pull_request: refresh the release-please branch, whose pyproject.toml
+#     version bump would otherwise fail the required 'uv lock --check' CI step.
+#     Contributor and Dependabot branches are intentionally untouched: a stale
+#     lock on those must fail the check, not be silently papered over.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  contents: write
+
+concurrency:
+  group: uv-lock-refresh-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    timeout-minutes: 5
+    runs-on: ubuntu-22.04
+    if: >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.ref == 'release-please--branches--master'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          # On pull_request events, check out the PR head so the refresh can be
+          # pushed back to its branch (master pushes use the default ref).
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - name: Setup python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - name: Refresh uv.lock if stale
+        run: |
+          if uv lock --check; then
+            echo "uv.lock is fresh, nothing to do."
+            exit 0
+          fi
+          uv lock
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add uv.lock
+          git commit -m "chore: refresh uv.lock after pyproject.toml change"
+          # Detached HEAD (PR-head checkout) needs an explicit push target.
+          git push origin "HEAD:refs/heads/${{ github.event.pull_request.head.ref || 'master' }}"
