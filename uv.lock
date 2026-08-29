@@ -439,7 +439,7 @@ requires-dist = [
     { name = "httpx", specifier = "==0.28.1" },
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "mcp", specifier = ">=1.28.1" },
-    { name = "pony", specifier = "==0.7.19" },
+    { name = "pony", specifier = "==0.7.20" },
     { name = "prometheus-client", specifier = "==0.25.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pydantic-settings", specifier = "==2.15.0" },
@@ -551,11 +551,11 @@ wheels = [
 
 [[package]]
 name = "pony"
-version = "0.7.19"
+version = "0.7.20"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/60/59/ab6542afa95de0d5a16545ce6ce683960352cfd9a2318722593b81a98123/pony-0.7.19.tar.gz", hash = "sha256:f7f83b2981893e49f7f18e8def52ad8fa8f8e6c5f9583b9aaed62d4d85036a0f", size = 258589, upload-time = "2024-08-27T12:29:29.963Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8b/0e/c76b175a7422816520552e2afc69303a171f434dc494354376d9d24ad2d5/pony-0.7.20.tar.gz", hash = "sha256:27a48dffd1d1005956ffa96873fb2de5eada639ca266c43db480cadabc860ccd", size = 278804, upload-time = "2026-08-09T12:42:20.233Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/16/cb/0ef8429024309fe6f5edf1debc7cf63adeaeb34b2242490cc18710658abd/pony-0.7.19-py3-none-any.whl", hash = "sha256:5112b4cf40d3f24e93ae66dc5ab7dc6813388efa870e750928d60dc699873cf5", size = 317259, upload-time = "2024-08-27T12:29:28.247Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/81/edd1014ef987dae03a30ccde3d30e317130d19dfe5317650a35cfba0151f/pony-0.7.20-py3-none-any.whl", hash = "sha256:88eb65c940c6efebdc56d2181dc4e5c89650f993f0b27037bbfb3e07b60696ba", size = 319899, upload-time = "2026-08-09T12:42:18.761Z" },
 ]
 
 [[package]]
