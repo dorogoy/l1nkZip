@@ -5,6 +5,15 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.6.3](https://github.com/dorogoy/l1nkZip/compare/v0.6.2...v0.6.3) (2026-08-29)
+
+
+### Bug Fixes
+
+* **deps:** bump pony from 0.7.19 to 0.7.20 ([cc65e61](https://github.com/dorogoy/l1nkZip/commit/cc65e61dd384eeaf1b31049cd61bde80e01bdb52))
+* **deps:** bump ruff from 0.16.3 to 0.16.4 ([d304b53](https://github.com/dorogoy/l1nkZip/commit/d304b53d5a7ac3d177ff1a02ebac7fb854ed63f2))
+* **deps:** bump uvicorn from 0.44.0 to 0.52.4 ([a27c4f4](https://github.com/dorogoy/l1nkZip/commit/a27c4f41bf3852f1c3ea717e6ba870328620c3b3))
+
 ## [0.6.2](https://github.com/dorogoy/l1nkZip/compare/v0.6.1...v0.6.2) (2026-08-13)
 
 
