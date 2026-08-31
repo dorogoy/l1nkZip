@@ -1,9 +1,16 @@
 import asyncio
 import secrets
 
-from mcp.server import Server
+from mcp.server import Server, ServerRequestContext
 from mcp.server.sse import SseServerTransport
 import mcp.types as types
+from mcp.types import (
+    CallToolRequestParams,
+    CallToolResult,
+    ListToolsResult,
+    PaginatedRequestParams,
+    TextContent,
+)
 
 from l1nkzip import config
 from l1nkzip.cache import cache
@@ -13,18 +20,13 @@ from l1nkzip.metrics import metrics
 
 logger = get_logger(__name__)
 
-mcp_server = Server("l1nkzip-mcp-server")
 
-sse_transport = SseServerTransport("/mcp/messages")
-
-
-@mcp_server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="shorten_url",
             description="Shorten a long URL and return the short link.",
-            inputSchema={
+            input_schema={
                 "type": "object",
                 "properties": {
                     "url": {
@@ -38,7 +40,7 @@ async def handle_list_tools() -> list[types.Tool]:
         types.Tool(
             name="get_original_url",
             description="Retrieve the destination URL for a previously shortened link.",
-            inputSchema={
+            input_schema={
                 "type": "object",
                 "properties": {
                     "link": {
@@ -52,7 +54,7 @@ async def handle_list_tools() -> list[types.Tool]:
         types.Tool(
             name="list_urls",
             description="List shortened URLs with their stats. Requires admin authorization (token).",
-            inputSchema={
+            input_schema={
                 "type": "object",
                 "properties": {
                     "token": {
@@ -71,7 +73,6 @@ async def handle_list_tools() -> list[types.Tool]:
     ]
 
 
-@mcp_server.call_tool()
 async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     if name == "shorten_url":
         return await _handle_shorten_url(arguments)
@@ -300,3 +301,45 @@ async def _safe_increment_visit(increment_fn, link: str) -> None:
         await increment_fn(link)
     except Exception as e:
         logger.warning("Async visit increment failed", extra={"error": str(e), "link": link})
+
+
+# ---------------------------------------------------------------------------
+# MCP v2 low-level Server adapters
+#
+# In mcp v2 the low-level Server no longer uses decorator-based handler
+# registration.  Handlers are passed as on_* keyword arguments to the
+# constructor and receive (ctx, params) instead of the unpacked arguments.
+# They must also return fully-typed result objects (ListToolsResult /
+# CallToolResult) rather than bare lists.
+#
+# The public handler functions above (handle_list_tools / handle_call_tool)
+# keep their v1 signatures so that tests can call them directly.  The
+# adapters below bridge those functions to the v2 Server API, including
+# wrapping exceptions into CallToolResult(is_error=True) to preserve the
+# v1 behaviour where tool errors were surfaced to the LLM as error results.
+# ---------------------------------------------------------------------------
+
+
+async def _on_list_tools(ctx: ServerRequestContext, params: PaginatedRequestParams | None) -> ListToolsResult:
+    tools = await handle_list_tools()
+    return ListToolsResult(tools=tools)
+
+
+async def _on_call_tool(ctx: ServerRequestContext, params: CallToolRequestParams) -> CallToolResult:
+    try:
+        content = await handle_call_tool(params.name, params.arguments or {})
+        return CallToolResult(content=content, is_error=False)
+    except Exception as exc:
+        return CallToolResult(
+            content=[TextContent(type="text", text=str(exc))],
+            is_error=True,
+        )
+
+
+mcp_server = Server(
+    "l1nkzip-mcp-server",
+    on_list_tools=_on_list_tools,
+    on_call_tool=_on_call_tool,
+)
+
+sse_transport = SseServerTransport("/mcp/messages")
