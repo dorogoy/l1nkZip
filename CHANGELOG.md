@@ -5,6 +5,19 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.7.0](https://github.com/dorogoy/l1nkZip/compare/v0.6.3...v0.7.0) (2026-08-31)
+
+
+### Features
+
+* **mcp:** migrate to MCP Python SDK v2.1.1 ([4e312ea](https://github.com/dorogoy/l1nkZip/commit/4e312eac8d89a514666422b09a5f9773ded975f8))
+
+
+### Bug Fixes
+
+* **deps:** bump psycopg2-binary from 2.9.10 to 2.9.12 ([1b13653](https://github.com/dorogoy/l1nkZip/commit/1b13653c26f0df69d8d01c06713060aefba51668))
+* **deps:** bump pytest-asyncio from 1.3.0 to 1.4.0 ([82b70fc](https://github.com/dorogoy/l1nkZip/commit/82b70fcae9888a10fe90c90876cbb8d0314147e5))
+
 ## [0.6.3](https://github.com/dorogoy/l1nkZip/compare/v0.6.2...v0.6.3) (2026-08-29)
 
 
