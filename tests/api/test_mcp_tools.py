@@ -83,7 +83,7 @@ class TestListTools:
         shorten = next(t for t in tools if t.name == "shorten_url")
 
         assert shorten.description
-        schema = shorten.inputSchema
+        schema = shorten.input_schema
         assert schema["type"] == "object"
         assert "url" in schema["properties"]
         assert schema["properties"]["url"]["type"] == "string"
@@ -96,7 +96,7 @@ class TestListTools:
         get_url = next(t for t in tools if t.name == "get_original_url")
 
         assert get_url.description
-        schema = get_url.inputSchema
+        schema = get_url.input_schema
         assert schema["type"] == "object"
         assert "link" in schema["properties"]
         assert schema["properties"]["link"]["type"] == "string"
@@ -116,7 +116,7 @@ class TestListTools:
         list_urls = next(t for t in tools if t.name == "list_urls")
 
         assert list_urls.description
-        schema = list_urls.inputSchema
+        schema = list_urls.input_schema
         assert schema["type"] == "object"
         assert "token" in schema["properties"]
         assert schema["properties"]["token"]["type"] == "string"
