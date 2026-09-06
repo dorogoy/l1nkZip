@@ -55,10 +55,15 @@ class Cache:
             return None
 
         try:
-            return await self.client.get(key)
+            value = await self.client.get(key)
         except Exception as e:
             logger.error("Redis get error", extra={"error": str(e), "key": key})
             return None
+        # decode_responses=True means redis returns str at runtime, but the redis
+        # stubs type it as bytes | str | None — narrow defensively for ty.
+        if value is None:
+            return None
+        return value if isinstance(value, str) else value.decode()
 
     async def set(self, key: str, value: str, ttl: Optional[int] = None) -> bool:
         """Set value in cache with TTL.

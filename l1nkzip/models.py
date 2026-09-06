@@ -68,11 +68,11 @@ def insert_link(url) -> Link:
     try:
         link_data = Link(url=url)
         link_data.flush()
-        link_data.link = build_link(link_data.id)  # type: ignore
+        link_data.link = build_link(link_data.id)
         return link_data
     except Exception as orig_exc:
         # If insertion failed (likely due to race condition), try to get existing URL again
-        db.rollback()  # type: ignore
+        db.rollback()
         try:
             existing = Link.get(url=url)
             if existing:
