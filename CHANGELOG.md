@@ -5,6 +5,16 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.7.1](https://github.com/dorogoy/l1nkZip/compare/v0.7.0...v0.7.1) (2026-09-06)
+
+
+### Bug Fixes
+
+* **deps:** bump prometheus-client from 0.25.0 to 0.26.0 ([d638d45](https://github.com/dorogoy/l1nkZip/commit/d638d45a83e6998b331b93932bb523f6b678d1eb))
+* **deps:** bump ruff from 0.16.4 to 0.16.5 ([e606175](https://github.com/dorogoy/l1nkZip/commit/e6061750d830b08e052ecd7e5aefe7fb48d4e325))
+* **deps:** bump ty from 0.0.1a19 to 0.0.78 ([f91c72c](https://github.com/dorogoy/l1nkZip/commit/f91c72c1db72c5ee307bf8104d28f15d1780558f))
+* **types:** satisfy ty 0.0.78 in cache and models ([86fa931](https://github.com/dorogoy/l1nkZip/commit/86fa931325b3104fe8b20c1c8fb5cf3bf952defa))
+
 ## [0.7.0](https://github.com/dorogoy/l1nkZip/compare/v0.6.3...v0.7.0) (2026-08-31)
 
 
