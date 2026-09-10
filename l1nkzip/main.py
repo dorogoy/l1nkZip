@@ -2,6 +2,7 @@ import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 import re
+import secrets
 from typing import List, Optional
 from urllib.parse import urlparse
 
@@ -260,7 +261,8 @@ async def not_found(request: Request):
 async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
     """Webhook to update the PhishTank database. The database can clean X days older entries."""
     validate_admin_token(token)
-    if token != settings.token:
+    # Use constant-time comparison to prevent timing side-channel attacks
+    if not secrets.compare_digest(token, settings.token):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     if not settings.phishtank:
@@ -280,7 +282,8 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
 def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
     """Get a list of all the URLs shortened by this API."""
     validate_admin_token(token)
-    if token != settings.token:
+    # Use constant-time comparison to prevent timing side-channel attacks
+    if not secrets.compare_digest(token, settings.token):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     # Validate limit parameter
