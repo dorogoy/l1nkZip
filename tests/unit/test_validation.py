@@ -13,6 +13,12 @@ invalid_urls = [
     ("javascript_scheme", "javascript:alert(1)", 422),
     ("overlength_url", "https://example.com/" + "a" * 2048, 422),
     ("empty_url", "", 422),
+    ("ssrf_localhost", "http://localhost", 422),
+    ("ssrf_subdomain_localhost", "http://foo.localhost", 422),
+    ("ssrf_loopback_ip", "http://127.0.0.1", 422),
+    ("ssrf_private_ip_10", "http://10.0.0.1", 422),
+    ("ssrf_private_ip_192", "http://192.168.1.1", 422),
+    ("ssrf_metadata_ip", "http://169.254.169.254", 422),
 ]
 
 # Test cases for admin token validation
