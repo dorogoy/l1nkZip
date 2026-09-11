@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
+import ipaddress
 from pathlib import Path
 import re
 import secrets
@@ -97,6 +98,25 @@ def validate_url(url: str) -> str:
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Invalid URL format - missing domain",
         )
+
+    # Check for local and private network addresses (SSRF prevention)
+    hostname = parsed.hostname
+    if hostname:
+        hostname_lower = hostname.lower()
+        if hostname_lower == "localhost" or hostname_lower.endswith(".localhost"):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="Invalid URL: local or private network address not allowed",
+            )
+        try:
+            ip = ipaddress.ip_address(hostname)
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="Invalid URL: local or private network address not allowed",
+                )
+        except ValueError:
+            pass
 
     return url
 
