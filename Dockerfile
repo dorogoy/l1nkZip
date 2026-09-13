@@ -1,4 +1,12 @@
-FROM python:3.12-slim
+FROM python:3.13-slim
+
+# Pull in Debian security patches even when the official base tag has not
+# been rebuilt after a Debian security release, and refresh the base Python
+# tooling so scanners do not flag stale setuptools/msgpack shipped with it.
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir --upgrade pip setuptools msgpack
 
 WORKDIR /code
 
