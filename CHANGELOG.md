@@ -5,6 +5,14 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.7.2](https://github.com/dorogoy/l1nkZip/compare/v0.7.1...v0.7.2) (2026-09-13)
+
+
+### Bug Fixes
+
+* **deps:** bump ruff from 0.16.5 to 0.16.6 ([2ac998a](https://github.com/dorogoy/l1nkZip/commit/2ac998ac31998ee7fcf90bc277514a2ee97f38f3))
+* PhishTank cleanup_days parameter input validation ([#266](https://github.com/dorogoy/l1nkZip/issues/266)) ([73acd7f](https://github.com/dorogoy/l1nkZip/commit/73acd7fe6c79155b7b689b27a65ce3be28443e71))
+
 ## [0.7.1](https://github.com/dorogoy/l1nkZip/compare/v0.7.0...v0.7.1) (2026-09-06)
 
 
