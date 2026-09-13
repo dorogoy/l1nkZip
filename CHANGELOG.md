@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.7.3](https://github.com/dorogoy/l1nkZip/compare/v0.7.2...v0.7.3) (2026-09-13)
+
+
+### Bug Fixes
+
+* **docker:** harden image against base-layer CVEs ([#267](https://github.com/dorogoy/l1nkZip/issues/267)) ([83d1876](https://github.com/dorogoy/l1nkZip/commit/83d1876955abb2a7806534021c5afcfabd30aa15))
+
 ## [0.7.2](https://github.com/dorogoy/l1nkZip/compare/v0.7.1...v0.7.2) (2026-09-13)
 
 
