@@ -3,6 +3,11 @@ name: Publish Docker image
 on:
   release:
     types: [published]
+  schedule:
+    # Weekly rebuild of :latest so base layers pick up fresh security
+    # patches even when no release happens. Version tags are not touched.
+    - cron: '23 4 * * 1'
+  workflow_dispatch:
 
 jobs:
   push_to_registry:
