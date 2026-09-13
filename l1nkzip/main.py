@@ -43,6 +43,11 @@ from l1nkzip.version import VERSION_NUMBER
 logger = get_logger(__name__)
 
 
+# Constants
+MIN_CLEANUP_DAYS = 1
+MAX_CLEANUP_DAYS = 365
+
+
 # Validation helper functions
 def validate_url(url: str) -> str:
     """Validate and sanitize URL input"""
@@ -285,8 +290,11 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
     if not secrets.compare_digest(token, settings.token):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    if cleanup_days < 1 or cleanup_days > 365:
-        raise HTTPException(status_code=422, detail="cleanup_days must be between 1 and 365")
+    if not (MIN_CLEANUP_DAYS <= cleanup_days <= MAX_CLEANUP_DAYS):
+        raise HTTPException(
+            status_code=422,
+            detail=f"cleanup_days must be between {MIN_CLEANUP_DAYS} and {MAX_CLEANUP_DAYS}",
+        )
 
     if not settings.phishtank:
         raise HTTPException(status_code=501, detail="PhishTank is not implemented")

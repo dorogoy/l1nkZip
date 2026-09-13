@@ -89,6 +89,13 @@ class TestAdminEndpoints:
         # PhishTank is disabled by default, so expect 501
         assert response.status_code == 501
 
+    @pytest.mark.parametrize("cleanup_days", [1, 30, 365])
+    def test_phishtank_update_valid_cleanup_days(self, test_client, admin_token, cleanup_days):
+        """Valid cleanup_days values (including boundaries) must pass validation."""
+        # PhishTank is disabled by default, so validation success surfaces as 501
+        response = test_client.get(f"/phishtank/update/{admin_token}?cleanup_days={cleanup_days}")
+        assert response.status_code == 501
+
     @pytest.mark.parametrize("cleanup_days", [0, -1, -100, 366, 1000])
     def test_phishtank_update_invalid_cleanup_days(self, test_client, admin_token, cleanup_days):
         """Test updating PhishTank with invalid cleanup_days query parameter."""
