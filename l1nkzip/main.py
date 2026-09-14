@@ -240,9 +240,10 @@ async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = "frame-ancestors 'none'"
     return response
+
 
 BASE_PATH = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=f"{BASE_PATH}/templates")
