@@ -5,6 +5,14 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.7.4](https://github.com/dorogoy/l1nkZip/compare/v0.7.3...v0.7.4) (2026-09-14)
+
+
+### Bug Fixes
+
+* add HTTP security headers middleware ([#269](https://github.com/dorogoy/l1nkZip/issues/269)) ([4ee1271](https://github.com/dorogoy/l1nkZip/commit/4ee1271a91339dbd72a81070db4aa34046c85752))
+* **ci:** weekly rebuild must refresh :latest, not create :master ([6fcf011](https://github.com/dorogoy/l1nkZip/commit/6fcf011eb725a465c23eb8318345c37ae0d0fb78))
+
 ## [0.7.3](https://github.com/dorogoy/l1nkZip/compare/v0.7.2...v0.7.3) (2026-09-13)
 
 
