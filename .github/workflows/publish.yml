@@ -28,6 +28,14 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
         with:
           images: dorogoy/l1nkzip
+          # Releases push vX.Y.Z + latest (ref,event=tag + latest=auto flavor).
+          # Weekly/dispatch rebuilds on the default branch refresh :latest
+          # directly instead of creating a :master tag.
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest,enable={{is_default_branch}}
+          flavor: |
+            latest=auto
 
       - name: Build and push Docker image
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
