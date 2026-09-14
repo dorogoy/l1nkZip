@@ -233,6 +233,18 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Middleware to add security headers to HTTP responses."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = "frame-ancestors 'none'"
+    return response
+
+
 BASE_PATH = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=f"{BASE_PATH}/templates")
 
