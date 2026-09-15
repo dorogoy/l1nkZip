@@ -4,6 +4,7 @@ import ipaddress
 from pathlib import Path
 import re
 import secrets
+import socket
 from typing import List, Optional
 from urllib.parse import urlparse
 
@@ -114,7 +115,13 @@ def validate_url(url: str) -> str:
                 detail="Invalid URL: local or private network address not allowed",
             )
         try:
-            ip = ipaddress.ip_address(hostname)
+            # Check for alternative IPv4 address representations (dec, hex, octal, shorthand)
+            try:
+                packed = socket.inet_aton(hostname)
+                ip = ipaddress.ip_address(packed)
+            except Exception:
+                ip = ipaddress.ip_address(hostname)
+
             if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
