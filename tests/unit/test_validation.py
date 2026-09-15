@@ -86,3 +86,29 @@ def test_redirect_with_invalid_short_link(client):
     """Test redirection with invalid short link format"""
     response = client.get("/invalid!link")
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://2130706433",
+        "http://0x7f000001",
+        "http://0177.0.0.1",
+        "http://127.1",
+        "http://0",
+    ],
+)
+def test_validate_url_blocks_alt_ipv4_forms(monkeypatch, url):
+    """Alternative IPv4 forms must be blocked by the SSRF check itself,
+    not only by upstream format validation (validators/pydantic),
+    whose behavior is not guaranteed across versions."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    with pytest.raises(HTTPException) as exc_info:
+        validate_url(url)
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
