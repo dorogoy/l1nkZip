@@ -9,12 +9,15 @@ def client(monkeypatch):
     monkeypatch.setenv("DB_TYPE", "inmemory")
 
     import sys
+
     for m in ["l1nkzip.config", "l1nkzip.models", "l1nkzip.main"]:
         if m in sys.modules:
             del sys.modules[m]
 
     from l1nkzip.main import app
+
     return TestClient(app)
+
 
 # Test cases for URL validation
 invalid_urls = [
