@@ -324,7 +324,7 @@ async def update_phishtank(token: str, cleanup_days: int = 5) -> GenericInfo:
         deleted_phishes = delete_old_phishes(days=cleanup_days)
         return GenericInfo(detail=f"PhishTank list updated. {deleted_phishes} entries have been deleted")
     except Exception as e:
-        logger.error("PhishTank update error", extra={"error": str(e), "token": token})
+        logger.error("PhishTank update error", extra={"error": str(e)})
         raise HTTPException(status_code=500, detail="Failed to update PhishTank database") from e
 
 
@@ -357,7 +357,7 @@ def get_list(token: str, limit: int = 100) -> List[LinkInfo]:
     except Exception as e:
         logger.error(
             "Database error in get_list",
-            extra={"error": str(e), "token": token, "limit": limit},
+            extra={"error": str(e), "limit": limit},
         )
         raise HTTPException(status_code=500, detail="Internal server error while retrieving URL list") from e
 
