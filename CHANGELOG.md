@@ -5,6 +5,16 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [0.7.6](https://github.com/dorogoy/l1nkZip/compare/v0.7.5...v0.7.6) (2026-09-16)
+
+
+### Bug Fixes
+
+* **deps:** bump mcp from 2.1.1 to 2.2.0 ([40d19fe](https://github.com/dorogoy/l1nkZip/commit/40d19fe457715c068dd1f6b9e6e4449feb9688d8))
+* **deps:** bump psycopg2-binary from 2.9.12 to 2.9.13 ([d77c180](https://github.com/dorogoy/l1nkZip/commit/d77c180323d4567f28669d552d9a2b78b51fb191))
+* **deps:** bump ruff from 0.16.6 to 0.16.7 ([1051f8c](https://github.com/dorogoy/l1nkZip/commit/1051f8cebba109be6ac2eb94254c37b8c592192a))
+* sensitive token exposure in logs ([#279](https://github.com/dorogoy/l1nkZip/issues/279)) ([0081dac](https://github.com/dorogoy/l1nkZip/commit/0081dac1b50d907c3af259c82147fcc55dcbc243))
+
 ## [0.7.5](https://github.com/dorogoy/l1nkZip/compare/v0.7.4...v0.7.5) (2026-09-15)
 
 
