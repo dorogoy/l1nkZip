@@ -259,3 +259,31 @@ class TestAdminEndpoints:
         # Verify metrics were recorded (admin requests should be tracked)
         metrics_output = metrics_collector.get_metrics().decode("utf-8")
         assert "l1nkzip_http_requests_total" in metrics_output
+
+    def test_admin_endpoints_no_sensitive_token_logging(self, test_client, admin_token, caplog, monkeypatch):
+        """Test that admin tokens are not included in log extra dictionaries when errors occur."""
+
+        # Simulate database error during get_list
+        def mock_get_visits(*args, **kwargs):
+            raise Exception("Simulated DB failure")
+
+        monkeypatch.setattr("l1nkzip.main.get_visits", mock_get_visits)
+
+        response = test_client.get(f"/list/{admin_token}")
+        assert response.status_code == 500
+
+        # Simulate update_phishtanks error during phishtank update
+        async def mock_update_phishtanks(*args, **kwargs):
+            raise Exception("Simulated PhishTank update failure")
+
+        monkeypatch.setattr("l1nkzip.main.settings.phishtank", "https://example.com")
+        monkeypatch.setattr("l1nkzip.main.update_phishtanks", mock_update_phishtanks)
+
+        response_phishtank = test_client.get(f"/phishtank/update/{admin_token}")
+        assert response_phishtank.status_code == 500
+
+        # Check all logged records for both endpoints
+        for record in caplog.records:
+            assert getattr(record, "token", None) != admin_token
+            if hasattr(record, "token"):
+                assert admin_token not in str(record.token)
