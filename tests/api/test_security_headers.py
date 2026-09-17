@@ -9,3 +9,5 @@ def test_security_headers_present(test_client):
     assert response.headers.get("X-Frame-Options") == "DENY"
     assert response.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
     assert response.headers.get("Content-Security-Policy") == "frame-ancestors 'none'"
+    assert response.headers.get("Strict-Transport-Security") == "max-age=63072000; includeSubDomains"
+    assert response.headers.get("Permissions-Policy") == "geolocation=(), microphone=(), camera=()"
