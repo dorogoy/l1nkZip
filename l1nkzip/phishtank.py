@@ -10,7 +10,7 @@ from l1nkzip.models import PhishTank, Url, db_session, utcnow_zone_aware
 
 def build_phishtank_url() -> str:
     """Build PhishTank API URL based on configuration"""
-    base_url = "http://data.phishtank.com/data"
+    base_url = "https://data.phishtank.com/data"
     if isinstance(settings.phishtank, str) and settings.phishtank != "anonymous":
         return f"{base_url}/{settings.phishtank}/online-valid.json"
     return f"{base_url}/online-valid.json"

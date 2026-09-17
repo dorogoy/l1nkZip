@@ -21,28 +21,28 @@ class TestBuildPhishtankUrl:
         """Test URL building with anonymous access"""
         mock_settings.phishtank = "anonymous"
         url = build_phishtank_url()
-        assert url == "http://data.phishtank.com/data/online-valid.json"
+        assert url == "https://data.phishtank.com/data/online-valid.json"
 
     @patch("l1nkzip.phishtank.settings")
     def test_build_url_with_api_key(self, mock_settings):
         """Test URL building with API key"""
         mock_settings.phishtank = "test-api-key"
         url = build_phishtank_url()
-        assert url == "http://data.phishtank.com/data/test-api-key/online-valid.json"
+        assert url == "https://data.phishtank.com/data/test-api-key/online-valid.json"
 
     @patch("l1nkzip.phishtank.settings")
     def test_build_url_false_setting(self, mock_settings):
         """Test URL building with False setting (disabled)"""
         mock_settings.phishtank = False
         url = build_phishtank_url()
-        assert url == "http://data.phishtank.com/data/online-valid.json"
+        assert url == "https://data.phishtank.com/data/online-valid.json"
 
     @patch("l1nkzip.phishtank.settings")
     def test_build_url_none_setting(self, mock_settings):
         """Test URL building with None setting"""
         mock_settings.phishtank = None
         url = build_phishtank_url()
-        assert url == "http://data.phishtank.com/data/online-valid.json"
+        assert url == "https://data.phishtank.com/data/online-valid.json"
 
 
 class TestFetchPhishtankData:
@@ -307,7 +307,7 @@ class TestIntegration:
     @patch("l1nkzip.phishtank.process_phishtank_items")
     async def test_full_update_workflow(self, mock_process, mock_fetch, mock_build_url):
         """Test the complete update workflow"""
-        mock_build_url.return_value = "http://data.phishtank.com/data/online-valid.json"
+        mock_build_url.return_value = "https://data.phishtank.com/data/online-valid.json"
         mock_fetch.return_value = [
             {
                 "phish_id": 12345,
@@ -327,7 +327,7 @@ class TestIntegration:
         # Verify the data flow
         call_args = mock_fetch.call_args
         assert call_args[0][0] == mock_client
-        assert call_args[0][1] == "http://data.phishtank.com/data/online-valid.json"
+        assert call_args[0][1] == "https://data.phishtank.com/data/online-valid.json"
 
         process_args = mock_process.call_args[0][0]
         assert len(process_args) == 1
