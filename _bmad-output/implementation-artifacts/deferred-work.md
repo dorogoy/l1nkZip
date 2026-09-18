@@ -24,9 +24,6 @@
 ## Deferred from: code review of spec-python-3-14-migration (2026-09-18)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-python-3-14-migration.md`
-  summary: Planning-doc dependency version tables are stale against pyproject pins (architecture.md cites FastAPI 0.115.12, project-context.md cites FastAPI 0.135.3/Uvicorn 0.41.0, vs pinned fastapi==0.141.1/uvicorn==0.52.4)
-  evidence: Pre-existing staleness not caused by the migration; only the Python version lines were updated in scope. Would surface as developer confusion when reading planning docs; fix is a one-pass sync of all version tables.
-- source_spec: `_bmad-output/implementation-artifacts/spec-python-3-14-migration.md`
   summary: CI workflows pin `runs-on: ubuntu-22.04` (ci.yml, uv-lock-refresh.yml), which is on GitHub's retirement track
   evidence: Pre-existing runner choice, independent of the Python bump; setup-python served prebuilt 3.14 fine on 22.04 during this migration's local verification assumptions. Move to ubuntu-24.04 as a separate infra PR.
 
