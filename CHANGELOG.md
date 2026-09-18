@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.0.1](https://github.com/dorogoy/l1nkZip/compare/v1.0.0...v1.0.1) (2026-09-18)
+
+
+### Documentation
+
+* record deferred CI approval gap on release-please branch ([667c075](https://github.com/dorogoy/l1nkZip/commit/667c0758d2f7561ee183f588264704fe8249260a))
+
 ## [1.0.0](https://github.com/dorogoy/l1nkZip/compare/v0.7.6...v1.0.0) (2026-09-18)
 
 
