@@ -5,6 +5,23 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.0.0](https://github.com/dorogoy/l1nkZip/compare/v0.7.6...v1.0.0) (2026-09-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* **python:** Python 3.12 and 3.13 are no longer supported. The minimum required Python version is now 3.14.
+
+### Features
+
+* **python:** require Python 3.14, drop 3.12/3.13 support ([#285](https://github.com/dorogoy/l1nkZip/issues/285)) ([75eca1e](https://github.com/dorogoy/l1nkZip/commit/75eca1e4376a0be923902f0400d626254dd5dcb1))
+
+
+### Bug Fixes
+
+* Add HSTS and Permissions-Policy HTTP security headers to all responses. ([425c553](https://github.com/dorogoy/l1nkZip/commit/425c553e4700c033594a605566cd0bf8972df4e3))
+* enforce HTTPS for PhishTank API requests ([5b1d0a0](https://github.com/dorogoy/l1nkZip/commit/5b1d0a0e998eadf4e4e936eca74917155b1b2dc0))
+
 ## [0.7.6](https://github.com/dorogoy/l1nkZip/compare/v0.7.5...v0.7.6) (2026-09-16)
 
 
