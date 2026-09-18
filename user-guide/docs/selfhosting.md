@@ -4,7 +4,7 @@ L1nkZip is distributed as a Docker image, although the full code can be found on
 
 ## Requirements
 
-L1nkZip would not be possible without the amazings [FastApi][FastApi] and [PonyORM][PonyORM] projects. The only requirement is Python 3.12+ if you use sqlite. Otherwise, you must install the database driver for your database of choice.
+L1nkZip would not be possible without the amazings [FastApi][FastApi] and [PonyORM][PonyORM] projects. The only requirement is Python 3.14+ if you use sqlite. Otherwise, you must install the database driver for your database of choice.
 
 The official Docker image comes with sqlite and postgresql support, but you can extend it to support other databases.
 

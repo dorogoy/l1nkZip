@@ -65,7 +65,7 @@ async def _collect_sse_messages(app, path: str = "/mcp/sse", timeout: float = 2.
     task.cancel()
     try:
         await task
-    except (asyncio.CancelledError, Exception):
+    except asyncio.CancelledError, Exception:
         pass
     return received
 

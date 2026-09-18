@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 # Pull in Debian security patches even when the official base tag has not
 # been rebuilt after a Debian security release, and refresh the base Python

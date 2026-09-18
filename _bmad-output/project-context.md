@@ -26,7 +26,7 @@ _Critical rules and patterns that AI agents must follow when implementing code. 
 ## Technology Stack & Versions
 
 **Core:**
-- Python 3.12+ / FastAPI 0.135.3 / Uvicorn 0.41.0
+- Python 3.14+ / FastAPI 0.135.3 / Uvicorn 0.41.0
 - Pony ORM 0.7.19 (multi-DB abstraction)
 - Pydantic Settings 2.4.0 (env-only configuration)
 - validators 0.34.0 (URL validation)

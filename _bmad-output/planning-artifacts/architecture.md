@@ -39,7 +39,7 @@ Performance NFRs are the primary architectural driver: redirect < 100ms p95 (cac
 
 ### Technical Constraints & Dependencies
 
-- **Python 3.12+** with FastAPI as async framework
+- **Python 3.14+** with FastAPI as async framework
 - **Pony ORM** for multi-database abstraction (SQLite, PostgreSQL, MySQL, Oracle, CockroachDB)
 - **Single-process deployment** via Uvicorn ASGI server
 - **SQLite + Litestream** for default database resilience (external to application)
@@ -55,7 +55,7 @@ Backend API (REST) — Python/FastAPI. Already implemented and in production.
 ### Existing Technology Stack (Brownfield — No Starter Selection Needed)
 
 **Language & Runtime:**
-- Python 3.12+ with FastAPI 0.115.12
+- Python 3.14+ with FastAPI 0.115.12
 - Uvicorn 0.35.0 as ASGI server
 - Async-first architecture
 
