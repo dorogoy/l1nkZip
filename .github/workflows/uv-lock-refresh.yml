@@ -7,6 +7,15 @@ name: uv.lock auto-refresh
 #     version bump would otherwise fail the required 'uv lock --check' CI step.
 #     Contributor and Dependabot branches are intentionally untouched: a stale
 #     lock on those must fail the check, not be silently papered over.
+#
+# The refresh commit is pushed with the GH_PAT (the same token release-please
+# uses), NOT the workflow's GITHUB_TOKEN. A GITHUB_TOKEN push leaves the
+# follow-up ci run on the release branch stuck in 'action_required', so the
+# release PR stayed red until someone approved the run manually — observed on
+# every release between 2026-09-14 and 2026-09-18. PAT pushes trigger ci
+# normally (release-please's own pushes already prove this) and the bounded
+# chain terminates: the re-triggered workflows find a fresh lock and exit
+# without pushing anything.
 on:
   push:
     branches:
@@ -48,6 +57,8 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
       - name: Refresh uv.lock if stale
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           if uv lock --check; then
             echo "uv.lock is fresh, nothing to do."
@@ -58,5 +69,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add uv.lock
           git commit -m "chore: refresh uv.lock after pyproject.toml change"
-          # Detached HEAD (PR-head checkout) needs an explicit push target.
-          git push origin "HEAD:refs/heads/${{ github.event.pull_request.head.ref || 'master' }}"
+          # Push with the PAT (see header comment): a GITHUB_TOKEN push would
+          # leave the follow-up ci run in 'action_required'. Detached HEAD
+          # (PR-head checkout) needs an explicit push target either way.
+          git push "https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${{ github.event.pull_request.head.ref || 'master' }}"
