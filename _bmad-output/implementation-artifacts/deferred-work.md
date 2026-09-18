@@ -20,3 +20,10 @@
 - Timing side-channel on `token != settings.token` (`l1nkzip/mcp.py:273`) — pre-existing pattern in all admin endpoints (`main.py:263,283`); requires transversal fix using `hmac.compare_digest`.
 - NULL `link` column in DB causes masked ValidationError in `get_visits` (`l1nkzip/models.py:42,100`) — `Link.link` is `Optional(str)` but `LinkInfo.link` is `str`; pre-existing model issue.
 - Default token `__change_me__` (14 chars) never passes `validate_admin_token` length check (`l1nkzip/config.py:18`, `l1nkzip/main.py:105`) — pre-existing config issue; no startup warning emitted.
+
+## Deferred from: code review of spec-python-3-14-migration (2026-09-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-python-3-14-migration.md`
+  summary: CI workflows pin `runs-on: ubuntu-22.04` (ci.yml, uv-lock-refresh.yml), which is on GitHub's retirement track
+  evidence: Pre-existing runner choice, independent of the Python bump; setup-python served prebuilt 3.14 fine on 22.04 during this migration's local verification assumptions. Move to ubuntu-24.04 as a separate infra PR.
+

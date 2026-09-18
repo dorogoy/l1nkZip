@@ -39,7 +39,7 @@ Performance NFRs are the primary architectural driver: redirect < 100ms p95 (cac
 
 ### Technical Constraints & Dependencies
 
-- **Python 3.12+** with FastAPI as async framework
+- **Python 3.14+** with FastAPI as async framework
 - **Pony ORM** for multi-database abstraction (SQLite, PostgreSQL, MySQL, Oracle, CockroachDB)
 - **Single-process deployment** via Uvicorn ASGI server
 - **SQLite + Litestream** for default database resilience (external to application)
@@ -55,29 +55,29 @@ Backend API (REST) — Python/FastAPI. Already implemented and in production.
 ### Existing Technology Stack (Brownfield — No Starter Selection Needed)
 
 **Language & Runtime:**
-- Python 3.12+ with FastAPI 0.115.12
-- Uvicorn 0.35.0 as ASGI server
+- Python 3.14+ with FastAPI 0.141.1
+- Uvicorn 0.52.4 as ASGI server
 - Async-first architecture
 
 **ORM & Database:**
-- Pony ORM 0.7.19 (multi-database abstraction)
+- Pony ORM 0.7.20 (multi-database abstraction)
 - SQLite as default (with Litestream for replication)
 - PostgreSQL, MySQL, Oracle, CockroachDB supported
 
 **Configuration:**
-- Pydantic Settings 2.4.0 (environment-based)
+- Pydantic Settings 2.15.0 (environment-based)
 - 100% env var configuration
 
 **Code Quality:**
-- Ruff 0.12.7 (linting + formatting)
+- Ruff 0.16.7 (linting + formatting)
 - ty (type checking, replaced mypy)
 - pytest + pytest-asyncio (testing)
 
 **Optional Dependencies:**
-- Redis 5.0.1 (caching)
-- Prometheus Client 0.21.0 (metrics)
-- HTTpx 0.28.1 (PhishTank HTTP client)
-- SlowAPI 0.1.9 (rate limiting)
+- Redis 8.1.0 (caching)
+- Prometheus Client 0.26.0 (metrics)
+- httpx 0.28.1 (PhishTank HTTP client)
+- SlowAPI 0.1.10 (rate limiting)
 - Jinja2 3.1.6 (error page templates)
 
 **Build & Deploy:**

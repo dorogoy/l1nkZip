@@ -26,24 +26,24 @@ _Critical rules and patterns that AI agents must follow when implementing code. 
 ## Technology Stack & Versions
 
 **Core:**
-- Python 3.12+ / FastAPI 0.135.3 / Uvicorn 0.41.0
-- Pony ORM 0.7.19 (multi-DB abstraction)
-- Pydantic Settings 2.4.0 (env-only configuration)
-- validators 0.34.0 (URL validation)
+- Python 3.14+ / FastAPI 0.141.1 / Uvicorn 0.52.4
+- Pony ORM 0.7.20 (multi-DB abstraction)
+- Pydantic Settings 2.15.0 (env-only configuration)
+- validators 0.35.0 (URL validation)
 
 **Optional Dependencies (graceful degradation required):**
-- Redis 5.0.1 (caching)
-- Prometheus Client 0.24.1 (metrics)
+- Redis 8.1.0 (caching)
+- Prometheus Client 0.26.0 (metrics)
 - httpx 0.28.1 (PhishTank HTTP client)
 
 **Middleware:**
-- SlowAPI 0.1.9 (rate limiting)
+- SlowAPI 0.1.10 (rate limiting)
 - Jinja2 3.1.6 (error page templates)
 
 **Tooling:**
-- Ruff 0.12.7 (lint + format, rules: F, E, W, I, N, B, line-length: 120)
+- Ruff 0.16.7 (lint + format, rules: F, E, W, I, N, B, line-length: 120)
 - ty (type checking)
-- pytest 9.0.2 + pytest-asyncio 1.3.0 + pytest-cov 7.0.0
+- pytest 9.1.1 + pytest-asyncio 1.4.0 + pytest-cov 7.1.0
 - uv (package manager)
 
 ---

@@ -8,8 +8,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 3.12 is the supported floor; 3.13 matches the Docker image runtime.
-        python-version: ['3.12', '3.13']
+        # 3.14 is the supported floor and the Docker image runtime.
+        python-version: ['3.14']
     steps:
       - name: Checkout code
         uses: actions/checkout@v7

@@ -541,7 +541,7 @@ async def _drive_sse_messages(app, timeout: float = 3.0, tool_arguments: dict | 
     task.cancel()
     try:
         await task
-    except (asyncio.CancelledError, Exception):
+    except asyncio.CancelledError, Exception:
         pass
     return blob
 
