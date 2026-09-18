@@ -128,7 +128,22 @@ def validate_url(url: str) -> str:
                     detail="Invalid URL: local or private network address not allowed",
                 )
         except ValueError:
-            pass
+            # Hostname is not an IP literal; attempt DNS resolution to check resolved IPs
+            try:
+                addr_info = socket.getaddrinfo(hostname, None)
+                for res in addr_info:
+                    ip_str = res[4][0]
+                    try:
+                        ip = ipaddress.ip_address(ip_str)
+                        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified:
+                            raise HTTPException(
+                                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                                detail="Invalid URL: local or private network address not allowed",
+                            )
+                    except ValueError:
+                        pass
+            except socket.gaierror:
+                pass
 
     return url
 
