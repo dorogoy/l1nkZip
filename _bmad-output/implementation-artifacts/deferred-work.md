@@ -27,3 +27,9 @@
   summary: CI workflows pin `runs-on: ubuntu-22.04` (ci.yml, uv-lock-refresh.yml), which is on GitHub's retirement track
   evidence: Pre-existing runner choice, independent of the Python bump; setup-python served prebuilt 3.14 fine on 22.04 during this migration's local verification assumptions. Move to ubuntu-24.04 as a separate infra PR.
 
+
+## Deferred from: release 1.0.0 CI triage (2026-09-18)
+
+- source_spec: none
+  summary: Release PRs stay red after uv-lock-refresh heals the lock — the bot's GITHUB_TOKEN push creates the follow-up ci run in `action_required`, so someone must manually approve it on every release
+  evidence: Recurring on every release since 2026-09-14 (0.7.x series and 1.0.0 / PR #282). Validated 2026-09-18: the heal lands within ~20s and the lock is fresh on the release branch head, but ci run 35367470238 sat in action_required until approved via `gh api .../runs/<id>/approve`. Rerunning the failed ci run is useless — it is pinned to the release-please commit that still carried the stale lock. Fix options: a small auto-approve workflow for action_required runs on the release-please branch, or pushing the heal with a PAT/App token so synchronize triggers ci normally.
