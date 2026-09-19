@@ -50,7 +50,12 @@ MAX_CLEANUP_DAYS = 365
 
 
 # Validation helper functions
-def validate_url(url: str) -> str:
+def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    """Address classes that must never be accepted as shortening targets."""
+    return ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified
+
+
+async def validate_url(url: str) -> str:
     """Validate and sanitize URL input"""
     if not url or not isinstance(url, str):
         raise HTTPException(
@@ -122,20 +127,24 @@ def validate_url(url: str) -> str:
             except Exception:
                 ip = ipaddress.ip_address(hostname)
 
-            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified:
+            if _is_blocked_ip(ip):
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     detail="Invalid URL: local or private network address not allowed",
                 )
         except ValueError:
-            # Hostname is not an IP literal; attempt DNS resolution to check resolved IPs
+            # Hostname is not an IP literal; resolve off the event loop and check
+            # every resolved address (IPv4 and IPv6) against the blocked ranges.
+            # Note: Validation-time DNS resolution prevents SSRF for client-side 301 redirects.
+            # If a future feature ever fetches stored URLs (e.g., link previews), DNS resolution
+            # must be repeated at fetch time to prevent DNS rebinding.
             try:
-                addr_info = socket.getaddrinfo(hostname, None)
+                loop = asyncio.get_running_loop()
+                addr_info = await loop.getaddrinfo(hostname, None)
                 for res in addr_info:
-                    ip_str = res[4][0]
                     try:
-                        ip = ipaddress.ip_address(ip_str)
-                        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified:
+                        ip = ipaddress.ip_address(res[4][0])
+                        if _is_blocked_ip(ip):
                             raise HTTPException(
                                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                                 detail="Invalid URL: local or private network address not allowed",
@@ -493,7 +502,7 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
 
     # Validate the URL
     try:
-        validated_url = validate_url(str(url.url))
+        validated_url = await validate_url(str(url.url))
     except HTTPException as e:
         raise e
     except Exception as e:
