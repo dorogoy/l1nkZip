@@ -99,7 +99,7 @@ async def _handle_shorten_url(arguments: dict) -> list[types.TextContent]:
         raise ValueError("Invalid URL: must be a string")
 
     try:
-        validated_url = validate_url(url)
+        validated_url = await validate_url(url)
     except HTTPException as e:
         raise ValueError(f"Invalid URL: {e.detail}") from e
     except Exception as e:

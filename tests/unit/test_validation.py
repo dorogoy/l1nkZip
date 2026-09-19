@@ -98,7 +98,8 @@ def test_redirect_with_invalid_short_link(client):
         "http://0",
     ],
 )
-def test_validate_url_blocks_alt_ipv4_forms(monkeypatch, url):
+@pytest.mark.asyncio
+async def test_validate_url_blocks_alt_ipv4_forms(monkeypatch, url):
     """Alternative IPv4 forms must be blocked by the SSRF check itself,
     not only by upstream format validation (validators/pydantic),
     whose behavior is not guaranteed across versions."""
@@ -109,6 +110,36 @@ def test_validate_url_blocks_alt_ipv4_forms(monkeypatch, url):
 
     monkeypatch.setattr(main.validators, "url", lambda _: True)
     with pytest.raises(HTTPException) as exc_info:
-        validate_url(url)
+        await validate_url(url)
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
+    """Hostnames resolving to private/loopback IP addresses must be blocked to prevent SSRF."""
+    import socket
+
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+
+    async def mock_getaddrinfo(host, port):
+        if host == "private.internal.example.com":
+            return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("192.168.1.50", 80))]
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 80))]
+
+    loop = main.asyncio.get_running_loop()
+    monkeypatch.setattr(loop, "getaddrinfo", mock_getaddrinfo)
+
+    # Should raise 422 for domain resolving to private IP
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url("http://private.internal.example.com")
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
+
+    # Should pass for domain resolving to public IP
+    assert await validate_url("http://public.example.com") == "http://public.example.com"
