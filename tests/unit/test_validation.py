@@ -44,6 +44,9 @@ invalid_tokens = [
     ("short_token", "short", 401),
     ("invalid_chars", "invalid!@#$%token", 401),
     ("empty_token", " ", 401),  # Use space instead of empty string
+    ("colon_token", "a" * 15 + ":", 401),
+    ("dot_token", "a" * 15 + ".", 401),
+    ("slash_token", "a" * 15 + "/", 401),
 ]
 
 
@@ -143,3 +146,26 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
 
     # Should pass for domain resolving to public IP
     assert await validate_url("http://public.example.com") == "http://public.example.com"
+
+
+def test_validate_admin_token_character_restrictions():
+    """Verify validate_admin_token rejects tokens containing unallowed characters."""
+    from fastapi import HTTPException
+
+    from l1nkzip.main import validate_admin_token
+
+    valid_token = "a" * 15 + "!"
+    assert validate_admin_token(valid_token) == valid_token
+
+    # Hyphen, plus, underscore, equals should be valid
+    for char in ["-", "+", "_", "="]:
+        token = "a" * 15 + char
+        assert validate_admin_token(token) == token
+
+    # Characters in ASCII range + to = (like :, ., /, ;, <) must be rejected
+    for char in [":", ".", "/", ";", "<"]:
+        token = "a" * 15 + char
+        with pytest.raises(HTTPException) as exc_info:
+            validate_admin_token(token)
+        assert exc_info.value.status_code == 401
+        assert exc_info.value.detail == "Invalid admin token format"
