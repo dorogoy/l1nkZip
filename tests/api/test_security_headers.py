@@ -11,3 +11,5 @@ def test_security_headers_present(test_client):
     assert response.headers.get("Content-Security-Policy") == "frame-ancestors 'none'"
     assert response.headers.get("Strict-Transport-Security") == "max-age=63072000; includeSubDomains"
     assert response.headers.get("Permissions-Policy") == "geolocation=(), microphone=(), camera=()"
+    assert response.headers.get("X-Permitted-Cross-Domain-Policies") == "none"
+    assert response.headers.get("Cross-Origin-Opener-Policy") == "same-origin"
