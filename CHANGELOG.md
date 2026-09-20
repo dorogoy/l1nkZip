@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.1.0](https://github.com/dorogoy/l1nkZip/compare/v1.0.1...v1.1.0) (2026-09-20)
+
+
+### Features
+
+* add X-Permitted-Cross-Domain-Policies and COOP security headers ([318ec84](https://github.com/dorogoy/l1nkZip/commit/318ec84aacba9ba79327b19c21795c4ff492ed1e))
+
 ## [1.0.1](https://github.com/dorogoy/l1nkZip/compare/v1.0.0...v1.0.1) (2026-09-19)
 
 
