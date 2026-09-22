@@ -37,6 +37,9 @@ invalid_urls = [
     ("ssrf_octal_ip", "http://0177.0.0.1", 422),
     ("ssrf_shorthand_ip", "http://127.1", 422),
     ("ssrf_zero_ip", "http://0", 422),
+    ("ssrf_ipv4_mapped_loopback", "http://[::ffff:127.0.0.1]", 422),
+    ("ssrf_ipv4_mapped_private", "http://[::ffff:10.0.0.1]", 422),
+    ("ssrf_ipv4_mapped_link_local", "http://[::ffff:169.254.169.254]", 422),
 ]
 
 # Test cases for admin token validation
@@ -143,3 +146,26 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
 
     # Should pass for domain resolving to public IP
     assert await validate_url("http://public.example.com") == "http://public.example.com"
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://[::ffff:127.0.0.1]",
+        "http://[::ffff:10.0.0.1]",
+        "http://[::ffff:169.254.169.254]",
+    ],
+)
+@pytest.mark.asyncio
+async def test_validate_url_blocks_ipv4_mapped_ipv6(monkeypatch, url):
+    """IPv4-mapped IPv6 addresses targeting private/loopback/link-local ranges must be blocked."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url(url)
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
