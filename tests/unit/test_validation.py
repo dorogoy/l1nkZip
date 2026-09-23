@@ -37,8 +37,11 @@ invalid_urls = [
     ("ssrf_octal_ip", "http://0177.0.0.1", 422),
     ("ssrf_shorthand_ip", "http://127.1", 422),
     ("ssrf_zero_ip", "http://0", 422),
+    ("ssrf_cgnat_ip", "http://100.64.0.1", 422),
+    ("ssrf_multicast_ip", "http://224.0.0.1", 422),
     ("ssrf_ipv4_mapped_loopback", "http://[::ffff:127.0.0.1]", 422),
     ("ssrf_ipv4_mapped_private", "http://[::ffff:10.0.0.1]", 422),
+    ("ssrf_ipv4_mapped_cgnat", "http://[::ffff:100.64.0.1]", 422),
     ("ssrf_ipv4_mapped_link_local", "http://[::ffff:169.254.169.254]", 422),
     ("ssrf_ipv4_mapped_hex_loopback", "http://[::ffff:7f00:1]", 422),
 ]
