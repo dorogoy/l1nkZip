@@ -52,7 +52,7 @@ MAX_CLEANUP_DAYS = 365
 # Validation helper functions
 def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     """Address classes that must never be accepted as shortening targets."""
-    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
+    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
         return _is_blocked_ip(ip.ipv4_mapped)
     return ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified
 

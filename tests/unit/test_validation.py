@@ -40,6 +40,7 @@ invalid_urls = [
     ("ssrf_ipv4_mapped_loopback", "http://[::ffff:127.0.0.1]", 422),
     ("ssrf_ipv4_mapped_private", "http://[::ffff:10.0.0.1]", 422),
     ("ssrf_ipv4_mapped_link_local", "http://[::ffff:169.254.169.254]", 422),
+    ("ssrf_ipv4_mapped_hex_loopback", "http://[::ffff:7f00:1]", 422),
 ]
 
 # Test cases for admin token validation
@@ -154,6 +155,7 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
         "http://[::ffff:127.0.0.1]",
         "http://[::ffff:10.0.0.1]",
         "http://[::ffff:169.254.169.254]",
+        "http://[::ffff:7f00:1]",
     ],
 )
 @pytest.mark.asyncio
@@ -169,3 +171,14 @@ async def test_validate_url_blocks_ipv4_mapped_ipv6(monkeypatch, url):
         await validate_url(url)
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_allows_public_ipv4_mapped_ipv6(monkeypatch):
+    """Public IPv4-mapped IPv6 addresses must be allowed."""
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    public_url = "http://[::ffff:8.8.8.8]"
+    assert await validate_url(public_url) == public_url
