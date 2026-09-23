@@ -147,9 +147,22 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
 
 def test_404_invalid_site_url_scheme(client, monkeypatch):
     """Test that setting site_url to a non-HTTP(S) scheme (e.g. javascript:) does not render the link in 404 page."""
-    from l1nkzip.config import settings
+    from l1nkzip.config import Settings, settings
 
-    monkeypatch.setattr(settings, "site_url", "javascript:alert(1)")
+    s = Settings(site_url="javascript:alert(1)")
+    assert s.site_url is None
+
+    monkeypatch.setattr(settings, "site_url", None)
     response = client.get("/404")
     assert response.status_code == 404
     assert "javascript:alert(1)" not in response.text
+
+
+def test_404_valid_site_url_scheme_renders_link(client, monkeypatch):
+    """Test that a valid HTTP(S) site_url still renders the homepage link on the 404 page."""
+    from l1nkzip.config import settings
+
+    monkeypatch.setattr(settings, "site_url", "https://example.com/")
+    response = client.get("/404")
+    assert response.status_code == 404
+    assert 'href="https://example.com/"' in response.text

@@ -1,5 +1,6 @@
 from typing import Any, Optional
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -14,6 +15,13 @@ class Settings(BaseSettings):
     db_dsn: Optional[str] = None
     phishtank: Optional[str] = None
     site_url: Optional[str] = "https://dorogoy.github.io/l1nkZip/"
+
+    @field_validator("site_url")
+    @classmethod
+    def _site_url_scheme(cls, v: Optional[str]) -> Optional[str]:
+        if v and not v.lower().startswith(("http://", "https://")):
+            return None
+        return v
     # Keep the token secret
     token: str = "__change_me__"
     # Change this to your own random generator string
