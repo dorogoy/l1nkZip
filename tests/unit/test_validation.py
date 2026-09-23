@@ -143,3 +143,13 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
 
     # Should pass for domain resolving to public IP
     assert await validate_url("http://public.example.com") == "http://public.example.com"
+
+
+def test_404_invalid_site_url_scheme(client, monkeypatch):
+    """Test that setting site_url to a non-HTTP(S) scheme (e.g. javascript:) does not render the link in 404 page."""
+    from l1nkzip.config import settings
+
+    monkeypatch.setattr(settings, "site_url", "javascript:alert(1)")
+    response = client.get("/404")
+    assert response.status_code == 404
+    assert "javascript:alert(1)" not in response.text

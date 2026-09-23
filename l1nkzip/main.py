@@ -318,11 +318,16 @@ def metrics_endpoint():
 
 @app.get("/404", response_class=responses.HTMLResponse, include_in_schema=False)
 async def not_found(request: Request):
+    homepage = (
+        settings.site_url
+        if settings.site_url and settings.site_url.startswith(("http://", "https://"))
+        else None
+    )
     return templates.TemplateResponse(
         request,
         "404.html",
         {
-            "homepage": settings.site_url,
+            "homepage": homepage,
             "api_name": settings.api_name,
         },
         status_code=404,
