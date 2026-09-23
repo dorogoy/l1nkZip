@@ -41,12 +41,11 @@ invalid_urls = [
 
 # Test cases for admin token validation
 invalid_tokens = [
-    ("short_token", "short", 401),
-    ("invalid_chars", "invalid!@#$%token", 401),
-    ("empty_token", " ", 401),  # Use space instead of empty string
-    ("colon_token", "a" * 15 + ":", 401),
-    ("dot_token", "a" * 15 + ".", 401),
-    ("slash_token", "a" * 15 + "/", 401),
+    ("short_token", "short", 401, "Invalid admin token"),
+    ("unauthorized_token", "invalidtoken123!", 401, "Unauthorized"),
+    ("empty_token", " ", 401, "Invalid admin token"),  # Use space instead of empty string
+    ("colon_token", "a" * 16 + ":", 401, "Invalid admin token format"),
+    ("dot_token", "a" * 16 + ".", 401, "Invalid admin token format"),
 ]
 
 
@@ -58,16 +57,18 @@ def test_invalid_url_creation(client, test_name, url, expected_status):
     assert "detail" in response.json()
 
 
-@pytest.mark.parametrize("test_name, token, expected_status", invalid_tokens)
-def test_invalid_admin_tokens(client, test_name, token, expected_status):
+@pytest.mark.parametrize("test_name, token, expected_status, expected_detail", invalid_tokens)
+def test_invalid_admin_tokens(client, test_name, token, expected_status, expected_detail):
     """Test admin endpoints with invalid tokens"""
     # Test list endpoint
     response = client.get(f"/list/{token}")
     assert response.status_code == expected_status
+    assert response.json()["detail"] == expected_detail
 
     # Test phishtank update endpoint
     response = client.get(f"/phishtank/update/{token}")
     assert response.status_code == expected_status
+    assert response.json()["detail"] == expected_detail
 
 
 def test_phishing_url_creation(client):
@@ -162,10 +163,16 @@ def test_validate_admin_token_character_restrictions():
         token = "a" * 15 + char
         assert validate_admin_token(token) == token
 
-    # Characters in ASCII range + to = (like :, ., /, ;, <) must be rejected
-    for char in [":", ".", "/", ";", "<"]:
+    # Characters in ASCII range + to = (like :, ., /, ;, <, ,) must be rejected
+    for char in [":", ".", "/", ";", "<", ","]:
         token = "a" * 15 + char
         with pytest.raises(HTTPException) as exc_info:
             validate_admin_token(token)
         assert exc_info.value.status_code == 401
         assert exc_info.value.detail == "Invalid admin token format"
+
+    # Trailing newline must also be rejected
+    with pytest.raises(HTTPException) as exc_info:
+        validate_admin_token("a" * 16 + "\n")
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.detail == "Invalid admin token format"
