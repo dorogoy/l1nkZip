@@ -149,6 +149,32 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
     assert await validate_url("http://public.example.com") == "http://public.example.com"
 
 
+def test_404_invalid_site_url_scheme(client, monkeypatch):
+    """Test that setting site_url to a non-HTTP(S) scheme (e.g. javascript:) does not render the link in 404 page."""
+    from l1nkzip.config import Settings, settings
+
+    s = Settings(site_url="  javascript:alert(1)  ")
+    assert s.site_url is None
+
+    s_valid = Settings(site_url="  https://example.com  ")
+    assert s_valid.site_url == "https://example.com"
+
+    monkeypatch.setattr(settings, "site_url", None)
+    response = client.get("/404")
+    assert response.status_code == 404
+    assert "<a href=" not in response.text
+
+
+def test_404_valid_site_url_scheme_renders_link(client, monkeypatch):
+    """Test that a valid HTTP(S) site_url still renders the homepage link on the 404 page."""
+    from l1nkzip.config import settings
+
+    monkeypatch.setattr(settings, "site_url", "https://example.com/")
+    response = client.get("/404")
+    assert response.status_code == 404
+    assert 'href="https://example.com/"' in response.text
+
+
 @pytest.mark.parametrize(
     "url",
     [
