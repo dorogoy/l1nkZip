@@ -165,7 +165,7 @@ def validate_admin_token(token: str) -> str:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
     # Check for allowed characters (alphanumeric + special)
-    if not re.match(r"^[a-zA-Z0-9!@#$%^&*()_+-=]+$", token):
+    if not re.fullmatch(r"[a-zA-Z0-9!@#$%^&*()_\-+=]+", token):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid admin token format",
