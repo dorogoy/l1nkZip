@@ -54,7 +54,15 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     """Address classes that must never be accepted as shortening targets."""
     if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
         return _is_blocked_ip(ip.ipv4_mapped)
-    return ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified
+    return (
+        not ip.is_global
+        or ip.is_private
+        or ip.is_loopback
+        or ip.is_link_local
+        or ip.is_reserved
+        or ip.is_unspecified
+        or ip.is_multicast
+    )
 
 
 async def validate_url(url: str) -> str:
