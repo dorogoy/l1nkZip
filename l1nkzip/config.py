@@ -19,10 +19,10 @@ class Settings(BaseSettings):
     @field_validator("site_url")
     @classmethod
     def _site_url_scheme(cls, v: Optional[str]) -> Optional[str]:
-        if v and not v.lower().startswith(("http://", "https://")):
+        if v is None:
             return None
-        return v
-
+        v = v.strip()
+        return v if v.lower().startswith(("http://", "https://")) else None
     # Keep the token secret
     token: str = "__change_me__"
     # Change this to your own random generator string
