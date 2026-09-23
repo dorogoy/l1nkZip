@@ -23,6 +23,7 @@ class Settings(BaseSettings):
             return None
         v = v.strip()
         return v if v.lower().startswith(("http://", "https://")) else None
+
     # Keep the token secret
     token: str = "__change_me__"
     # Change this to your own random generator string
