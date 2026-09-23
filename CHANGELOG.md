@@ -5,6 +5,18 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.1.1](https://github.com/dorogoy/l1nkZip/compare/v1.1.0...v1.1.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **deps:** bump ruff from 0.16.7 to 0.16.8 ([9e69376](https://github.com/dorogoy/l1nkZip/commit/9e69376db50e3b43506836a588cbc179202a679b))
+* **deps:** bump ty from 0.0.78 to 0.0.82 ([aab71b3](https://github.com/dorogoy/l1nkZip/commit/aab71b30a0d92c6edb0b8da6f17415d343af5ecc))
+* **deps:** bump uvicorn from 0.52.4 to 0.53.0 ([e37f977](https://github.com/dorogoy/l1nkZip/commit/e37f977de1590192457b739135c2164d4b4fc753))
+* escape hyphen in admin token validation regex ([#292](https://github.com/dorogoy/l1nkZip/issues/292)) ([61348d8](https://github.com/dorogoy/l1nkZip/commit/61348d89a80f7e9874a9ba053638380978db167f))
+* handle IPv4-mapped IPv6 addresses in SSRF IP checks ([101e6f5](https://github.com/dorogoy/l1nkZip/commit/101e6f52b53faf49b33df73d314acdf42a435da9))
+* sanitize site_url scheme on 404 template response ([#298](https://github.com/dorogoy/l1nkZip/issues/298)) ([8e3b9a1](https://github.com/dorogoy/l1nkZip/commit/8e3b9a103b38bf93f71f94ef68b224581b60ce7b))
+
 ## [1.1.0](https://github.com/dorogoy/l1nkZip/compare/v1.0.1...v1.1.0) (2026-09-20)
 
 
