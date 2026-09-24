@@ -12,3 +12,8 @@
 **Vulnerability:** `ipaddress.ip_address` returns `is_private=False` and `is_reserved=False` for Carrier-Grade NAT / Shared Address Space (`100.64.0.0/10`, RFC 6598) and multicast addresses (`224.0.0.0/4`). URL validation relying only on `is_private` or `is_reserved` allows SSRF targeting internal CGNAT, Tailscale mesh nodes, or multicast endpoints.
 **Learning:** Checking `not ip.is_global` or `ip.is_multicast` correctly identifies non-globally-routable addresses, including CGNAT/Shared Address Space (`100.64.0.0/10`) and multicast (`224.0.0.0/4`), blocking them during SSRF validation.
 **Prevention:** Always include `not ip.is_global` and `ip.is_multicast` alongside `is_private` / `is_loopback` / `is_link_local` / `is_reserved` / `is_unspecified` when evaluating IP addresses against SSRF.
+
+## 2026-09-14 - SSRF Bypass via IPv6 Translation Prefixes (NAT64 & 6to4)
+**Vulnerability:** IPv6 translation addresses such as NAT64 (`64:ff9b::/96`) and 6to4 (`2002::/16`) embed IPv4 target addresses into IPv6 hostnames (e.g. `64:ff9b::127.0.0.1` or `2002:7f00:0001::`). Python's `ipaddress.IPv6Address` treats these addresses as global IPv6 addresses (`is_private=False`, `is_global=True`), bypassing standard IPv6 SSRF checks.
+**Learning:** Standard library `ipaddress.IPv6Address` provides `ip.sixtofour` for 6to4 addresses, and NAT64 (`64:ff9b::/96`) embedded IPv4 can be extracted from `ip.packed[-4:]`.
+**Prevention:** Always unwrap `ip.sixtofour` and NAT64 `64:ff9b::/96` embedded IPv4 addresses and recursively evaluate `_is_blocked_ip` on the extracted IPv4 address.

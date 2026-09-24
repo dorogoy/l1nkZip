@@ -52,8 +52,14 @@ MAX_CLEANUP_DAYS = 365
 # Validation helper functions
 def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     """Address classes that must never be accepted as shortening targets."""
-    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
-        return _is_blocked_ip(ip.ipv4_mapped)
+    if isinstance(ip, ipaddress.IPv6Address):
+        if ip.ipv4_mapped is not None:
+            return _is_blocked_ip(ip.ipv4_mapped)
+        if ip.sixtofour is not None:
+            return _is_blocked_ip(ip.sixtofour)
+        # Check Well-Known Prefix for NAT64 (64:ff9b::/96)
+        if ip.packed.startswith(b"\x00d\xff\x9b\x00\x00\x00\x00\x00\x00\x00\x00"):
+            return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
     return (
         not ip.is_global
         or ip.is_private

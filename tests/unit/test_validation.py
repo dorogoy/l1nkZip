@@ -44,6 +44,10 @@ invalid_urls = [
     ("ssrf_ipv4_mapped_cgnat", "http://[::ffff:100.64.0.1]", 422),
     ("ssrf_ipv4_mapped_link_local", "http://[::ffff:169.254.169.254]", 422),
     ("ssrf_ipv4_mapped_hex_loopback", "http://[::ffff:7f00:1]", 422),
+    ("ssrf_nat64_loopback", "http://[64:ff9b::127.0.0.1]", 422),
+    ("ssrf_nat64_private", "http://[64:ff9b::10.0.0.1]", 422),
+    ("ssrf_6to4_loopback", "http://[2002:7f00:0001::]", 422),
+    ("ssrf_6to4_private", "http://[2002:0a00:0001::]", 422),
 ]
 
 # Test cases for admin token validation
@@ -244,3 +248,16 @@ async def test_validate_url_allows_public_ipv4_mapped_ipv6(monkeypatch):
     monkeypatch.setattr(main.validators, "url", lambda _: True)
     public_url = "http://[::ffff:8.8.8.8]"
     assert await validate_url(public_url) == public_url
+
+
+@pytest.mark.asyncio
+async def test_validate_url_allows_public_translation_ipv6(monkeypatch):
+    """Public IPv6 translation addresses (NAT64 / 6to4) targeting public IPv4 must be allowed."""
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    public_nat64 = "http://[64:ff9b::8.8.8.8]"
+    public_6to4 = "http://[2002:0808:0808::]"
+    assert await validate_url(public_nat64) == public_nat64
+    assert await validate_url(public_6to4) == public_6to4
