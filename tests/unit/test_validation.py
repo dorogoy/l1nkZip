@@ -48,6 +48,8 @@ invalid_urls = [
     ("ssrf_nat64_private", "http://[64:ff9b::10.0.0.1]", 422),
     ("ssrf_6to4_loopback", "http://[2002:7f00:0001::]", 422),
     ("ssrf_6to4_private", "http://[2002:0a00:0001::]", 422),
+    ("ssrf_isatap_loopback", "http://[2000::5efe:7f00:1]", 422),
+    ("ssrf_isatap_private", "http://[2000::5efe:10.0.0.1]", 422),
 ]
 
 # Test cases for admin token validation
@@ -259,5 +261,7 @@ async def test_validate_url_allows_public_translation_ipv6(monkeypatch):
     monkeypatch.setattr(main.validators, "url", lambda _: True)
     public_nat64 = "http://[64:ff9b::8.8.8.8]"
     public_6to4 = "http://[2002:0808:0808::]"
+    public_isatap = "http://[2000::5efe:8.8.8.8]"
     assert await validate_url(public_nat64) == public_nat64
     assert await validate_url(public_6to4) == public_6to4
+    assert await validate_url(public_isatap) == public_isatap
