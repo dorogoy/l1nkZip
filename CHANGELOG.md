@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.1.3](https://github.com/dorogoy/l1nkZip/compare/v1.1.2...v1.1.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* block SSRF bypass via NAT64 and 6to4 IPv6 translation addresses ([#302](https://github.com/dorogoy/l1nkZip/issues/302)) ([ff212db](https://github.com/dorogoy/l1nkZip/commit/ff212dbaeaabf99558f174bed459c7a339ac6e70))
+
 ## [1.1.2](https://github.com/dorogoy/l1nkZip/compare/v1.1.1...v1.1.2) (2026-09-24)
 
 
