@@ -196,7 +196,7 @@ def validate_admin_token(token: str) -> str:
 
 def validate_short_link(link: str) -> str:
     """Validate short link format"""
-    if not link or not re.match(r"^[a-zA-Z0-9_-]{4,20}$", link):
+    if not link or not re.fullmatch(r"[a-zA-Z0-9_-]{4,20}", link):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid short link format")
     return link
 
