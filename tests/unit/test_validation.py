@@ -111,6 +111,9 @@ def test_validate_short_link_rejects_trailing_newline():
 
     from l1nkzip.main import validate_short_link
 
+    # Valid links must keep passing (guards against over-tightening)
+    assert validate_short_link("abcd") == "abcd"
+
     with pytest.raises(HTTPException) as exc_info:
         validate_short_link("abcd\n")
     assert exc_info.value.status_code == 400
