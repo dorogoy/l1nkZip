@@ -105,6 +105,21 @@ def test_redirect_with_invalid_short_link(client):
     assert response.status_code == 404
 
 
+def test_validate_short_link_rejects_trailing_newline():
+    """Verify validate_short_link rejects inputs with trailing newlines (re.match vs re.fullmatch fix)."""
+    from fastapi import HTTPException
+
+    from l1nkzip.main import validate_short_link
+
+    # Valid links must keep passing (guards against over-tightening)
+    assert validate_short_link("abcd") == "abcd"
+
+    with pytest.raises(HTTPException) as exc_info:
+        validate_short_link("abcd\n")
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Invalid short link format"
+
+
 @pytest.mark.parametrize(
     "url",
     [
