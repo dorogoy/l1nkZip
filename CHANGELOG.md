@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.1.4](https://github.com/dorogoy/l1nkZip/compare/v1.1.3...v1.1.4) (2026-09-26)
+
+
+### Bug Fixes
+
+* replace re.match with re.fullmatch in short link validation ([#304](https://github.com/dorogoy/l1nkZip/issues/304)) ([7057484](https://github.com/dorogoy/l1nkZip/commit/705748404dc4f5b6c0fbf7ba5d108455ef8fcfc1))
+
 ## [1.1.3](https://github.com/dorogoy/l1nkZip/compare/v1.1.2...v1.1.3) (2026-09-25)
 
 
