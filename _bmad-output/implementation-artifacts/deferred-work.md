@@ -24,5 +24,5 @@
 ## Deferred from: code review of spec-python-3-14-migration (2026-09-18)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-python-3-14-migration.md`
-  summary: CI workflows pin `runs-on: ubuntu-22.04` (ci.yml, uv-lock-refresh.yml), which is on GitHub's retirement track
-  evidence: Pre-existing runner choice, independent of the Python bump; setup-python served prebuilt 3.14 fine on 22.04 during this migration's local verification assumptions. Move to ubuntu-24.04 as a separate infra PR.
+  summary: CI workflow pins `runs-on: ubuntu-22.04` (ci.yml), which is on GitHub's retirement track
+  evidence: Pre-existing runner choice, independent of the Python bump; setup-python served prebuilt 3.14 fine on 22.04 during this migration's local verification assumptions. Move to ubuntu-24.04 as a separate infra PR. (`uv-lock-refresh.yml` retired in #308; only `ci.yml` remains.)
