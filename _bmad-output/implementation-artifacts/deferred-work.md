@@ -25,4 +25,4 @@
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-python-3-14-migration.md`
   summary: CI workflow pins `runs-on: ubuntu-22.04` (ci.yml), which is on GitHub's retirement track
-  evidence: Pre-existing runner choice, independent of the Python bump; setup-python served prebuilt 3.14 fine on 22.04 during this migration's local verification assumptions. Move to ubuntu-24.04 as a separate infra PR. (`uv-lock-refresh.yml` retired in #308; only `ci.yml` remains.)
+  evidence: Pre-existing runner choice, independent of the Python bump; setup-python served prebuilt 3.14 fine on 22.04 during this migration's local verification assumptions. Move to ubuntu-24.04 as a separate infra PR. (`uv-lock-refresh.yml` retired in #309; only `ci.yml` remains.)
