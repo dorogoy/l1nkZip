@@ -52,6 +52,7 @@ invalid_urls = [
     ("ssrf_isatap_private", "http://[2000::5efe:10.0.0.1]", 422),
     ("ssrf_ipv4_compat_loopback", "http://[::127.0.0.1]", 422),
     ("ssrf_ipv4_compat_private", "http://[::10.0.0.1]", 422),
+    ("ssrf_ipv4_compat_metadata", "http://[::169.254.169.254]", 422),
 ]
 
 # Test cases for admin token validation
