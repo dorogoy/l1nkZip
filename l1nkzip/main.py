@@ -66,6 +66,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # ISATAP interface identifier (0000:5efe:<ipv4>) embeds an IPv4 address
         if ip.packed[8:12] == b"\x00\x00\x5e\xfe":
             return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
+        # Check IPv4-compatible IPv6 addresses (::/96 prefix, starting with 12 zero bytes)
+        if ip.packed.startswith(b"\x00" * 12):
+            return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
     return (
         not ip.is_global
         or ip.is_private
