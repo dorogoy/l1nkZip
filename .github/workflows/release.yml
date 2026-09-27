@@ -20,7 +20,11 @@ jobs:
           client-id: ${{ secrets.BOT_CLIENT_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
 
+      # Manifest mode: release-please-config.json drives the version bumps,
+      # including the uv.lock package version via the toml extra-files updater,
+      # so the release PR carries a lockfile that passes 'uv lock --check'.
       - uses: googleapis/release-please-action@v5
         with:
-          release-type: python
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
           token: ${{ steps.bot-token.outputs.token }}
