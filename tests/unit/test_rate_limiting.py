@@ -37,6 +37,29 @@ class TestRateLimiting:
             response = client.post("/url", json=url_data)
             assert response.status_code == 200
 
+    def test_rate_limit_exceeded_returns_429(self, monkeypatch):
+        """Test that exceeding rate limits returns HTTP 429 with appropriate error payload."""
+        monkeypatch.setenv("RATE_LIMIT_CREATE", "2/minute")
+        monkeypatch.setenv("DB_TYPE", "inmemory")
+
+        import sys
+
+        for mod in ["l1nkzip.config", "l1nkzip.models", "l1nkzip.main"]:
+            if mod in sys.modules:
+                del sys.modules[mod]
+
+        from l1nkzip.main import app
+
+        test_client = TestClient(app)
+        url_data = {"url": "https://example.com"}
+
+        assert test_client.post("/url", json=url_data).status_code == 200
+        assert test_client.post("/url", json=url_data).status_code == 200
+
+        res = test_client.post("/url", json=url_data)
+        assert res.status_code == 429
+        assert "Rate limit exceeded" in res.json().get("error", "")
+
     def test_health_endpoint_works(self, client):
         """Test that the health endpoint works"""
         response = client.get("/health")

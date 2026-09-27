@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 from fastapi import FastAPI, HTTPException, Request, responses, status
 from fastapi.templating import Jinja2Templates
 from pydantic import HttpUrl
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from slowapi.extension import Limiter
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
@@ -285,8 +287,9 @@ app = FastAPI(
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
 
-# Add rate limiting middleware
+# Add rate limiting middleware and exception handler
 app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 
