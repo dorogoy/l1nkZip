@@ -287,9 +287,22 @@ app = FastAPI(
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
 
+
+def _handle_rate_limit_exceeded(request: Request, exc: Exception) -> responses.Response:
+    """Adapt slowapi's handler to Starlette's ExceptionHandler signature.
+
+    slowapi types the exception as RateLimitExceeded, which is not assignable
+    to Starlette's ExceptionHandler (exc: Exception). ty rejects the direct
+    registration.
+    """
+    if not isinstance(exc, RateLimitExceeded):
+        raise exc
+    return _rate_limit_exceeded_handler(request, exc)
+
+
 # Add rate limiting middleware and exception handler
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, _handle_rate_limit_exceeded)
 app.add_middleware(SlowAPIMiddleware)
 
 
