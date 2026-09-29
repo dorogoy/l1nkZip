@@ -54,6 +54,8 @@ invalid_urls = [
     ("ssrf_ipv4_compat_private", "http://[::10.0.0.1]", 422),
     ("ssrf_ipv4_compat_metadata", "http://[::169.254.169.254]", 422),
     ("ssrf_ipv6_site_local", "http://[fec0::1]", 422),
+    ("ssrf_teredo_loopback", "http://[2001:0::80ff:fffe]", 422),
+    ("ssrf_teredo_loopback_alt", "http://[2001:0::80ff:fbf5]", 422),
 ]
 
 # Test cases for admin token validation
@@ -301,3 +303,24 @@ async def test_validate_url_blocks_ipv6_site_local(monkeypatch):
         await validate_url("http://[fec0::1]")
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_teredo_private_and_allows_public(monkeypatch):
+    """Teredo IPv6 addresses embedding private/loopback IPv4 addresses must be blocked, while public ones pass."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+
+    # 2001:0::80ff:fffe embeds 127.0.0.1 (loopback)
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url("http://[2001:0::80ff:fffe]")
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
+
+    # Teredo address with public Teredo server (65.54.227.120) and public client IPv4 (8.8.8.8)
+    public_teredo = "http://[2001:0:4136:e378:8000:63bf:f7f7:f7f7]"
+    assert await validate_url(public_teredo) == public_teredo

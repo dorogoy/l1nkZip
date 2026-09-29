@@ -71,6 +71,11 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # Check IPv4-compatible IPv6 addresses (::/96 prefix, starting with 12 zero bytes)
         if ip.packed.startswith(b"\x00" * 12):
             return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
+        # Check Teredo tunneling IPv6 addresses (2001:0::/32)
+        teredo = getattr(ip, "teredo", None)
+        if teredo is not None:
+            server, client = teredo
+            return _is_blocked_ip(server) or _is_blocked_ip(client)
     return (
         not ip.is_global
         or ip.is_private

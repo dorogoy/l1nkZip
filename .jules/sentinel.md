@@ -27,3 +27,8 @@
 **Vulnerability:** IPv6 site-local hostnames using the deprecated `fec0::/10` prefix (such as `fec0::1`) evaluate to `is_private=False` and `is_global=True` in Python's `ipaddress` module, bypassing standard IPv6 SSRF checks.
 **Learning:** Python's `ipaddress.IPv6Address` provides `ip.is_site_local` specifically to identify site-local addresses (`fec0::/10`), which are non-globally routable internal site network addresses.
 **Prevention:** Always include `getattr(ip, "is_site_local", False)` or `ip.is_site_local` alongside `is_global`, `is_private`, `is_loopback`, `is_link_local`, `is_reserved`, `is_unspecified`, and `is_multicast` when evaluating IP addresses against SSRF.
+
+## 2026-09-26 - SSRF Bypass via Teredo Tunneling IPv6 Addresses (`2001:0::/32` Prefix)
+**Vulnerability:** Teredo tunneling IPv6 addresses (`2001:0::/32`) embed both a Teredo server IPv4 address and an obfuscated (XOR 0xFFFFFFFF) client IPv4 address (e.g. `2001:0::80ff:fffe` embedding `127.0.0.1`). Python's `ipaddress.IPv6Address` evaluates Teredo addresses as global IPv6 addresses (`is_private=False`, `is_global=True`), bypassing standard SSRF checks.
+**Learning:** Python's `ipaddress.IPv6Address` provides `ip.teredo` returning `(server_ipv4, client_ipv4)` if the IP address is a Teredo IPv6 address (`2001:0::/32`), allowing extraction and recursive SSRF checking of both embedded IPv4 addresses.
+**Prevention:** Always check `getattr(ip, "teredo", None)` on `IPv6Address` instances and recursively evaluate `_is_blocked_ip` on both the Teredo server and client IPv4 addresses.
