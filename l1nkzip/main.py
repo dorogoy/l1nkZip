@@ -76,6 +76,7 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         or ip.is_private
         or ip.is_loopback
         or ip.is_link_local
+        or getattr(ip, "is_site_local", False)
         or ip.is_reserved
         or ip.is_unspecified
         or ip.is_multicast
