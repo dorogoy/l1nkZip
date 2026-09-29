@@ -22,3 +22,8 @@
 **Vulnerability:** IPv4-compatible IPv6 hostnames using the deprecated `::/96` prefix (such as `::127.0.0.1` or `::10.0.0.1`) embed IPv4 addresses directly in the last 4 bytes of an IPv6 address starting with 12 zero bytes (`b"\x00" * 12`). Python's `ipaddress.IPv6Address` treats these as global IPv6 addresses (`is_private=False`, `is_global=True`), bypassing standard IPv6 SSRF checks while dual-stack HTTP clients or network stacks can fall back to connecting to the embedded IPv4 address.
 **Learning:** Checking `ip.packed.startswith(b"\x00" * 12)` identifies IPv4-compatible IPv6 addresses, allowing extraction of `ipaddress.IPv4Address(ip.packed[-4:])` to recursively evaluate `_is_blocked_ip`.
 **Prevention:** Always check for `b"\x00" * 12` prefix on `IPv6Address` instances, extract the embedded IPv4 address, and evaluate it against blocked IP rules.
+
+## 2026-09-26 - SSRF Bypass via Deprecated IPv6 Site-Local Addresses (`fec0::/10` Prefix)
+**Vulnerability:** IPv6 site-local hostnames using the deprecated `fec0::/10` prefix (such as `fec0::1`) evaluate to `is_private=False` and `is_global=True` in Python's `ipaddress` module, bypassing standard IPv6 SSRF checks.
+**Learning:** Python's `ipaddress.IPv6Address` provides `ip.is_site_local` specifically to identify site-local addresses (`fec0::/10`), which are non-globally routable internal site network addresses.
+**Prevention:** Always include `getattr(ip, "is_site_local", False)` or `ip.is_site_local` alongside `is_global`, `is_private`, `is_loopback`, `is_link_local`, `is_reserved`, `is_unspecified`, and `is_multicast` when evaluating IP addresses against SSRF.
