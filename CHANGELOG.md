@@ -5,6 +5,22 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.2.0](https://github.com/dorogoy/l1nkZip/compare/v1.1.4...v1.2.0) (2026-09-29)
+
+
+### Features
+
+* **ci:** update uv.lock version directly in release-please ([#309](https://github.com/dorogoy/l1nkZip/issues/309)) ([23a9ecc](https://github.com/dorogoy/l1nkZip/commit/23a9ecc428d8e48b1bdedc53f7f2e45cd1ca26cd))
+
+
+### Bug Fixes
+
+* add exception handler for slowapi RateLimitExceeded ([#311](https://github.com/dorogoy/l1nkZip/issues/311)) ([328e174](https://github.com/dorogoy/l1nkZip/commit/328e17493e3ff08b1ef0e8238a96b063954fa379))
+* block deprecated IPv6 site-local addresses to prevent SSRF ([e2310f4](https://github.com/dorogoy/l1nkZip/commit/e2310f4b194fb3e03b9bbc43e2e3ab0bb883803d))
+* **deps:** bump ruff from 0.16.8 to 0.16.9 ([870fdb1](https://github.com/dorogoy/l1nkZip/commit/870fdb1fb6248e63fa45a3b17a0fb7fc01888b76))
+* **deps:** bump ty from 0.0.82 to 0.0.84 ([3243b8b](https://github.com/dorogoy/l1nkZip/commit/3243b8bfae1064bf62aee6d4e60ca4d1b2edc2da))
+* **deps:** bump uvicorn from 0.53.0 to 0.54.0 ([839cdcc](https://github.com/dorogoy/l1nkZip/commit/839cdcc14ad9bc5157b7aa7c1fc09ffd70f22436))
+
 ## [1.1.4](https://github.com/dorogoy/l1nkZip/compare/v1.1.3...v1.1.4) (2026-09-27)
 
 
