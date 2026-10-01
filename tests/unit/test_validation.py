@@ -54,6 +54,7 @@ invalid_urls = [
     ("ssrf_ipv4_compat_private", "http://[::10.0.0.1]", 422),
     ("ssrf_ipv4_compat_metadata", "http://[::169.254.169.254]", 422),
     ("ssrf_ipv6_site_local", "http://[fec0::1]", 422),
+    ("ssrf_orchidv2_ip", "http://[2001:20::1]", 422),
 ]
 
 # Test cases for admin token validation
@@ -321,5 +322,20 @@ async def test_validate_url_blocks_ipv6_site_local(monkeypatch):
     monkeypatch.setattr(main.validators, "url", lambda _: True)
     with pytest.raises(HTTPException) as exc_info:
         await validate_url("http://[fec0::1]")
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_orchidv2_ipv6(monkeypatch):
+    """ORCHIDv2 IPv6 addresses (2001:20::/28) must be blocked to prevent SSRF."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url("http://[2001:20::1]")
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail

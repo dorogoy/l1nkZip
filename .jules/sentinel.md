@@ -32,3 +32,8 @@
 **Vulnerability:** On Python >=3.14 (and >=3.12.4), `2001:0::/32` is part of `2001::/23` which `ipaddress` classifies as non-global/private. Unwrapping embedded IPv4 in Teredo addresses could allow public targets that were previously blocked under the prefix.
 **Learning:** For deprecated protocols like Teredo (`2001:0::/32`), explicitly blocking the entire prefix outright (`ip.packed.startswith(b"\x20\x01\x00\x00")`) prevents any unexpected opening of attack vectors while serving as defense-in-depth alongside `0.0.0.0/8` (`ip.packed[0] == 0`).
 **Prevention:** Always block deprecated tunneling prefixes like Teredo outright rather than unwrapping embedded IPv4 destinations.
+
+## 2026-10-02 - SSRF Bypass via ORCHIDv2 IPv6 Address Range (`2001:20::/28`)
+**Vulnerability:** ORCHIDv2 addresses (`2001:20::/28`, RFC 7343) are non-routable IPv6 overlay addresses for cryptographic identifiers. In Python's standard `ipaddress` module, ORCHIDv2 addresses evaluate to `is_global=True` and `is_private=False`, allowing SSRF validation that relies solely on `is_global` / `is_private` to be bypassed.
+**Learning:** Matching `ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x20` precisely identifies all IPv6 addresses within the ORCHIDv2 `/28` range (`2001:20::/28`).
+**Prevention:** Explicitly check and block `2001:20::/28` IPv6 prefix during URL validation for SSRF prevention.
