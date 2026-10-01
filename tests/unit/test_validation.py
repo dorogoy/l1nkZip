@@ -183,7 +183,7 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_validate_url_blocks_teredo_and_zero_network(monkeypatch):
-    """Teredo IPv6 addresses embedding private IPv4 addresses and 0.0.0.0/8 IPs must be blocked."""
+    """Teredo IPv6 addresses (2001:0000::/32) and 0.0.0.0/8 IPs must be blocked."""
     from fastapi import HTTPException
 
     from l1nkzip import main
@@ -191,21 +191,16 @@ async def test_validate_url_blocks_teredo_and_zero_network(monkeypatch):
 
     monkeypatch.setattr(main.validators, "url", lambda _: True)
 
-    # 2001:0::80ff:fefe embeds 127.0.0.1 (0x80^0xFF=127, 0xFF^0xFF=0, 0xFF^0xFF=0, 0xFE^0xFF=1)
-    teredo_loopback = "http://[2001:0::80ff:fefe]"
-    # 2001:0::f5ff:fffe embeds 10.0.0.1 (0xF5^0xFF=10, 0xFF^0xFF=0, 0xFF^0xFF=0, 0xFE^0xFF=1)
+    teredo_loopback = "http://[2001:0::80ff:fffe]"
     teredo_private = "http://[2001:0::f5ff:fffe]"
+    teredo_public = "http://[2001:0::f7f7:f7f7]"
     zero_network = "http://0.0.0.1"
 
-    for url in [teredo_loopback, teredo_private, zero_network]:
+    for url in [teredo_loopback, teredo_private, teredo_public, zero_network]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
         assert exc_info.value.status_code == 422
         assert "local or private network" in exc_info.value.detail
-
-    # 2001:0::f7f7:f7f7 embeds 8.8.8.8 (0xF7^0xFF=8), which is public and allowed
-    teredo_public = "http://[2001:0::f7f7:f7f7]"
-    assert await validate_url(teredo_public) == teredo_public
 
 
 def test_validate_admin_token_character_restrictions():

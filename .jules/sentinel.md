@@ -28,7 +28,7 @@
 **Learning:** Python's `ipaddress.IPv6Address` provides `ip.is_site_local` specifically to identify site-local addresses (`fec0::/10`), which are non-globally routable internal site network addresses.
 **Prevention:** Always include `getattr(ip, "is_site_local", False)` or `ip.is_site_local` alongside `is_global`, `is_private`, `is_loopback`, `is_link_local`, `is_reserved`, `is_unspecified`, and `is_multicast` when evaluating IP addresses against SSRF.
 
-## 2026-09-26 - SSRF Bypass via Teredo IPv6 Tunneling (`2001:0::/32`) and 0.0.0.0/8 Range
-**Vulnerability:** Teredo IPv6 addresses (`2001:0::/32`) embed client IPv4 addresses in the last 4 bytes XOR'd with `0xFFFFFFFF`. Python's `ipaddress.IPv6Address` treats Teredo addresses as global IPv6 addresses (`is_private=False`, `is_global=True`), bypassing standard IPv6 SSRF checks. Additionally, IPv4 addresses in the `0.0.0.0/8` range evaluate to `is_private=False` and `is_global=True` in `ipaddress`, but route to local services on host operating systems.
-**Learning:** Checking `ip.packed.startswith(b"\x20\x01\x00\x00")` identifies Teredo IPv6 addresses, allowing extraction of embedded client IPv4 by inverting the last 4 bytes (`b ^ 0xFF`) and recursively evaluating `_is_blocked_ip`. Checking `ip.packed[0] == 0` blocks `0.0.0.0/8`.
-**Prevention:** Always extract and unwrap Teredo embedded IPv4 addresses and block `0.0.0.0/8` when evaluating IP addresses against SSRF.
+## 2026-09-26 - Explicit Blocking of Deprecated Teredo IPv6 (`2001:0::/32`) and `0.0.0.0/8` Range
+**Vulnerability:** On Python >=3.14 (and >=3.12.4), `2001:0::/32` is part of `2001::/23` which `ipaddress` classifies as non-global/private. Unwrapping embedded IPv4 in Teredo addresses could allow public targets that were previously blocked under the prefix.
+**Learning:** For deprecated protocols like Teredo (`2001:0::/32`), explicitly blocking the entire prefix outright (`ip.packed.startswith(b"\x20\x01\x00\x00")`) prevents any unexpected opening of attack vectors while serving as defense-in-depth alongside `0.0.0.0/8` (`ip.packed[0] == 0`).
+**Prevention:** Always block deprecated tunneling prefixes like Teredo outright rather than unwrapping embedded IPv4 destinations.
