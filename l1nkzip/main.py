@@ -71,7 +71,11 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # Check IPv4-compatible IPv6 addresses (::/96 prefix, starting with 12 zero bytes)
         if ip.packed.startswith(b"\x00" * 12):
             return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
-        # Check Teredo tunneling IPv6 addresses (2001:0::/32)
+        # Teredo tunneling IPv6 addresses (2001:0::/32) embed a server IPv4 and an
+        # XOR 0xFFFFFFFF-obfuscated client IPv4 (both de-obfuscated by `.teredo`).
+        # On supported Pythons (>= 3.12.4) this prefix is already classified private
+        # (is_global=False), so this unwrap's real effect is to allow Teredo literals
+        # whose embedded endpoints are both fully public.
         teredo = getattr(ip, "teredo", None)
         if teredo is not None:
             server, client = teredo
