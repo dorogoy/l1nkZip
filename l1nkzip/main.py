@@ -71,6 +71,12 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # Check IPv4-compatible IPv6 addresses (::/96 prefix, starting with 12 zero bytes)
         if ip.packed.startswith(b"\x00" * 12):
             return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
+        # Teredo (2001:0000::/32) is non-global (is_private=True via 2001::/23)
+        # and the protocol is deprecated. Block the whole prefix outright:
+        if ip.packed.startswith(b"\x20\x01\x00\x00"):
+            return True
+    if isinstance(ip, ipaddress.IPv4Address) and ip.packed[0] == 0:
+        return True
     return (
         not ip.is_global
         or ip.is_private

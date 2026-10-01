@@ -27,3 +27,8 @@
 **Vulnerability:** IPv6 site-local hostnames using the deprecated `fec0::/10` prefix (such as `fec0::1`) evaluate to `is_private=False` and `is_global=True` in Python's `ipaddress` module, bypassing standard IPv6 SSRF checks.
 **Learning:** Python's `ipaddress.IPv6Address` provides `ip.is_site_local` specifically to identify site-local addresses (`fec0::/10`), which are non-globally routable internal site network addresses.
 **Prevention:** Always include `getattr(ip, "is_site_local", False)` or `ip.is_site_local` alongside `is_global`, `is_private`, `is_loopback`, `is_link_local`, `is_reserved`, `is_unspecified`, and `is_multicast` when evaluating IP addresses against SSRF.
+
+## 2026-09-26 - Explicit Blocking of Deprecated Teredo IPv6 (`2001:0::/32`) and `0.0.0.0/8` Range
+**Vulnerability:** On Python >=3.14 (and >=3.12.4), `2001:0::/32` is part of `2001::/23` which `ipaddress` classifies as non-global/private. Unwrapping embedded IPv4 in Teredo addresses could allow public targets that were previously blocked under the prefix.
+**Learning:** For deprecated protocols like Teredo (`2001:0::/32`), explicitly blocking the entire prefix outright (`ip.packed.startswith(b"\x20\x01\x00\x00")`) prevents any unexpected opening of attack vectors while serving as defense-in-depth alongside `0.0.0.0/8` (`ip.packed[0] == 0`).
+**Prevention:** Always block deprecated tunneling prefixes like Teredo outright rather than unwrapping embedded IPv4 destinations.

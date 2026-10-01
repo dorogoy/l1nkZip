@@ -181,6 +181,28 @@ async def test_validate_url_blocks_dns_resolved_private_ip(monkeypatch):
     assert await validate_url("http://public.example.com") == "http://public.example.com"
 
 
+@pytest.mark.asyncio
+async def test_validate_url_blocks_teredo_and_zero_network(monkeypatch):
+    """Teredo IPv6 addresses (2001:0000::/32) and 0.0.0.0/8 IPs must be blocked."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+
+    teredo_loopback = "http://[2001:0::80ff:fffe]"
+    teredo_private = "http://[2001:0::f5ff:fffe]"
+    teredo_public = "http://[2001:0::f7f7:f7f7]"
+    zero_network = "http://0.0.0.1"
+
+    for url in [teredo_loopback, teredo_private, teredo_public, zero_network]:
+        with pytest.raises(HTTPException) as exc_info:
+            await validate_url(url)
+        assert exc_info.value.status_code == 422
+        assert "local or private network" in exc_info.value.detail
+
+
 def test_validate_admin_token_character_restrictions():
     """Verify validate_admin_token rejects tokens containing unallowed characters."""
     from fastapi import HTTPException
