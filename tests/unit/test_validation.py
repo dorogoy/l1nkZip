@@ -323,3 +323,30 @@ async def test_validate_url_blocks_ipv6_site_local(monkeypatch):
         await validate_url("http://[fec0::1]")
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_local_use_nat64_private_ip(monkeypatch):
+    """Local-Use NAT64 (64:ff9b:1::/48) addresses embedding private/loopback IPv4 addresses must be blocked."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    for url in ["http://[64:ff9b:1::127.0.0.1]", "http://[64:ff9b:1::10.0.0.1]"]:
+        with pytest.raises(HTTPException) as exc_info:
+            await validate_url(url)
+        assert exc_info.value.status_code == 422
+        assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_allows_local_use_nat64_public_ip(monkeypatch):
+    """Local-Use NAT64 (64:ff9b:1::/48) addresses embedding public IPv4 addresses must be allowed."""
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    public_nat64_local = "http://[64:ff9b:1::8.8.8.8]"
+    assert await validate_url(public_nat64_local) == public_nat64_local
