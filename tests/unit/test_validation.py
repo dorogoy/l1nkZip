@@ -55,6 +55,8 @@ invalid_urls = [
     ("ssrf_ipv4_compat_metadata", "http://[::169.254.169.254]", 422),
     ("ssrf_ipv6_site_local", "http://[fec0::1]", 422),
     ("ssrf_orchidv2_ip", "http://[2001:20::1]", 422),
+    ("ssrf_orchidv2_upper_boundary", "http://[2001:2f::1]", 422),
+    ("ssrf_orchidv1_ip", "http://[2001:10::1]", 422),
 ]
 
 # Test cases for admin token validation
