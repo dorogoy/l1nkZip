@@ -190,7 +190,9 @@ See the [self-hosting documentation](user-guide/docs/selfhosting.md) for detaile
 
 ## MCP Integration
 
-L1nkZip embeds a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so AI agents and LLM-powered clients can discover and invoke its URL management capabilities directly. The server uses the Server-Sent Events (SSE) transport and speaks JSON-RPC 2.0. MCP is always enabled — there is no environment variable to toggle it.
+L1nkZip embeds a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so AI agents and LLM-powered clients can discover and invoke its URL management capabilities directly. The server uses the Server-Sent Events (SSE) transport and speaks JSON-RPC 2.0. MCP is enabled by default. Set `MCP_ENABLED=false` to turn it off; `/mcp/sse` and `/mcp/messages` then return 404.
+
+`shorten_url` uses the same per-client `RATE_LIMIT_CREATE` budget as `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP. Both limits live in the process-wide limiter, so opening another MCP connection does not grant a new budget. `GENERATOR_STRING` must be a long random alphabet; the process will not start with the published default.
 
 ### Endpoints
 

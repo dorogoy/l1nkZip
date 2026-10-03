@@ -21,7 +21,7 @@ import validators
 from l1nkzip.cache import cache
 from l1nkzip.config import openapi_tags, ponyorm_settings, settings
 from l1nkzip.logging import get_logger
-from l1nkzip.mcp import mcp_server, sse_transport
+from l1nkzip.mcp import mcp_request, mcp_server, sse_transport
 from l1nkzip.metrics import metrics, record_request_end, record_request_start
 from l1nkzip.models import (
     GenericInfo,
@@ -323,6 +323,25 @@ app.add_exception_handler(RateLimitExceeded, _handle_rate_limit_exceeded)
 app.add_middleware(SlowAPIMiddleware)
 
 
+@limiter.shared_limit(settings.rate_limit_create, scope="/url")
+async def count_url_create(request: Request) -> None:
+    """Count one creation on the same per-client budget as POST /url.
+
+    The scope matches that route's path key. Storage is the process-wide
+    limiter, so every MCP connection for this client shares it.
+    """
+    del request
+
+
+@limiter.shared_limit(settings.rate_limit_redirect, scope="resolve")
+async def count_url_resolve(request: Request) -> None:
+    """Count one resolution against RATE_LIMIT_REDIRECT for this client IP.
+
+    One bucket per client for the process, not one bucket per MCP connection.
+    """
+    del request
+
+
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     """Middleware to add security headers to HTTP responses."""
@@ -617,71 +636,87 @@ async def create_url(request: Request, url: Url) -> LinkInfo:
         raise HTTPException(status_code=500, detail="Internal server error while creating URL") from e
 
 
+def _require_mcp() -> None:
+    if not settings.mcp_enabled:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="MCP is disabled")
+
+
 @app.get("/mcp/sse", tags=["mcp"])
 async def handle_sse(request: Request) -> None:
+    _require_mcp()
     # request._send is a private Starlette attribute. This is necessary because
     # MCP's connect_sse/handle_post_message require ASGI channels directly.
+    # Tool handlers run on this task, so the rate limit sees this client.
+    context = mcp_request.set(request)
     try:
-        connect_ctx = sse_transport.connect_sse(
-            request.scope,
-            request.receive,
-            request._send,
-        )
-    except Exception as e:
-        logger.error(
-            "Failed to initialize MCP SSE connection",
-            extra={"error": str(e)},
-        )
-        raise HTTPException(status_code=400, detail="Failed to initialize SSE connection") from e
-
-    try:
-        async with connect_ctx as streams:
-            await mcp_server.run(
-                streams[0],
-                streams[1],
-                mcp_server.create_initialization_options(),
+        try:
+            connect_ctx = sse_transport.connect_sse(
+                request.scope,
+                request.receive,
+                request._send,
             )
-    except asyncio.CancelledError:
-        logger.info("MCP SSE client connection cancelled/disconnected gracefully")
-    except Exception as e:
-        err_msg = str(e).lower()
-        is_disconnect = any(
-            p in err_msg
-            for p in (
-                "broken pipe",
-                "connection reset",
-                "connection closed",
-                "closed",
-                "cancelled",
-                "client disconnected",
-            )
-        ) or isinstance(e, (ConnectionResetError, BrokenPipeError))
-
-        if is_disconnect:
-            logger.info(
-                "MCP SSE client connection disconnected abruptly",
-                extra={"error": str(e)},
-            )
-        else:
+        except Exception as e:
             logger.error(
-                "Unexpected error in MCP SSE connection",
+                "Failed to initialize MCP SSE connection",
                 extra={"error": str(e)},
             )
+            raise HTTPException(status_code=400, detail="Failed to initialize SSE connection") from e
+
+        try:
+            async with connect_ctx as streams:
+                await mcp_server.run(
+                    streams[0],
+                    streams[1],
+                    mcp_server.create_initialization_options(),
+                )
+        except asyncio.CancelledError:
+            logger.info("MCP SSE client connection cancelled/disconnected gracefully")
+        except Exception as e:
+            err_msg = str(e).lower()
+            is_disconnect = any(
+                p in err_msg
+                for p in (
+                    "broken pipe",
+                    "connection reset",
+                    "connection closed",
+                    "closed",
+                    "cancelled",
+                    "client disconnected",
+                )
+            ) or isinstance(e, (ConnectionResetError, BrokenPipeError))
+
+            if is_disconnect:
+                logger.info(
+                    "MCP SSE client connection disconnected abruptly",
+                    extra={"error": str(e)},
+                )
+            else:
+                logger.error(
+                    "Unexpected error in MCP SSE connection",
+                    extra={"error": str(e)},
+                )
+    finally:
+        mcp_request.reset(context)
 
 
 @app.post("/mcp/messages", tags=["mcp"])
 async def handle_messages(request: Request) -> None:
+    _require_mcp()
     # request._send is a private Starlette attribute. This is necessary because
     # MCP's connect_sse/handle_post_message require ASGI channels directly.
+    context = mcp_request.set(request)
     try:
-        await sse_transport.handle_post_message(
-            request.scope,
-            request.receive,
-            request._send,
-        )
-    except Exception as e:
-        logger.error(
-            "Error handling MCP message POST request",
-            extra={"error": str(e)},
-        )
-        raise HTTPException(status_code=500, detail="Internal server error in message route") from e
+        try:
+            await sse_transport.handle_post_message(
+                request.scope,
+                request.receive,
+                request._send,
+            )
+        except Exception as e:
+            logger.error(
+                "Error handling MCP message POST request",
+                extra={"error": str(e)},
+            )
+            raise HTTPException(status_code=500, detail="Internal server error in message route") from e
+    finally:
+        mcp_request.reset(context)

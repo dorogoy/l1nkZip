@@ -4,11 +4,7 @@ from l1nkzip.generator import (
     DEFAULT_BLOCK_SIZE,
     MIN_LENGTH,
     UrlEncoder,
-    debase,
-    decode,
     decode_url,
-    enbase,
-    encode,
     encode_url,
 )
 
@@ -65,23 +61,27 @@ def test_generator_string():
 
 
 def test_encode():
-    """Test basic encoding functionality"""
-    assert encode(123) == 14548992
+    """Test basic encoding functionality for the historical public alphabet."""
+    encoder = UrlEncoder(alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq")
+    assert encoder.encode(123) == 14548992
 
 
 def test_decode():
-    """Test basic decoding functionality"""
-    assert decode(14548992) == 123
+    """Test basic decoding functionality for the historical public alphabet."""
+    encoder = UrlEncoder(alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq")
+    assert encoder.decode(14548992) == 123
 
 
 def test_enbase():
-    """Test base conversion encoding"""
-    assert enbase(123) == "mmmjq"
+    """Test base conversion encoding for the historical public alphabet."""
+    encoder = UrlEncoder(alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq")
+    assert encoder.enbase(123) == "mmmjq"
 
 
 def test_debase():
-    """Test base conversion decoding"""
-    assert debase("mmmjq") == 123
+    """Test base conversion decoding for the historical public alphabet."""
+    encoder = UrlEncoder(alphabet="mn6j2c4rv8bpygw95z7hsdaetxuk3fq")
+    assert encoder.debase("mmmjq") == 123
 
 
 def test_url_encoder_initialization():

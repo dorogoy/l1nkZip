@@ -29,7 +29,7 @@ For more information check the [PonyORM documentation](https://docs.ponyorm.org/
 * `DB_TYPE`: Database type. Supported values are `inmemory`, `sqlite` and `postgresql`. Other databases like `mysql`, `oracle`, and `cockroachdb` are also supported thanks to [PonyORM][PonyORM], but require additional drivers.
 * `DB_NAME`: Database name. Used for sqlite and postgresql.
 * `TOKEN`: Token used to authenticate some administrative actions to the API. This is a secret value and should not be shared.
-* `GENERATOR_STRING`: String used to generate the shortened URLs. This is a secret value and should not be shared. You can shuffle uppercase, lowercase letters and/or numbers without repeating them.
+* `GENERATOR_STRING`: Required secret alphabet used to generate short codes. Use a long random string of at least 31 characters (letters and digits, no repeats). The process refuses to start if this is unset, shorter than 31 characters, or the published alphabet `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`. Do not share it.
 
 ### Optional environment variables
 
@@ -47,6 +47,7 @@ For more information check the [PonyORM documentation](https://docs.ponyorm.org/
 * `METRICS_ENABLED`: Enable Prometheus metrics endpoint. Default: false.
 * `LOG_LEVEL`: Logging level. Default: "INFO". Options: "DEBUG", "INFO", "WARN", "ERROR".
 * `LOG_FORMAT`: Log format. Default: "text". Set to "json" for structured logging.
+* `MCP_ENABLED`: Enable the MCP server. Default: `true`. Set to `false` to make `/mcp/sse` and `/mcp/messages` return 404. When enabled, `shorten_url` shares `RATE_LIMIT_CREATE` with `POST /url`, and `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP across all MCP connections in the process.
 
 ## Phishtank support
 
@@ -279,7 +280,7 @@ services:
       DB_USER: "l1nkzip"
       DB_PASSWORD: "your-postgres-password"
       TOKEN: "your-secret-admin-token"
-      GENERATOR_STRING: "your-custom-alphabet-here"
+      GENERATOR_STRING: "replace-with-a-long-random-alphabet"
 
       # Optional environment variables
       PHISHTANK: "anonymous"

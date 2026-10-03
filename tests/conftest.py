@@ -2,6 +2,14 @@
 Pytest configuration and shared fixtures for L1nkZip tests.
 """
 
+# ruff: noqa: E402
+
+import os
+
+
+# The app refuses the published alphabet. Set a long stand-in before importing it.
+os.environ["GENERATOR_STRING"] = "zyxwvutsrqponmlkjihgfedcba987654"
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi.testclient import TestClient
