@@ -85,8 +85,15 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # it explicitly rather than relying on stdlib is_private classification
         if ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x10:
             return True
-    if isinstance(ip, ipaddress.IPv4Address) and ip.packed[0] == 0:
-        return True
+        # AMT (2001:3::/32, Automatic Multicast Tunneling, RFC 7450) non-routable range
+        if ip.packed.startswith(b"\x20\x01\x00\x03"):
+            return True
+    if isinstance(ip, ipaddress.IPv4Address):
+        if ip.packed[0] == 0:
+            return True
+        # Deprecated 6to4 Anycast IPv4 prefix (192.88.99.0/24, RFC 7526)
+        if ip.packed[:3] == b"\xc0\x58\x63":
+            return True
     return (
         not ip.is_global
         or ip.is_private
