@@ -5,6 +5,15 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.2.1](https://github.com/dorogoy/l1nkZip/compare/v1.2.0...v1.2.1) (2026-10-03)
+
+
+### Bug Fixes
+
+* **deps:** bump pyjwt ([d6752d8](https://github.com/dorogoy/l1nkZip/commit/d6752d855564ce9bd7058bbff08f74e51243c97b))
+* harden SSRF IP validation against Teredo IPv6 and 0.0.0.0/8 ([#317](https://github.com/dorogoy/l1nkZip/issues/317)) ([742d32a](https://github.com/dorogoy/l1nkZip/commit/742d32a637df589a335e47b7e09ea17e7f319aaf))
+* Rate-limit MCP tools and reject the public short-code alphabet ([#322](https://github.com/dorogoy/l1nkZip/issues/322)) ([f6fff4c](https://github.com/dorogoy/l1nkZip/commit/f6fff4c62b4b4075a38d409826229f5826b281d3))
+
 ## [1.2.0](https://github.com/dorogoy/l1nkZip/compare/v1.1.4...v1.2.0) (2026-09-29)
 
 
