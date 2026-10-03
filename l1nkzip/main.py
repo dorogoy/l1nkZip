@@ -78,6 +78,13 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # and the protocol is deprecated. Block the whole prefix outright:
         if ip.packed.startswith(b"\x20\x01\x00\x00"):
             return True
+        # ORCHIDv2 (2001:20::/28) non-routable Overlay Routable Cryptographic Hash Identifiers
+        if ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x20:
+            return True
+        # ORCHIDv1 (2001:10::/28, legacy RFC 4843 range) is non-routable too; block
+        # it explicitly rather than relying on stdlib is_private classification
+        if ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x10:
+            return True
     if isinstance(ip, ipaddress.IPv4Address) and ip.packed[0] == 0:
         return True
     return (

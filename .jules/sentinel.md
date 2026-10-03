@@ -37,3 +37,8 @@
 **Vulnerability:** Local-Use NAT64 IPv6 hostnames using the RFC 8215 prefix `64:ff9b:1::/48` (such as `64:ff9b:1::127.0.0.1` or `64:ff9b:1::10.0.0.1`) embed target IPv4 addresses in the last 4 bytes. Without explicit unwrapping, internal loopback or private IPv4 addresses embedded in Local-Use NAT64 prefixes could bypass SSRF checks depending on Python runtime address classification, or reject valid public targets.
 **Learning:** Checking `ip.packed.startswith(b"\x00\x64\xff\x9b\x00\x01")` identifies Local-Use NAT64 addresses (`64:ff9b:1::/48`), allowing extraction of `ipaddress.IPv4Address(ip.packed[-4:])` to recursively evaluate `_is_blocked_ip`.
 **Prevention:** Always unwrap RFC 8215 Local-Use NAT64 (`64:ff9b:1::/48`) embedded IPv4 addresses alongside Well-Known NAT64 (`64:ff9b::/96`) and recursively evaluate the extracted IPv4 address against blocked IP rules.
+
+## 2026-10-02 - SSRF Bypass via ORCHIDv2 IPv6 Address Range (`2001:20::/28`)
+**Vulnerability:** ORCHIDv2 addresses (`2001:20::/28`, RFC 7343) are non-routable IPv6 overlay addresses for cryptographic identifiers. In Python's standard `ipaddress` module, ORCHIDv2 addresses evaluate to `is_global=True` and `is_private=False`, allowing SSRF validation that relies solely on `is_global` / `is_private` to be bypassed.
+**Learning:** Matching `ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x20` precisely identifies all IPv6 addresses within the ORCHIDv2 `/28` range (`2001:20::/28`).
+**Prevention:** Explicitly check and block `2001:20::/28` IPv6 prefix during URL validation for SSRF prevention.
