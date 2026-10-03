@@ -2,7 +2,11 @@
 
 L1nkZip ships with an embedded [Model Context Protocol (MCP)][MCP] server, so AI agents and LLM-powered clients can discover and invoke its URL management capabilities directly. The server uses the [Server-Sent Events (SSE)][SSE] transport and speaks [JSON-RPC 2.0][JSON-RPC], exposing shortening, retrieval, and administrative tools through a single, discoverable interface.
 
-MCP is always enabled. There is no environment variable to toggle it — once L1nkZip is running, the endpoints below are available.
+MCP is enabled by default. Set `MCP_ENABLED=false` to disable it. While it is disabled, `/mcp/sse` and `/mcp/messages` respond with `404`.
+
+`shorten_url` shares the per-client `RATE_LIMIT_CREATE` budget with `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT`, one bucket per client IP. The bucket is the process-wide HTTP limiter, not a counter per SSE connection.
+
+The process also requires `GENERATOR_STRING`: a long random alphabet of at least 31 characters with no repeated characters. Startup rejects a missing value, a shorter value, a repeated character, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ## Endpoints
 
@@ -102,7 +106,8 @@ result = await session.call_tool(
 
 ## Security notes
 
-- Public tools (`shorten_url`, `get_original_url`) inherit the same protections as the REST API: URL validation, PhishTank checks, and rate limiting semantics.
+- Public tools (`shorten_url`, `get_original_url`) inherit URL validation and PhishTank checks from the REST API. `shorten_url` shares the `POST /url` rate limit. `get_original_url` is limited by `RATE_LIMIT_REDIRECT` per client IP across every MCP connection in the process.
+- Set `MCP_ENABLED=false` when the process should not expose MCP at all.
 - The `list_urls` tool validates the admin token using the same mechanism as the REST admin endpoints (length and character whitelist, then comparison against `TOKEN`).
 - Never expose or log your admin token. See the [Self-hosting](/l1nkZip/selfhosting) guide for token configuration.
 

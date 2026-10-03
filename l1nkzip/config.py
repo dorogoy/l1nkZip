@@ -4,6 +4,11 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
+# Published alphabet. Short codes are a reversible encoding of sequential ids,
+# so this value must not be used as a deployment secret.
+PUBLIC_GENERATOR_ALPHABET = "mn6j2c4rv8bpygw95z7hsdaetxuk3fq"
+
+
 class Settings(BaseSettings):
     api_name: str = "l1nkZip"
     api_domain: str = "https://l1nk.zip"
@@ -26,8 +31,8 @@ class Settings(BaseSettings):
 
     # Keep the token secret
     token: str = "__change_me__"
-    # Change this to your own random generator string
-    generator_string: str = "mn6j2c4rv8bpygw95z7hsdaetxuk3fq"
+    # Required secret. The historical default is rejected at startup.
+    generator_string: str = PUBLIC_GENERATOR_ALPHABET
     # Rate limiting settings
     rate_limit_create: str = "10/minute"  # Rate limit for URL creation
     rate_limit_redirect: str = "120/minute"  # Rate limit for URL redirection
@@ -38,6 +43,24 @@ class Settings(BaseSettings):
     metrics_enabled: bool = False  # Enable Prometheus metrics endpoint
     log_level: str = "INFO"  # Logging level: DEBUG, INFO, WARN, ERROR
     log_format: str = "text"  # Log format: text or json
+    # MCP is on unless MCP_ENABLED=false. Tool calls use the HTTP rate limits.
+    mcp_enabled: bool = True
+
+    @field_validator("generator_string")
+    @classmethod
+    def _generator_string_secret(cls, v: str) -> str:
+        if v == PUBLIC_GENERATOR_ALPHABET:
+            raise ValueError(
+                "GENERATOR_STRING must be set to a long random alphabet. The public default alphabet is not allowed."
+            )
+        if len(v) < len(PUBLIC_GENERATOR_ALPHABET):
+            raise ValueError(
+                "GENERATOR_STRING must be a long random alphabet "
+                f"of at least {len(PUBLIC_GENERATOR_ALPHABET)} characters."
+            )
+        if len(set(v)) != len(v):
+            raise ValueError("GENERATOR_STRING must not contain repeated characters.")
+        return v
 
 
 settings = Settings()

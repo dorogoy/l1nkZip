@@ -13,7 +13,7 @@ The code of l1nkZip is available at its [Github repository][Github repository] u
 * Optional protection against phishing using the [PhishTank][PhishTank] database.
 * Built-in rate limiting to prevent abuse through mass URL creation and enumeration attacks.
 * Optional Redis caching for improved performance on frequently accessed URLs.
-* Built-in [Model Context Protocol (MCP)][MCP] server so AI agents can shorten and resolve links directly. See the [MCP Integration](/l1nkZip/mcp) page.
+* Built-in [Model Context Protocol (MCP)][MCP] server so AI agents can shorten and resolve links directly. `shorten_url` shares `RATE_LIMIT_CREATE` and `get_original_url` uses `RATE_LIMIT_REDIRECT`. Set `MCP_ENABLED=false` to turn the MCP routes off. See the [MCP Integration](/l1nkZip/mcp) page.
 
 ## User manual
 
@@ -123,6 +123,12 @@ You can customize rate limits using environment variables:
 export RATE_LIMIT_CREATE="20/minute"    # URL creation limit
 export RATE_LIMIT_REDIRECT="180/minute"  # URL redirection limit
 ```
+
+MCP uses these same limits. `shorten_url` shares the per-client `RATE_LIMIT_CREATE` budget with `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP, across every MCP connection in the process. Set `MCP_ENABLED=false` to turn `/mcp/sse` and `/mcp/messages` off (they then return 404).
+
+## Short codes
+
+`GENERATOR_STRING` must be a long random alphabet of at least 31 characters, with no repeated characters. The process refuses to start if it is unset, shorter than 31 characters, contains a repeated character, or is the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ### Rate Limit Headers
 When rate limited, responses include informative headers:

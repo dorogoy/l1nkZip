@@ -1,6 +1,9 @@
 import asyncio
+from collections.abc import Awaitable, Callable
+from contextvars import ContextVar
 import secrets
 
+from fastapi import Request
 from mcp.server import Server, ServerRequestContext
 from mcp.server.sse import SseServerTransport
 import mcp.types as types
@@ -11,6 +14,7 @@ from mcp.types import (
     PaginatedRequestParams,
     TextContent,
 )
+from slowapi.errors import RateLimitExceeded
 
 from l1nkzip import config
 from l1nkzip.cache import cache
@@ -19,6 +23,28 @@ from l1nkzip.metrics import metrics
 
 
 logger = get_logger(__name__)
+
+# Set by the MCP HTTP routes for the task that runs tool calls.
+mcp_request: ContextVar[Request | None] = ContextVar("mcp_request", default=None)
+
+
+async def _hit_mcp_limit(count: Callable[[Request], Awaitable[None]]) -> None:
+    """Consume the process-wide create or resolve budget for this client.
+
+    In-process handler calls have no HTTP request and are not limited here.
+    GET /mcp/sse and POST /mcp/messages always set mcp_request.
+    """
+    request = mcp_request.get()
+    if request is None:
+        return
+    # slowapi marks a Request as already counted so middleware and the route
+    # decorator do not double-count one HTTP request. One MCP connection sends
+    # many tool calls on that same Request; each call has to consume a hit.
+    request.state._rate_limiting_complete = False
+    try:
+        await count(request)
+    except RateLimitExceeded as exc:
+        raise ValueError(f"Rate limit exceeded: {exc.detail}") from exc
 
 
 async def handle_list_tools() -> list[types.Tool]:
@@ -86,7 +112,9 @@ async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent
 async def _handle_shorten_url(arguments: dict) -> list[types.TextContent]:
     from fastapi import HTTPException
 
-    from l1nkzip.main import insert_link, retry_phishtank_check, validate_url
+    from l1nkzip.main import count_url_create, insert_link, retry_phishtank_check, validate_url
+
+    await _hit_mcp_limit(count_url_create)
 
     if not isinstance(arguments, dict):
         raise ValueError("Invalid arguments: expected object")
@@ -147,8 +175,10 @@ async def _handle_shorten_url(arguments: dict) -> list[types.TextContent]:
 async def _handle_get_original_url(arguments: dict) -> list[types.TextContent]:
     from fastapi import HTTPException
 
-    from l1nkzip.main import retry_phishtank_check, set_visit, validate_short_link
+    from l1nkzip.main import count_url_resolve, retry_phishtank_check, set_visit, validate_short_link
     from l1nkzip.models import increment_visit_async
+
+    await _hit_mcp_limit(count_url_resolve)
 
     if not isinstance(arguments, dict):
         raise ValueError("Invalid arguments: expected object")

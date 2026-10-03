@@ -16,7 +16,7 @@ The full documentation is available at https://dorogoy.github.io/l1nkZip.
 * Built-in rate limiting protection against abuse through mass URL creation or enumeration attacks using [slowapi](https://github.com/laurentS/slowapi).
 * Optional Redis caching for improved performance on frequently accessed URLs (TTL-based with configurable expiration).
 * **Comprehensive monitoring and observability** with Prometheus metrics, structured logging, and alerting support.
-* **Built-in MCP (Model Context Protocol) server** over SSE, letting AI agents shorten and resolve links directly via discoverable tools.
+* **Built-in MCP (Model Context Protocol) server** over SSE, letting AI agents shorten and resolve links directly via discoverable tools. It shares the HTTP create and redirect rate limits. Set `MCP_ENABLED=false` to turn the MCP routes off.
 * **Comprehensive test suite** with more than 229 tests covering unit, API, and integration scenarios (75%+ coverage).
 
 ## Companion CLI Tool
@@ -190,7 +190,11 @@ See the [self-hosting documentation](user-guide/docs/selfhosting.md) for detaile
 
 ## MCP Integration
 
-L1nkZip embeds a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so AI agents and LLM-powered clients can discover and invoke its URL management capabilities directly. The server uses the Server-Sent Events (SSE) transport and speaks JSON-RPC 2.0. MCP is always enabled — there is no environment variable to toggle it.
+L1nkZip embeds a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so AI agents and LLM-powered clients can discover and invoke its URL management capabilities directly. The server uses the Server-Sent Events (SSE) transport and speaks JSON-RPC 2.0. MCP is enabled by default. Set `MCP_ENABLED=false` to turn it off; `/mcp/sse` and `/mcp/messages` then return 404.
+
+`shorten_url` shares the per-client `RATE_LIMIT_CREATE` budget with `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP. Both limits live in the process-wide limiter, so opening another MCP connection does not grant a new budget.
+
+`GENERATOR_STRING` must be a long random alphabet of at least 31 characters, with no repeated characters. Startup rejects a missing value, a shorter value, repeated characters, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ### Endpoints
 

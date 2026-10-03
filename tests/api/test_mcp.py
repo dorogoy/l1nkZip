@@ -75,6 +75,17 @@ class TestMCPSSEEndpoint:
         response = mcp_test_client.post("/mcp/sse")
         assert response.status_code == 405
 
+    def test_mcp_routes_disabled_by_setting(self, monkeypatch):
+        monkeypatch.setenv("MCP_ENABLED", "false")
+        monkeypatch.setenv("DB_TYPE", "inmemory")
+        for mod in ("l1nkzip.config", "l1nkzip.models", "l1nkzip.main"):
+            sys.modules.pop(mod, None)
+        from l1nkzip.main import app
+
+        client = TestClient(app)
+        assert client.get("/mcp/sse").status_code == 404
+        assert client.post("/mcp/messages", json={"jsonrpc": "2.0", "method": "ping", "id": 1}).status_code == 404
+
 
 class TestMCPMessagesEndpoint:
     def test_messages_endpoint_post_without_session(self, mcp_test_client):
