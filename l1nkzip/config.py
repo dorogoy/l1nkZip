@@ -58,6 +58,8 @@ class Settings(BaseSettings):
                 "GENERATOR_STRING must be a long random alphabet "
                 f"of at least {len(PUBLIC_GENERATOR_ALPHABET)} characters."
             )
+        if len(set(v)) != len(v):
+            raise ValueError("GENERATOR_STRING must not contain repeated characters.")
         return v
 
 

@@ -6,7 +6,7 @@ MCP is enabled by default. Set `MCP_ENABLED=false` to disable it. While it is di
 
 `shorten_url` shares the per-client `RATE_LIMIT_CREATE` budget with `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT`, one bucket per client IP. The bucket is the process-wide HTTP limiter, not a counter per SSE connection.
 
-The process also requires `GENERATOR_STRING`: a long random alphabet of at least 31 characters. Startup rejects a missing value, a shorter value, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
+The process also requires `GENERATOR_STRING`: a long random alphabet of at least 31 characters with no repeated characters. Startup rejects a missing value, a shorter value, a repeated character, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ## Endpoints
 

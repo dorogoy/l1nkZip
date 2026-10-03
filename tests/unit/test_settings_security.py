@@ -24,6 +24,11 @@ def test_missing_generator_string_is_rejected(monkeypatch):
         Settings()
 
 
+def test_repeated_generator_characters_are_rejected():
+    with pytest.raises(ValidationError, match="repeated"):
+        Settings(generator_string="a" * len(PUBLIC_GENERATOR_ALPHABET))
+
+
 def test_long_custom_generator_alphabet_is_accepted():
     alphabet = "zyxwvutsrqponmlkjihgfedcba98765"
     settings = Settings(generator_string=alphabet)

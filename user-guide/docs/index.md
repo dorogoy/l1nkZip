@@ -128,7 +128,7 @@ MCP uses these same limits. `shorten_url` shares the per-client `RATE_LIMIT_CREA
 
 ## Short codes
 
-`GENERATOR_STRING` must be a long random alphabet of at least 31 characters. The process refuses to start if it is unset, shorter than 31 characters, or the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
+`GENERATOR_STRING` must be a long random alphabet of at least 31 characters, with no repeated characters. The process refuses to start if it is unset, shorter than 31 characters, contains a repeated character, or is the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ### Rate Limit Headers
 When rate limited, responses include informative headers:

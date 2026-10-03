@@ -194,7 +194,7 @@ L1nkZip embeds a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 
 `shorten_url` shares the per-client `RATE_LIMIT_CREATE` budget with `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP. Both limits live in the process-wide limiter, so opening another MCP connection does not grant a new budget.
 
-`GENERATOR_STRING` must be a long random alphabet of at least 31 characters. Startup rejects a missing value, a shorter value, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
+`GENERATOR_STRING` must be a long random alphabet of at least 31 characters, with no repeated characters. Startup rejects a missing value, a shorter value, repeated characters, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ### Endpoints
 

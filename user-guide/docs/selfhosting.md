@@ -29,7 +29,7 @@ For more information check the [PonyORM documentation](https://docs.ponyorm.org/
 * `DB_TYPE`: Database type. Supported values are `inmemory`, `sqlite` and `postgresql`. Other databases like `mysql`, `oracle`, and `cockroachdb` are also supported thanks to [PonyORM][PonyORM], but require additional drivers.
 * `DB_NAME`: Database name. Used for sqlite and postgresql.
 * `TOKEN`: Token used to authenticate some administrative actions to the API. This is a secret value and should not be shared.
-* `GENERATOR_STRING`: Required secret alphabet used to generate short codes. Use a long random string of at least 31 characters (letters and digits, no repeats). The process refuses to start if this is unset, shorter than 31 characters, or the published alphabet `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`. Do not share it.
+* `GENERATOR_STRING`: Required secret alphabet used to generate short codes. Use a long random string of at least 31 characters (letters and digits, no repeats). The process refuses to start if this is unset, shorter than 31 characters, contains a repeated character, or is the published alphabet `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`. Do not share it.
 
 ### Optional environment variables
 
@@ -67,7 +67,7 @@ docker pull dorogoy/l1nkzip
 
 ## Kubernetes manifest
 
-This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. Put a long random alphabet of at least 31 characters in the `GENERATOR_STRING` secret. The process rejects the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq` at startup. `MCP_ENABLED=false` turns `/mcp/sse` and `/mcp/messages` off. While MCP is on, `shorten_url` shares `RATE_LIMIT_CREATE` with `POST /url`, and `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP. This example is for a S3 compatible service (idrive e2), [Amazon S3 configuration](https://litestream.io/guides/s3/) for AWS is slightly different. Please, have a look at the [Litestream documentation][litestream] for more details.
+This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. Put a long random alphabet of at least 31 characters, with no repeated characters, in the `GENERATOR_STRING` secret. The process rejects the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq` at startup. `MCP_ENABLED=false` turns `/mcp/sse` and `/mcp/messages` off. While MCP is on, `shorten_url` shares `RATE_LIMIT_CREATE` with `POST /url`, and `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP. This example is for a S3 compatible service (idrive e2), [Amazon S3 configuration](https://litestream.io/guides/s3/) for AWS is slightly different. Please, have a look at the [Litestream documentation][litestream] for more details.
 
 ```yaml
 ---
@@ -191,8 +191,8 @@ spec:
                 secretKeyRef:
                   name: l1nkzip-secret
                   key: TOKEN
-            # Long random alphabet of at least 31 characters. The published
-            # default (mn6j2c4rv8bpygw95z7hsdaetxuk3fq) is rejected at startup.
+            # Long random alphabet of at least 31 characters, no repeats.
+            # The published default (mn6j2c4rv8bpygw95z7hsdaetxuk3fq) is rejected at startup.
             - name: GENERATOR_STRING
               valueFrom:
                 secretKeyRef:
@@ -291,7 +291,7 @@ services:
       DB_USER: "l1nkzip"
       DB_PASSWORD: "your-postgres-password"
       TOKEN: "your-secret-admin-token"
-      # At least 31 characters. The published default alphabet is rejected at startup.
+      # At least 31 characters, no repeats. The published default alphabet is rejected at startup.
       GENERATOR_STRING: "replace-with-a-long-random-alphabet"
 
       # Optional environment variables
@@ -324,7 +324,7 @@ To use this configuration:
 2. Replace the placeholder values:
    - `your-postgres-password`: A strong password for PostgreSQL
    - `your-secret-admin-token`: A secure token for admin operations
-   - `replace-with-a-long-random-alphabet`: `GENERATOR_STRING`, a long random alphabet of at least 31 characters. Startup rejects the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
+   - `replace-with-a-long-random-alphabet`: `GENERATOR_STRING`, a long random alphabet of at least 31 characters with no repeats. Startup rejects the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 3. Run: `docker-compose up -d`
 
 The API will be available at `http://localhost:8000` with:
