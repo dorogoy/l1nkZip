@@ -67,7 +67,7 @@ docker pull dorogoy/l1nkzip
 
 ## Kubernetes manifest
 
-This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. This example is for a S3 compatible service (idrive e2), [Amazon S3 configuration](https://litestream.io/guides/s3/) for AWS is slightly different. Please, have a look at the [Litestream documentation][litestream] for more details.
+This is an example of a StatefulSet to deploy L1nkZip to a Kubernetes cluster. The required secrets are not included and it uses a sqlite database with litestream. Put a long random alphabet of at least 31 characters in the `GENERATOR_STRING` secret. The process rejects the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq` at startup. `MCP_ENABLED=false` turns `/mcp/sse` and `/mcp/messages` off. While MCP is on, `shorten_url` shares `RATE_LIMIT_CREATE` with `POST /url`, and `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP. This example is for a S3 compatible service (idrive e2), [Amazon S3 configuration](https://litestream.io/guides/s3/) for AWS is slightly different. Please, have a look at the [Litestream documentation][litestream] for more details.
 
 ```yaml
 ---
@@ -191,11 +191,22 @@ spec:
                 secretKeyRef:
                   name: l1nkzip-secret
                   key: TOKEN
+            # Long random alphabet of at least 31 characters. The published
+            # default (mn6j2c4rv8bpygw95z7hsdaetxuk3fq) is rejected at startup.
             - name: GENERATOR_STRING
               valueFrom:
                 secretKeyRef:
                   name: l1nkzip-secret
                   key: GENERATOR_STRING
+            # "false" turns /mcp/sse and /mcp/messages off (404).
+            # When enabled, shorten_url shares RATE_LIMIT_CREATE with POST /url
+            # and get_original_url uses RATE_LIMIT_REDIRECT per client IP.
+            - name: MCP_ENABLED
+              value: "true"
+            - name: RATE_LIMIT_CREATE
+              value: "10/minute"
+            - name: RATE_LIMIT_REDIRECT
+              value: "120/minute"
             - name: PHISHTANK
               value: "anonymous"
             - name: DB_TYPE
@@ -280,9 +291,13 @@ services:
       DB_USER: "l1nkzip"
       DB_PASSWORD: "your-postgres-password"
       TOKEN: "your-secret-admin-token"
+      # At least 31 characters. The published default alphabet is rejected at startup.
       GENERATOR_STRING: "replace-with-a-long-random-alphabet"
 
       # Optional environment variables
+      # false turns /mcp/sse and /mcp/messages off (404).
+      # shorten_url shares RATE_LIMIT_CREATE; get_original_url uses RATE_LIMIT_REDIRECT.
+      MCP_ENABLED: "true"
       PHISHTANK: "anonymous"
       REDIS_SERVER: "redis://redis:6379/0"
       REDIS_TTL: "86400"
@@ -309,7 +324,7 @@ To use this configuration:
 2. Replace the placeholder values:
    - `your-postgres-password`: A strong password for PostgreSQL
    - `your-secret-admin-token`: A secure token for admin operations
-   - `your-custom-alphabet`: A shuffled string of characters for URL generation (e.g., "aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789")
+   - `replace-with-a-long-random-alphabet`: `GENERATOR_STRING`, a long random alphabet of at least 31 characters. Startup rejects the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 3. Run: `docker-compose up -d`
 
 The API will be available at `http://localhost:8000` with:

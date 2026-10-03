@@ -4,7 +4,9 @@ L1nkZip ships with an embedded [Model Context Protocol (MCP)][MCP] server, so AI
 
 MCP is enabled by default. Set `MCP_ENABLED=false` to disable it. While it is disabled, `/mcp/sse` and `/mcp/messages` respond with `404`.
 
-`shorten_url` draws from the same per-client `RATE_LIMIT_CREATE` budget as `POST /url`. `get_original_url` draws from `RATE_LIMIT_REDIRECT`, one bucket per client IP. The bucket is the process-wide HTTP limiter, not a counter per SSE connection.
+`shorten_url` shares the per-client `RATE_LIMIT_CREATE` budget with `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT`, one bucket per client IP. The bucket is the process-wide HTTP limiter, not a counter per SSE connection.
+
+The process also requires `GENERATOR_STRING`: a long random alphabet of at least 31 characters. Startup rejects a missing value, a shorter value, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ## Endpoints
 
