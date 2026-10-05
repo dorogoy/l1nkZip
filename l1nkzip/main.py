@@ -88,7 +88,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # AMT (2001:3::/32, Automatic Multicast Tunneling, RFC 7450) non-routable range
         if ip.packed.startswith(b"\x20\x01\x00\x03"):
             return True
-        # LISP (2001:1::/32, Locator/ID Separation Protocol, RFC 6837 / RFC 9301) non-routable range
+        # IETF Protocol Assignments (2001:1::/32, RFC 2928): CPython exempts the
+        # globally reachable anycast addresses inside this block (PCP 2001:1::1,
+        # TURN 2001:1::2) from the private 2001::/23 range, so block the whole /32
         if ip.packed.startswith(b"\x20\x01\x00\x01"):
             return True
     if isinstance(ip, ipaddress.IPv4Address):
