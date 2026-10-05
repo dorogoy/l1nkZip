@@ -58,6 +58,8 @@ invalid_urls = [
     ("ssrf_orchidv2_upper_boundary", "http://[2001:2f::1]", 422),
     ("ssrf_orchidv1_ip", "http://[2001:10::1]", 422),
     ("ssrf_amt_ipv6", "http://[2001:3::1]", 422),
+    ("ssrf_lisp_ipv6", "http://[2001:1::1]", 422),
+    ("ssrf_turn_anycast_ipv6", "http://[2001:1::2]", 422),
     ("ssrf_6to4_anycast_ipv4", "http://192.88.99.1", 422),
 ]
 
