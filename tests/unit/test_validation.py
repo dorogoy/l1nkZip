@@ -61,6 +61,7 @@ invalid_urls = [
     ("ssrf_lisp_ipv6", "http://[2001:1::1]", 422),
     ("ssrf_turn_anycast_ipv6", "http://[2001:1::2]", 422),
     ("ssrf_6to4_anycast_ipv4", "http://192.88.99.1", 422),
+    ("ssrf_drone_remote_id_ipv6", "http://[2001:30::1]", 422),
 ]
 
 # Test cases for admin token validation
@@ -343,6 +344,21 @@ async def test_validate_url_blocks_orchidv2_ipv6(monkeypatch):
     monkeypatch.setattr(main.validators, "url", lambda _: True)
     with pytest.raises(HTTPException) as exc_info:
         await validate_url("http://[2001:20::1]")
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_drone_remote_id_ipv6(monkeypatch):
+    """Drone Remote ID IPv6 addresses (2001:30::/28) must be blocked to prevent SSRF."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url("http://[2001:30::1]")
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
 
