@@ -5,6 +5,17 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.2.2](https://github.com/dorogoy/l1nkZip/compare/v1.2.1...v1.2.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* block deprecated 6to4 Anycast IPv4 and AMT IPv6 ranges against SSRF ([#323](https://github.com/dorogoy/l1nkZip/issues/323)) ([cef5acb](https://github.com/dorogoy/l1nkZip/commit/cef5acb2a2ee28cc29496a482580e75e8d7ee400))
+* block Drone Remote ID IPv6 prefix to prevent SSRF ([#329](https://github.com/dorogoy/l1nkZip/issues/329)) ([a51dde7](https://github.com/dorogoy/l1nkZip/commit/a51dde7f838444f8b8884d766f9c92bd3b996149))
+* **deps:** bump fastapi from 0.141.1 to 0.142.2 ([44c434a](https://github.com/dorogoy/l1nkZip/commit/44c434a15f6823357967804ef93876536f92323f))
+* **deps:** bump mcp from 2.2.0 to 2.3.0 ([ae0277b](https://github.com/dorogoy/l1nkZip/commit/ae0277b7683992fb9e66e7ac3702542787d47247))
+* **deps:** bump ruff from 0.16.9 to 0.16.10 ([81562f6](https://github.com/dorogoy/l1nkZip/commit/81562f6a942190706d955b9e81b3ef73a37b7deb))
+
 ## [1.2.1](https://github.com/dorogoy/l1nkZip/compare/v1.2.0...v1.2.1) (2026-10-03)
 
 
