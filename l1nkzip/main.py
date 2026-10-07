@@ -96,6 +96,11 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     if isinstance(ip, ipaddress.IPv4Address):
         if ip.packed[0] == 0:
             return True
+        # IETF Protocol Assignments IPv4 prefix (192.0.0.0/24, RFC 6890): CPython exempts
+        # PCP (192.0.0.9) and TURN (192.0.0.10) anycast addresses from is_private=True,
+        # so block the 192.0.0.0/24 range explicitly.
+        if ip.packed[:3] == b"\xc0\x00\x00":
+            return True
         # Deprecated 6to4 Anycast IPv4 prefix (192.88.99.0/24, RFC 7526)
         if ip.packed[:3] == b"\xc0\x58\x63":
             return True

@@ -61,6 +61,8 @@ invalid_urls = [
     ("ssrf_lisp_ipv6", "http://[2001:1::1]", 422),
     ("ssrf_turn_anycast_ipv6", "http://[2001:1::2]", 422),
     ("ssrf_6to4_anycast_ipv4", "http://192.88.99.1", 422),
+    ("ssrf_pcp_anycast_ipv4", "http://192.0.0.9", 422),
+    ("ssrf_turn_anycast_ipv4", "http://192.0.0.10", 422),
 ]
 
 # Test cases for admin token validation

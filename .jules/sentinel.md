@@ -47,3 +47,8 @@
 **Vulnerability:** Proposal to block Drone Remote ID IPv6 addresses (`2001:30::/28`, allocated by RFC 9374) as non-routable targets.
 **Learning:** Per RFC 9374 and the IANA IPv6 Special-Purpose Address Space registry, `2001:30::/28` is marked `Forwardable: True` and `Globally Reachable: True`. Python correctly reports `is_global=True` and `is_private=False` for addresses in this block. Blocking `2001:30::/28` rejects globally reachable IPv6 destinations and would introduce a compatibility-breaking rule without security justification.
 **Prevention:** Do not block `2001:30::/28` during SSRF checks as it is globally routable.
+
+## 2026-10-07 - SSRF Bypass via IPv4 IETF Protocol Assignments Range (`192.0.0.0/24`)
+**Vulnerability:** In Python's standard `ipaddress` module, `IPv4Network("192.0.0.0/24")` (RFC 6890 IETF Protocol Assignments) is marked as `is_private=True`, but CPython specifically exempts PCP Anycast (`192.0.0.9`, RFC 7723) and TURN Anycast (`192.0.0.10`, RFC 8155) addresses, returning `is_global=True` and `is_private=False`. As a result, URL validation relying on `is_private` / `is_global` fails to block `192.0.0.9` and `192.0.0.10`, allowing potential SSRF targeting of local gateway/router infrastructure.
+**Learning:** Matching `ip.packed[:3] == b"\xc0\x00\x00"` explicitly identifies all addresses in the `192.0.0.0/24` range, including PCP and TURN Anycast addresses.
+**Prevention:** Explicitly block `192.0.0.0/24` (`ip.packed[:3] == b"\xc0\x00\x00"`) alongside `2001:1::/32` during URL validation for SSRF prevention.
