@@ -43,7 +43,7 @@
 **Learning:** Matching `ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x20` precisely identifies all IPv6 addresses within the ORCHIDv2 `/28` range (`2001:20::/28`).
 **Prevention:** Explicitly check and block `2001:20::/28` IPv6 prefix during URL validation for SSRF prevention.
 
-## 2026-10-06 - SSRF Bypass via Drone Remote ID IPv6 Address Range (`2001:30::/28`)
-**Vulnerability:** Drone Remote ID addresses (`2001:30::/28`, RFC 9153) are non-routable IPv6 overlay addresses used for direct drone identification communications. In Python's standard `ipaddress` module, `2001:30::/28` addresses evaluate to `is_global=True` and `is_private=False`, allowing SSRF validation relying solely on `is_global` / `is_private` to be bypassed.
-**Learning:** Matching `ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x30` accurately identifies IPv6 addresses within the Drone Remote ID `/28` range (`2001:30::/28`).
-**Prevention:** Explicitly check and block `2001:30::/28` IPv6 prefix during URL validation for SSRF prevention.
+## 2026-10-06 - Rejected Block on Drone Remote ID IPv6 Range (`2001:30::/28`)
+**Vulnerability:** Proposal to block Drone Remote ID IPv6 addresses (`2001:30::/28`, allocated by RFC 9374) as non-routable targets.
+**Learning:** Per RFC 9374 and the IANA IPv6 Special-Purpose Address Space registry, `2001:30::/28` is marked `Forwardable: True` and `Globally Reachable: True`. Python correctly reports `is_global=True` and `is_private=False` for addresses in this block. Blocking `2001:30::/28` rejects globally reachable IPv6 destinations and would introduce a compatibility-breaking rule without security justification.
+**Prevention:** Do not block `2001:30::/28` during SSRF checks as it is globally routable.
