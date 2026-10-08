@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.2.3](https://github.com/dorogoy/l1nkZip/compare/v1.2.2...v1.2.3) (2026-10-08)
+
+
+### Bug Fixes
+
+* block IPv4 IETF Protocol Assignments PCP and TURN Anycast in SSRF validation ([1f6f75a](https://github.com/dorogoy/l1nkZip/commit/1f6f75acf1356c328a2361593f5cb3eb637b46ce))
+
 ## [1.2.2](https://github.com/dorogoy/l1nkZip/compare/v1.2.1...v1.2.2) (2026-10-07)
 
 
