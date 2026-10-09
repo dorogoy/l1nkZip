@@ -58,6 +58,7 @@ invalid_urls = [
     ("ssrf_orchidv2_upper_boundary", "http://[2001:2f::1]", 422),
     ("ssrf_orchidv1_ip", "http://[2001:10::1]", 422),
     ("ssrf_amt_ipv6", "http://[2001:3::1]", 422),
+    ("ssrf_amt_ipv4", "http://192.52.193.1", 422),
     ("ssrf_lisp_ipv6", "http://[2001:1::1]", 422),
     ("ssrf_turn_anycast_ipv6", "http://[2001:1::2]", 422),
     ("ssrf_6to4_anycast_ipv4", "http://192.88.99.1", 422),
@@ -374,3 +375,18 @@ async def test_validate_url_allows_local_use_nat64_public_ip(monkeypatch):
     monkeypatch.setattr(main.validators, "url", lambda _: True)
     public_nat64_local = "http://[64:ff9b:1::8.8.8.8]"
     assert await validate_url(public_nat64_local) == public_nat64_local
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_amt_ipv4(monkeypatch):
+    """AMT IPv4 Anycast addresses (192.52.193.0/24, RFC 7450) must be blocked to prevent SSRF."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url("http://192.52.193.1")
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
