@@ -57,3 +57,8 @@
 **Vulnerability:** Automatic Multicast Tunneling (AMT) IPv4 Anycast hostnames in the `192.52.193.0/24` range (RFC 7450) evaluate to `is_global=True` and `is_private=False` in Python's standard `ipaddress` module. While `2001:3::/32` was previously blocked for IPv6, `192.52.193.0/24` remained unblocked, allowing potential SSRF targeting AMT multicast gateway infrastructure.
 **Learning:** Matching `ip.packed[:3] == b"\xc0\x34\xc1"` explicitly identifies all addresses in the AMT IPv4 range (`192.52.193.0/24`).
 **Prevention:** Explicitly block `192.52.193.0/24` (`ip.packed[:3] == b"\xc0\x34\xc1"`) alongside `2001:3::/32` during URL validation for SSRF prevention.
+
+## 2026-10-09 - SSRF Bypass via AS112 IPv4/IPv6 Sinkhole and Redirection Ranges (`192.175.48.0/24`, `192.31.196.0/24`, `2001:4:112::/48`)
+**Vulnerability:** AS112 service addresses (`192.175.48.0/24` and `2001:4:112::/48`, RFC 7534) and AS112 redirection service addresses (`192.31.196.0/24`, RFC 7535) evaluate to `is_global=True` and `is_private=False` in Python's standard `ipaddress` module. These ranges serve as non-globally routable sinkhole nameservers for private reverse DNS queries, allowing potential SSRF targeting AS112 sinkhole endpoints.
+**Learning:** Matching `ip.packed[:3] == b"\xc0\xaf\x30"` (`192.175.48.0/24`), `ip.packed[:3] == b"\xc0\x1f\xc4"` (`192.31.196.0/24`), and `ip.packed.startswith(b"\x20\x01\x00\x04\x01\x12")` (`2001:4:112::/48`) explicitly identifies all AS112 IPv4 and IPv6 addresses.
+**Prevention:** Explicitly block `192.175.48.0/24`, `192.31.196.0/24`, and `2001:4:112::/48` during URL validation for SSRF prevention.

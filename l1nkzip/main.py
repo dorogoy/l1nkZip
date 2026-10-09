@@ -93,6 +93,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # TURN 2001:1::2) from the private 2001::/23 range, so block the whole /32
         if ip.packed.startswith(b"\x20\x01\x00\x01"):
             return True
+        # AS112 IPv6 prefix (2001:4:112::/48, RFC 7534) non-routable sinkhole range
+        if ip.packed.startswith(b"\x20\x01\x00\x04\x01\x12"):
+            return True
     if isinstance(ip, ipaddress.IPv4Address):
         if ip.packed[0] == 0:
             return True
@@ -106,6 +109,12 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
             return True
         # Deprecated 6to4 Anycast IPv4 prefix (192.88.99.0/24, RFC 7526)
         if ip.packed[:3] == b"\xc0\x58\x63":
+            return True
+        # AS112 IPv4 prefix (192.175.48.0/24, RFC 7534) non-routable sinkhole range
+        if ip.packed[:3] == b"\xc0\xaf\x30":
+            return True
+        # AS112 Redirection IPv4 prefix (192.31.196.0/24, RFC 7535)
+        if ip.packed[:3] == b"\xc0\x1f\xc4":
             return True
     return (
         not ip.is_global
