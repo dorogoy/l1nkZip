@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.2.4](https://github.com/dorogoy/l1nkZip/compare/v1.2.3...v1.2.4) (2026-10-09)
+
+
+### Bug Fixes
+
+* block AMT IPv4 Anycast range (192.52.193.0/24) in URL validation ([d2d6874](https://github.com/dorogoy/l1nkZip/commit/d2d6874e640ad13e91e96276939d2c204769fee2))
+
 ## [1.2.3](https://github.com/dorogoy/l1nkZip/compare/v1.2.2...v1.2.3) (2026-10-08)
 
 
