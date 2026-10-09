@@ -101,6 +101,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # so block the 192.0.0.0/24 range explicitly.
         if ip.packed[:3] == b"\xc0\x00\x00":
             return True
+        # AMT IPv4 Anycast prefix (192.52.193.0/24, Automatic Multicast Tunneling, RFC 7450) non-routable range
+        if ip.packed[:3] == b"\xc0\x34\xc1":
+            return True
         # Deprecated 6to4 Anycast IPv4 prefix (192.88.99.0/24, RFC 7526)
         if ip.packed[:3] == b"\xc0\x58\x63":
             return True

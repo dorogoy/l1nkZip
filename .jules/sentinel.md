@@ -52,3 +52,8 @@
 **Vulnerability:** In Python's standard `ipaddress` module, `IPv4Network("192.0.0.0/24")` (RFC 6890 IETF Protocol Assignments) is marked as `is_private=True`, but CPython specifically exempts PCP Anycast (`192.0.0.9`, RFC 7723) and TURN Anycast (`192.0.0.10`, RFC 8155) addresses, returning `is_global=True` and `is_private=False`. As a result, URL validation relying on `is_private` / `is_global` fails to block `192.0.0.9` and `192.0.0.10`, allowing potential SSRF targeting of local gateway/router infrastructure.
 **Learning:** Matching `ip.packed[:3] == b"\xc0\x00\x00"` explicitly identifies all addresses in the `192.0.0.0/24` range, including PCP and TURN Anycast addresses.
 **Prevention:** Explicitly block `192.0.0.0/24` (`ip.packed[:3] == b"\xc0\x00\x00"`) alongside `2001:1::/32` during URL validation for SSRF prevention.
+
+## 2026-10-08 - SSRF Bypass via AMT IPv4 Anycast Range (`192.52.193.0/24`)
+**Vulnerability:** Automatic Multicast Tunneling (AMT) IPv4 Anycast hostnames in the `192.52.193.0/24` range (RFC 7450) evaluate to `is_global=True` and `is_private=False` in Python's standard `ipaddress` module. While `2001:3::/32` was previously blocked for IPv6, `192.52.193.0/24` remained unblocked, allowing potential SSRF targeting AMT multicast gateway infrastructure.
+**Learning:** Matching `ip.packed[:3] == b"\xc0\x34\xc1"` explicitly identifies all addresses in the AMT IPv4 range (`192.52.193.0/24`).
+**Prevention:** Explicitly block `192.52.193.0/24` (`ip.packed[:3] == b"\xc0\x34\xc1"`) alongside `2001:3::/32` during URL validation for SSRF prevention.
