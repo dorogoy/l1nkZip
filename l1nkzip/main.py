@@ -93,6 +93,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # TURN 2001:1::2) from the private 2001::/23 range, so block the whole /32
         if ip.packed.startswith(b"\x20\x01\x00\x01"):
             return True
+        # IPv6 Documentation prefix (2001:db8::/32, RFC 3849) non-routable range
+        if ip.packed.startswith(b"\x20\x01\x0d\xb8"):
+            return True
     if isinstance(ip, ipaddress.IPv4Address):
         if ip.packed[0] == 0:
             return True
