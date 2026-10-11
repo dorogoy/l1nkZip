@@ -50,13 +50,15 @@ class TestGetVisits:
         assert all(isinstance(item, LinkInfo) for item in results)
 
         # Find link1 result
-        link1_info = next(r for r in results if str(r.url) in ("https://example.com", "https://example.com/"))
+        link1_info = next((r for r in results if str(r.url) in ("https://example.com", "https://example.com/")), None)
+        assert link1_info is not None, "Expected link for https://example.com was not found in get_visits output"
         assert link1_info.visits == 2
         assert isinstance(link1_info.full_link, HttpUrl)
         assert isinstance(link1_info.url, HttpUrl)
 
         # Find link2 result
-        link2_info = next(r for r in results if str(r.url) in ("https://python.org", "https://python.org/"))
+        link2_info = next((r for r in results if str(r.url) in ("https://python.org", "https://python.org/")), None)
+        assert link2_info is not None, "Expected link for https://python.org was not found in get_visits output"
         assert link2_info.visits == 0
 
     def test_get_visits_limit_parameter(self):
@@ -75,12 +77,14 @@ class TestGetVisits:
         assert len(results_all) == 5
 
     def test_get_visits_default_limit(self):
-        """Test get_visits uses default limit of 100."""
-        # Default parameter in signature is 100
-        import inspect
+        """Test get_visits uses default limit of 100 when called without explicit limit."""
+        urls = [f"https://example{i}.com" for i in range(105)]
+        with db_session:
+            for url in urls:
+                insert_link(url)
 
-        sig = inspect.signature(get_visits)
-        assert sig.parameters["limit"].default == 100
+        results = get_visits()
+        assert len(results) == 100
 
     def test_get_visits_with_mocked_select(self):
         """Test get_visits with mocked Link.select query for isolated unit test."""
