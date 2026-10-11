@@ -67,3 +67,8 @@
 **Vulnerability:** IPv6 documentation addresses (`2001:db8::/32`, RFC 3849) are non-routable addresses reserved for documentation and examples. Python's `ipaddress` module evaluates `2001:db8::/32` as `is_private=True` and `is_global=False`, so the fallthrough check already rejects them.
 **Learning:** Explicitly checking `ip.packed.startswith(b"\x20\x01\x0d\xb8")` serves as explicit defense-in-depth against future stdlib reclassifications while documenting intent for RFC 3849 documentation prefixes.
 **Prevention:** Explicitly block `2001:db8::/32` (`ip.packed.startswith(b"\x20\x01\x0d\xb8")`) as defense-in-depth during SSRF checks.
+
+## 2026-10-12 - SSRF Bypass via ISATAP IPv6 Addresses with Universal/Local Bit Set (`0200:5efe` Prefix)
+**Vulnerability:** ISATAP IPv6 interface identifiers (RFC 5214 §6.1) construct 64-bit interface IDs starting with either `0000:5efe` (u-bit=0) or `0200:5efe` (u-bit=1). Checking only `b"\x00\x00\x5e\xfe"` allows hostnames like `[2000::0200:5efe:127.0.0.1]` or `[2000::0200:5efe:10.0.0.1]` to evaluate to `is_global=True` and `is_private=False` in Python's `ipaddress` module, bypassing SSRF validation.
+**Learning:** Checking `ip.packed[8:12] in (b"\x00\x00\x5e\xfe", b"\x02\x00\x5e\xfe")` ensures ISATAP interface IDs with both `u=0` and `u=1` are identified and their embedded IPv4 address unwrapped.
+**Prevention:** Always check both `0000:5efe` and `0200:5efe` interface identifier prefixes when unwrapping ISATAP IPv6 addresses for SSRF prevention.
