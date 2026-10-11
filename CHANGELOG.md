@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.2.5](https://github.com/dorogoy/l1nkZip/compare/v1.2.4...v1.2.5) (2026-10-11)
+
+
+### Bug Fixes
+
+* SSRF vulnerability via IPv6 documentation address range (2001:db8::/32) ([#335](https://github.com/dorogoy/l1nkZip/issues/335)) ([9593fc8](https://github.com/dorogoy/l1nkZip/commit/9593fc877df36c878f1a7f4ca315a0498feea874))
+
 ## [1.2.4](https://github.com/dorogoy/l1nkZip/compare/v1.2.3...v1.2.4) (2026-10-09)
 
 
