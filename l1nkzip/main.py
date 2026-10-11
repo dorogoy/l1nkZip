@@ -521,8 +521,6 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
             # Cache hit - redirect immediately and update visit count asynchronously
             try:
                 # Start async visit count update (fire and forget)
-                import asyncio
-
                 asyncio.create_task(increment_visit_async(link))
             except Exception as e:
                 logger.error("Async visit count error", extra={"error": str(e), "link": link})
@@ -547,7 +545,7 @@ async def get_url(request: Request, link: str) -> responses.RedirectResponse:
         else:
             # Cache miss - use database
             try:
-                link_data = set_visit(link)
+                link_data = await asyncio.to_thread(set_visit, link)
             except Exception as e:
                 logger.error("Database error in get_url", extra={"error": str(e), "link": link})
                 record_request_end("GET", "/{link}", 500, "get_url", start_time)

@@ -25,12 +25,12 @@ class TestCreationFlow:
 
         # Verify metrics were updated - check if metrics exist first
         urls_created_metrics = list(metrics_collector.urls_created_total.collect())
-        if urls_created_metrics:
+        if urls_created_metrics and urls_created_metrics[0].samples:
             final_urls_created = urls_created_metrics[0].samples[0].value
             assert final_urls_created >= 1
 
         requests_metrics = list(metrics_collector.http_requests_total.collect())
-        if requests_metrics:
+        if requests_metrics and requests_metrics[0].samples:
             final_requests = requests_metrics[0].samples[0].value
             assert final_requests >= 1
 

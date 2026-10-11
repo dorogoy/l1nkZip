@@ -129,5 +129,6 @@ async def increment_visit_async(link: str):
     This function runs the synchronous database operation in a thread pool
     to avoid blocking the async event loop.
     """
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, increment_visit, link)
+    from l1nkzip import models
+
+    await asyncio.to_thread(models.increment_visit, link)
