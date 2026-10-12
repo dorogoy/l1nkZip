@@ -4,6 +4,7 @@ Tests for Prometheus metrics functionality.
 
 from unittest.mock import patch
 
+from l1nkzip import config
 from l1nkzip.metrics import (
     MetricsCollector,
     metrics,
@@ -125,7 +126,7 @@ class TestMetricsCollector:
         test_metrics = MetricsCollector()
 
         # Patch both the settings and the global metrics instance
-        with patch("l1nkzip.config.settings.metrics_enabled", True):
+        with patch.object(config.settings, "metrics_enabled", True):
             with patch("l1nkzip.metrics.metrics", test_metrics):
                 # Record request start
                 start_time = record_request_start("GET", "/health")
@@ -138,7 +139,7 @@ class TestMetricsCollector:
                 metrics_output = test_metrics.get_metrics()
                 assert b"l1nkzip_http_requests_total" in metrics_output
 
-    @patch("l1nkzip.config.settings.metrics_enabled", False)
+    @patch.object(config.settings, "metrics_enabled", False)
     def test_record_request_start_end_disabled(self):
         """Test request start/end recording when metrics are disabled."""
         # Record request start
@@ -169,12 +170,12 @@ class TestMetricsCollector:
     def test_is_enabled(self):
         """Test the is_enabled method."""
         # Test with True - create the collector after patching
-        with patch("l1nkzip.config.settings.metrics_enabled", True):
+        with patch.object(config.settings, "metrics_enabled", True):
             test_collector = MetricsCollector()
             assert test_collector.is_enabled() is True
 
         # Test with False - create the collector after patching
-        with patch("l1nkzip.config.settings.metrics_enabled", False):
+        with patch.object(config.settings, "metrics_enabled", False):
             test_collector = MetricsCollector()
             assert test_collector.is_enabled() is False
 

@@ -22,8 +22,12 @@ class TestRedirectFlow:
         redirects_metrics = list(metrics_collector.redirects_total.collect())
         requests_metrics = list(metrics_collector.http_requests_total.collect())
 
-        initial_redirects = redirects_metrics[0].samples[0].value if redirects_metrics else 0
-        initial_requests = requests_metrics[0].samples[0].value if requests_metrics else 0
+        initial_redirects = (
+            redirects_metrics[0].samples[0].value if redirects_metrics and redirects_metrics[0].samples else 0
+        )
+        initial_requests = (
+            requests_metrics[0].samples[0].value if requests_metrics and requests_metrics[0].samples else 0
+        )
 
         # Redirect
         redirect_response = test_client.get(f"/{short_link}")
@@ -48,7 +52,7 @@ class TestRedirectFlow:
             final_redirects = redirects_metrics[0].samples[0].value
             assert final_redirects >= initial_redirects
 
-        if requests_metrics:
+        if requests_metrics and requests_metrics[0].samples:
             final_requests = requests_metrics[0].samples[0].value
             assert final_requests >= initial_requests
 
@@ -377,8 +381,12 @@ class TestRedirectFlow:
             redirects_metrics = list(metrics_collector.redirects_total.collect())
             requests_metrics = list(metrics_collector.http_requests_total.collect())
 
-            initial_redirects = redirects_metrics[0].samples[0].value if redirects_metrics else 0
-            initial_requests = requests_metrics[0].samples[0].value if requests_metrics else 0
+            initial_redirects = (
+                redirects_metrics[0].samples[0].value if redirects_metrics and redirects_metrics[0].samples else 0
+            )
+            initial_requests = (
+                requests_metrics[0].samples[0].value if requests_metrics and requests_metrics[0].samples else 0
+            )
 
             # Redirect
             redirect_response = redis_client.get(f"/{short_link}")
@@ -403,7 +411,7 @@ class TestRedirectFlow:
                 final_redirects = redirects_metrics[0].samples[0].value
                 assert final_redirects >= initial_redirects
 
-            if requests_metrics:
+            if requests_metrics and requests_metrics[0].samples:
                 final_requests = requests_metrics[0].samples[0].value
                 assert final_requests >= initial_requests
 

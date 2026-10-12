@@ -88,7 +88,7 @@ def insert_link(url) -> Link:
 def set_visit(link) -> Link:
     link_data = Link.get(link=link)
     if link_data:
-        link_data.visits += 1
+        db.execute("UPDATE links SET visits = visits + 1 WHERE link = $link")
     return link_data
 
 
@@ -120,7 +120,7 @@ def increment_visit(link: str):
     """Increment visit count for a link (synchronous)."""
     link_data = Link.get(link=link)
     if link_data:
-        link_data.visits += 1
+        db.execute("UPDATE links SET visits = visits + 1 WHERE link = $link")
 
 
 async def increment_visit_async(link: str):
@@ -129,5 +129,6 @@ async def increment_visit_async(link: str):
     This function runs the synchronous database operation in a thread pool
     to avoid blocking the async event loop.
     """
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, increment_visit, link)
+    import sys
+
+    await asyncio.to_thread(sys.modules[__name__].increment_visit, link)

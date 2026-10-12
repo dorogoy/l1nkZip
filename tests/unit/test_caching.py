@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from l1nkzip import config
 from l1nkzip.cache import Cache, cache
 from l1nkzip.models import increment_visit_async
 
@@ -15,14 +16,14 @@ class TestCache:
 
     def test_cache_disabled_when_no_redis_server(self):
         """Test that cache is disabled when REDIS_SERVER is not set."""
-        with patch("l1nkzip.config.settings.redis_server", None):
+        with patch.object(config.settings, "redis_server", None):
             test_cache = Cache()
             assert test_cache.client is None
             assert not test_cache.is_enabled()
 
     def test_cache_enabled_when_redis_server_set(self):
         """Test that cache is enabled when REDIS_SERVER is set."""
-        with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
+        with patch.object(config.settings, "redis_server", "redis://localhost:6379/0"):
             with patch("redis.asyncio.from_url") as mock_from_url:
                 mock_from_url.return_value = "mock_redis_client"
                 test_cache = Cache()
@@ -32,7 +33,7 @@ class TestCache:
     @pytest.mark.asyncio
     async def test_get_returns_none_when_cache_disabled(self):
         """Test that get returns None when cache is disabled."""
-        with patch("l1nkzip.config.settings.redis_server", None):
+        with patch.object(config.settings, "redis_server", None):
             test_cache = Cache()
             result = await test_cache.get("test_key")
             assert result is None
@@ -40,7 +41,7 @@ class TestCache:
     @pytest.mark.asyncio
     async def test_set_returns_false_when_cache_disabled(self):
         """Test that set returns False when cache is disabled."""
-        with patch("l1nkzip.config.settings.redis_server", None):
+        with patch.object(config.settings, "redis_server", None):
             test_cache = Cache()
             result = await test_cache.set("test_key", "test_value")
             assert result is False
@@ -48,7 +49,7 @@ class TestCache:
     @pytest.mark.asyncio
     async def test_get_with_enabled_cache(self):
         """Test get operation with enabled cache."""
-        with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
+        with patch.object(config.settings, "redis_server", "redis://localhost:6379/0"):
             mock_client = AsyncMock()
             mock_client.get.return_value = "cached_value"
             test_cache = Cache()
@@ -61,8 +62,8 @@ class TestCache:
     @pytest.mark.asyncio
     async def test_set_with_enabled_cache(self):
         """Test set operation with enabled cache."""
-        with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
-            with patch("l1nkzip.config.settings.redis_ttl", 3600):
+        with patch.object(config.settings, "redis_server", "redis://localhost:6379/0"):
+            with patch.object(config.settings, "redis_ttl", 3600):
                 mock_client = AsyncMock()
                 mock_client.set.return_value = True
                 test_cache = Cache()
@@ -75,7 +76,7 @@ class TestCache:
     @pytest.mark.asyncio
     async def test_get_handles_exceptions(self):
         """Test that get handles Redis exceptions gracefully."""
-        with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
+        with patch.object(config.settings, "redis_server", "redis://localhost:6379/0"):
             mock_client = AsyncMock()
             mock_client.get.side_effect = Exception("Redis error")
             test_cache = Cache()
@@ -87,7 +88,7 @@ class TestCache:
     @pytest.mark.asyncio
     async def test_set_handles_exceptions(self):
         """Test that set handles Redis exceptions gracefully."""
-        with patch("l1nkzip.config.settings.redis_server", "redis://localhost:6379/0"):
+        with patch.object(config.settings, "redis_server", "redis://localhost:6379/0"):
             mock_client = AsyncMock()
             mock_client.set.side_effect = Exception("Redis error")
             test_cache = Cache()
