@@ -68,6 +68,11 @@
 **Learning:** Explicitly checking `ip.packed.startswith(b"\x20\x01\x0d\xb8")` serves as explicit defense-in-depth against future stdlib reclassifications while documenting intent for RFC 3849 documentation prefixes.
 **Prevention:** Explicitly block `2001:db8::/32` (`ip.packed.startswith(b"\x20\x01\x0d\xb8")`) as defense-in-depth during SSRF checks.
 
+## 2026-10-12 - SSRF Bypass via ISATAP IPv6 Addresses with Universal/Local Bit Set (`0200:5efe` Prefix)
+**Vulnerability:** ISATAP IPv6 interface identifiers (RFC 5214 §6.1) construct 64-bit interface IDs starting with either `0000:5efe` (u-bit=0) or `0200:5efe` (u-bit=1). Checking only `b"\x00\x00\x5e\xfe"` allows hostnames like `[2000::0200:5efe:127.0.0.1]` or `[2000::0200:5efe:10.0.0.1]` to evaluate to `is_global=True` and `is_private=False` in Python's `ipaddress` module, bypassing SSRF validation.
+**Learning:** Checking `ip.packed[8:12] in (b"\x00\x00\x5e\xfe", b"\x02\x00\x5e\xfe")` ensures ISATAP interface IDs with both `u=0` and `u=1` are identified and their embedded IPv4 address unwrapped.
+**Prevention:** Always check both `0000:5efe` and `0200:5efe` interface identifier prefixes when unwrapping ISATAP IPv6 addresses for SSRF prevention.
+
 ## 2026-10-15 - Explicit Defense-in-Depth Block on RFC 9637 IPv6 Documentation Prefix (`3fff::/20`)
 **Vulnerability:** RFC 9637 allocated `3fff::/20` as additional non-routable IPv6 documentation address space (expanding RFC 3849 `2001:db8::/32`). Since Python 3.14 (gh-124217) the stdlib classifies it as `is_private=True` / `is_global=False`, so the existing fallthrough check already rejects these addresses on every Python this project supports (`requires-python >= 3.14`).
 **Learning:** Matching `ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00` accurately identifies all IPv6 addresses within the RFC 9637 `/20` documentation range (`3fff::/20`), serving as explicit defense-in-depth.

@@ -50,6 +50,8 @@ invalid_urls = [
     ("ssrf_6to4_private", "http://[2002:0a00:0001::]", 422),
     ("ssrf_isatap_loopback", "http://[2000::5efe:7f00:1]", 422),
     ("ssrf_isatap_private", "http://[2000::5efe:10.0.0.1]", 422),
+    ("ssrf_isatap_universal_loopback", "http://[2000::0200:5efe:7f00:1]", 422),
+    ("ssrf_isatap_universal_private", "http://[2000::0200:5efe:10.0.0.1]", 422),
     ("ssrf_ipv4_compat_loopback", "http://[::127.0.0.1]", 422),
     ("ssrf_ipv4_compat_private", "http://[::10.0.0.1]", 422),
     ("ssrf_ipv4_compat_metadata", "http://[::169.254.169.254]", 422),
@@ -315,10 +317,12 @@ async def test_validate_url_allows_public_translation_ipv6(monkeypatch):
     public_nat64 = "http://[64:ff9b::8.8.8.8]"
     public_6to4 = "http://[2002:0808:0808::]"
     public_isatap = "http://[2000::5efe:8.8.8.8]"
+    public_isatap_universal = "http://[2000::0200:5efe:8.8.8.8]"
     public_compat = "http://[::8.8.8.8]"
     assert await validate_url(public_nat64) == public_nat64
     assert await validate_url(public_6to4) == public_6to4
     assert await validate_url(public_isatap) == public_isatap
+    assert await validate_url(public_isatap_universal) == public_isatap_universal
     assert await validate_url(public_compat) == public_compat
 
 
@@ -361,7 +365,12 @@ async def test_validate_url_blocks_local_use_nat64_private_ip(monkeypatch):
     from l1nkzip.main import validate_url
 
     monkeypatch.setattr(main.validators, "url", lambda _: True)
-    for url in ["http://[64:ff9b:1::127.0.0.1]", "http://[64:ff9b:1::10.0.0.1]"]:
+    for url in [
+        "http://[64:ff9b:1::127.0.0.1]",
+        "http://[64:ff9b:1::10.0.0.1]",
+        "http://[64:ff9b:1:1::10.0.0.1]",
+        "http://[64:ff9b:1:abcd::127.0.0.1]",
+    ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
         assert exc_info.value.status_code == 422
@@ -370,13 +379,13 @@ async def test_validate_url_blocks_local_use_nat64_private_ip(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_validate_url_allows_local_use_nat64_public_ip(monkeypatch):
-    """Local-Use NAT64 (64:ff9b:1::/48) addresses embedding public IPv4 addresses must be allowed."""
+    """Local-Use NAT64 (64:ff9b:1::/48) addresses embedding public IPv4 addresses must be allowed across subnets."""
     from l1nkzip import main
     from l1nkzip.main import validate_url
 
     monkeypatch.setattr(main.validators, "url", lambda _: True)
-    public_nat64_local = "http://[64:ff9b:1::8.8.8.8]"
-    assert await validate_url(public_nat64_local) == public_nat64_local
+    for public_nat64_local in ["http://[64:ff9b:1::8.8.8.8]", "http://[64:ff9b:1:1::8.8.8.8]"]:
+        assert await validate_url(public_nat64_local) == public_nat64_local
 
 
 @pytest.mark.asyncio
