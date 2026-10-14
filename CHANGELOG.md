@@ -5,6 +5,23 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.2.6](https://github.com/dorogoy/l1nkZip/compare/v1.2.5...v1.2.6) (2026-10-14)
+
+
+### Bug Fixes
+
+* add SSRF protection for RFC 9637 IPv6 documentation prefix ([#341](https://github.com/dorogoy/l1nkZip/issues/341)) ([db87ea8](https://github.com/dorogoy/l1nkZip/commit/db87ea86aec06047dab4dc5e4e1946311f190183))
+* **deps:** bump fastapi from 0.142.2 to 0.143.0 ([e258c24](https://github.com/dorogoy/l1nkZip/commit/e258c24ed53b6371cc9dc59fd0306673bec6f04a))
+* **deps:** bump ty from 0.0.84 to 0.0.86 ([765a377](https://github.com/dorogoy/l1nkZip/commit/765a377199e6dc99a69e0405a4c94b733933341e))
+* **deps:** bump validators from 0.35.0 to 0.36.0 ([aab84a0](https://github.com/dorogoy/l1nkZip/commit/aab84a04f35c5a2c538a740214824cde49a4e87a))
+* expand Local-Use NAT64 SSRF check across all /48 subnets ([d9decb3](https://github.com/dorogoy/l1nkZip/commit/d9decb3465c251f157530e4b5bd0f1ebe3639b7e))
+* prevent SSRF bypass via ISATAP IPv6 addresses with universal/local bit set ([fc643e7](https://github.com/dorogoy/l1nkZip/commit/fc643e7aceef0b67eec928ed9eab0ff5cedcefde))
+
+
+### Performance Improvements
+
+* offload set_visit DB operation in get_url to thread pool ([#338](https://github.com/dorogoy/l1nkZip/issues/338)) ([fd78075](https://github.com/dorogoy/l1nkZip/commit/fd78075aa402e5a9bd4321eee21fc25fe37e9e93))
+
 ## [1.2.5](https://github.com/dorogoy/l1nkZip/compare/v1.2.4...v1.2.5) (2026-10-11)
 
 
