@@ -68,7 +68,7 @@
 **Learning:** Explicitly checking `ip.packed.startswith(b"\x20\x01\x0d\xb8")` serves as explicit defense-in-depth against future stdlib reclassifications while documenting intent for RFC 3849 documentation prefixes.
 **Prevention:** Explicitly block `2001:db8::/32` (`ip.packed.startswith(b"\x20\x01\x0d\xb8")`) as defense-in-depth during SSRF checks.
 
-## 2026-10-15 - SSRF Bypass via RFC 9637 IPv6 Documentation Prefix (`3fff::/20`)
-**Vulnerability:** RFC 9637 allocated `3fff::/20` as a new non-routable IPv6 documentation address space (expanding RFC 3849 `2001:db8::/32`). In Python's standard `ipaddress` module, `3fff::/20` evaluates to `is_global=True` and `is_private=False`, allowing URLs targeting `3fff::/20` to bypass standard SSRF checks.
-**Learning:** Matching `ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00` accurately identifies all IPv6 addresses within the RFC 9637 `/20` documentation range (`3fff::/20`).
-**Prevention:** Explicitly block `3fff::/20` (`ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00`) alongside `2001:db8::/32` during URL validation for SSRF prevention.
+## 2026-10-15 - Explicit Defense-in-Depth Block on RFC 9637 IPv6 Documentation Prefix (`3fff::/20`)
+**Vulnerability:** RFC 9637 allocated `3fff::/20` as additional non-routable IPv6 documentation address space (expanding RFC 3849 `2001:db8::/32`). Since Python 3.14 (gh-124217) the stdlib classifies it as `is_private=True` / `is_global=False`, so the existing fallthrough check already rejects these addresses on every Python this project supports (`requires-python >= 3.14`).
+**Learning:** Matching `ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00` accurately identifies all IPv6 addresses within the RFC 9637 `/20` documentation range (`3fff::/20`), serving as explicit defense-in-depth.
+**Prevention:** Explicitly block `3fff::/20` (`ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00`) alongside `2001:db8::/32` as defense-in-depth during SSRF checks.

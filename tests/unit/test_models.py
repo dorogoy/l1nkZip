@@ -98,7 +98,7 @@ class TestGetVisits:
         mock_query = MagicMock()
         mock_query.__getitem__.return_value = [mock_link]
 
-        with patch.object(Link, "select", return_value=mock_query):
+        with patch("l1nkzip.models.Link.select", return_value=mock_query):
             results = get_visits(limit=10)
 
         assert len(results) == 1
