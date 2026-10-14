@@ -96,6 +96,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # IPv6 Documentation prefix (2001:db8::/32, RFC 3849) non-routable range
         if ip.packed.startswith(b"\x20\x01\x0d\xb8"):
             return True
+        # IPv6 Documentation prefix (3fff::/20, RFC 9637) non-routable range
+        if ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00:
+            return True
     if isinstance(ip, ipaddress.IPv4Address):
         if ip.packed[0] == 0:
             return True

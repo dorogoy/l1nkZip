@@ -67,6 +67,7 @@ invalid_urls = [
     ("ssrf_pcp_anycast_ipv4", "http://192.0.0.9", 422),
     ("ssrf_turn_anycast_ipv4", "http://192.0.0.10", 422),
     ("ssrf_ipv6_documentation", "http://[2001:db8::1]", 422),
+    ("ssrf_ipv6_doc_rfc9637", "http://[3fff::1]", 422),
 ]
 
 # Test cases for admin token validation
@@ -426,3 +427,18 @@ async def test_validate_url_allows_as112_addresses(monkeypatch):
     monkeypatch.setattr(main.validators, "url", lambda _: True)
     for url in ["http://192.175.48.1", "http://192.31.196.1", "http://[2001:4:112::1]"]:
         assert await validate_url(url) == url
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_rfc9637_ipv6_documentation(monkeypatch):
+    """RFC 9637 IPv6 Documentation addresses (3fff::/20) must be blocked to prevent SSRF."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url("http://[3fff::1]")
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
