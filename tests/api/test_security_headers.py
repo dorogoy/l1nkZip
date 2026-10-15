@@ -13,3 +13,4 @@ def test_security_headers_present(test_client):
     assert response.headers.get("Permissions-Policy") == "geolocation=(), microphone=(), camera=()"
     assert response.headers.get("X-Permitted-Cross-Domain-Policies") == "none"
     assert response.headers.get("Cross-Origin-Opener-Policy") == "same-origin"
+    assert response.headers.get("Cross-Origin-Resource-Policy") == "same-origin"
