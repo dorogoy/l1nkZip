@@ -77,3 +77,8 @@
 **Vulnerability:** RFC 9637 allocated `3fff::/20` as additional non-routable IPv6 documentation address space (expanding RFC 3849 `2001:db8::/32`). Since Python 3.14 (gh-124217) the stdlib classifies it as `is_private=True` / `is_global=False`, so the existing fallthrough check already rejects these addresses on every Python this project supports (`requires-python >= 3.14`).
 **Learning:** Matching `ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00` accurately identifies all IPv6 addresses within the RFC 9637 `/20` documentation range (`3fff::/20`), serving as explicit defense-in-depth.
 **Prevention:** Explicitly block `3fff::/20` (`ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00`) alongside `2001:db8::/32` as defense-in-depth during SSRF checks.
+
+## 2026-10-18 - SSRF Bypass via Standard RFC 6052 /48 Layout for Local-Use NAT64 (`64:ff9b:1::/48`)
+**Vulnerability:** RFC 6052 §2.2 specifies that for a `/48` IPv6 prefix (such as RFC 8215 Local-Use NAT64 `64:ff9b:1::/48`), the embedded 32-bit IPv4 address is located in bytes 7..10 (`ip.packed[7:11]`), with trailing suffix bytes set to zero. Checking only `ip.packed[-4:]` (bytes 12..15) failed to evaluate private/loopback IPv4 addresses placed in bytes 7..10, allowing SSRF bypasses while simultaneously rejecting standard public NAT64 addresses whose suffix bytes evaluate to `0.0.0.0`.
+**Learning:** For `/48` NAT64 prefixes, evaluating both `ip.packed[7:11]` (RFC 6052 standard position) and `ip.packed[-4:]` (when non-zero) ensures embedded IPv4 destinations in either location are safely unwrapped and evaluated.
+**Prevention:** Always check both standard RFC 6052 embedded positions (`ip.packed[7:11]` and `ip.packed[-4:]`) when unwrapping `/48` NAT64 IPv6 addresses.

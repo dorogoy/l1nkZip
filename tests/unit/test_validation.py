@@ -370,6 +370,8 @@ async def test_validate_url_blocks_local_use_nat64_private_ip(monkeypatch):
         "http://[64:ff9b:1::10.0.0.1]",
         "http://[64:ff9b:1:1::10.0.0.1]",
         "http://[64:ff9b:1:abcd::127.0.0.1]",
+        "http://[64:ff9b:1:7f:0:100::]",  # RFC 6052 /48 standard layout embedding 127.0.0.1
+        "http://[64:ff9b:1:7f:0:100:808:808]",  # RFC 6052 /48 standard layout embedding 127.0.0.1 with non-zero suffix
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
@@ -384,7 +386,11 @@ async def test_validate_url_allows_local_use_nat64_public_ip(monkeypatch):
     from l1nkzip.main import validate_url
 
     monkeypatch.setattr(main.validators, "url", lambda _: True)
-    for public_nat64_local in ["http://[64:ff9b:1::8.8.8.8]", "http://[64:ff9b:1:1::8.8.8.8]"]:
+    for public_nat64_local in [
+        "http://[64:ff9b:1::8.8.8.8]",
+        "http://[64:ff9b:1:1::8.8.8.8]",
+        "http://[64:ff9b:1:8:808:800::]",  # RFC 6052 /48 standard layout embedding 8.8.8.8
+    ]:
         assert await validate_url(public_nat64_local) == public_nat64_local
 
 

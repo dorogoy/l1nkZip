@@ -65,9 +65,13 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # Check Well-Known Prefix for NAT64 (64:ff9b::/96)
         if ip.packed.startswith(b"\x00\x64\xff\x9b" + b"\x00" * 8):
             return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
-        # Check Local-Use Prefix for NAT64 (64:ff9b:1::/48, RFC 8215)
+        # Check Local-Use Prefix for NAT64 (64:ff9b:1::/48, RFC 8215 / RFC 6052)
         if ip.packed.startswith(b"\x00\x64\xff\x9b\x00\x01"):
-            return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
+            if ip.packed[7:11] != b"\x00\x00\x00\x00" and _is_blocked_ip(ipaddress.IPv4Address(ip.packed[7:11])):
+                return True
+            if ip.packed[-4:] != b"\x00\x00\x00\x00" and _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:])):
+                return True
+            return False
         # ISATAP interface identifier (0000:5efe:<ipv4> or 0200:5efe:<ipv4>, RFC 5214 §6.1) embeds an IPv4 address
         if ip.packed[8:12] in (b"\x00\x00\x5e\xfe", b"\x02\x00\x5e\xfe"):
             return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
