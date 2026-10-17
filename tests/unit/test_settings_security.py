@@ -45,6 +45,11 @@ def test_short_token_is_rejected():
         Settings(token="short_token_123")
 
 
+def test_whitespace_token_is_rejected():
+    with pytest.raises(ValidationError, match="at least 16 characters"):
+        Settings(token=" " * 16)
+
+
 def test_missing_token_is_rejected(monkeypatch):
     monkeypatch.delenv("TOKEN", raising=False)
     with pytest.raises(ValidationError, match="default token '__change_me__' is not allowed"):

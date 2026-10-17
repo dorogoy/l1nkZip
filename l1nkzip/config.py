@@ -39,7 +39,8 @@ class Settings(BaseSettings):
             raise ValueError(
                 "TOKEN must be set to a long random secret. The default token '__change_me__' is not allowed."
             )
-        if len(v) < 16:
+        v_stripped = v.strip()
+        if len(v_stripped) < 16:
             raise ValueError("TOKEN must be a secret of at least 16 characters.")
         return v
 
