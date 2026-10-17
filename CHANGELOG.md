@@ -5,6 +5,19 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.0](https://github.com/dorogoy/l1nkZip/compare/v1.2.6...v1.3.0) (2026-10-17)
+
+
+### Features
+
+* add Cross-Origin-Resource-Policy security header ([60bcd3d](https://github.com/dorogoy/l1nkZip/commit/60bcd3d6026d72b5a942a3a3b8c4cc78382d053c))
+
+
+### Bug Fixes
+
+* default insecure admin token startup allowance ([#346](https://github.com/dorogoy/l1nkZip/issues/346)) ([0c39948](https://github.com/dorogoy/l1nkZip/commit/0c39948a84ed8da94f03acccf6327cf83d67620a))
+* fix SSRF bypass for RFC 8215 Local-Use NAT64 IPv6 addresses ([#348](https://github.com/dorogoy/l1nkZip/issues/348)) ([9ab0038](https://github.com/dorogoy/l1nkZip/commit/9ab0038c00fbef167f5e46f8b443e48ea8e4a2e9))
+
 ## [1.2.6](https://github.com/dorogoy/l1nkZip/compare/v1.2.5...v1.2.6) (2026-10-14)
 
 
