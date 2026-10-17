@@ -194,6 +194,8 @@ L1nkZip embeds a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 
 `shorten_url` shares the per-client `RATE_LIMIT_CREATE` budget with `POST /url`. `get_original_url` uses `RATE_LIMIT_REDIRECT` per client IP. Both limits live in the process-wide limiter, so opening another MCP connection does not grant a new budget.
 
+`TOKEN` is required for admin authorization (`/list/{token}`, `/phishtank/update/{token}`, and MCP `list_urls`). It must be a secret of at least 16 characters. Startup rejects the default token `__change_me__` and values under 16 characters.
+
 `GENERATOR_STRING` must be a long random alphabet of at least 31 characters, with no repeated characters. Startup rejects a missing value, a shorter value, repeated characters, and the published default `mn6j2c4rv8bpygw95z7hsdaetxuk3fq`.
 
 ### Endpoints

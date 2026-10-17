@@ -35,6 +35,33 @@ def test_long_custom_generator_alphabet_is_accepted():
     assert settings.generator_string == alphabet
 
 
+def test_default_token_is_rejected():
+    with pytest.raises(ValidationError, match="default token '__change_me__' is not allowed"):
+        Settings(token="__change_me__")
+
+
+def test_short_token_is_rejected():
+    with pytest.raises(ValidationError, match="at least 16 characters"):
+        Settings(token="short_token_123")
+
+
+def test_whitespace_token_is_rejected():
+    with pytest.raises(ValidationError, match="at least 16 characters"):
+        Settings(token=" " * 16)
+
+
+def test_missing_token_is_rejected(monkeypatch):
+    monkeypatch.delenv("TOKEN", raising=False)
+    with pytest.raises(ValidationError, match="default token '__change_me__' is not allowed"):
+        Settings()
+
+
+def test_valid_token_is_accepted():
+    token = "a_valid_admin_token_12345"
+    settings = Settings(token=token)
+    assert settings.token == token
+
+
 def test_process_refuses_to_start_with_public_alphabet():
     env = os.environ.copy()
     env["GENERATOR_STRING"] = PUBLIC_GENERATOR_ALPHABET
@@ -49,3 +76,19 @@ def test_process_refuses_to_start_with_public_alphabet():
     )
     assert completed.returncode != 0
     assert "public default" in completed.stderr + completed.stdout
+
+
+def test_process_refuses_to_start_with_default_token():
+    env = os.environ.copy()
+    env["TOKEN"] = "__change_me__"
+    env["DB_TYPE"] = "inmemory"
+    completed = subprocess.run(
+        [sys.executable, "-c", "import l1nkzip.main"],
+        cwd=os.path.join(os.path.dirname(__file__), "..", ".."),
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode != 0
+    assert "default token '__change_me__' is not allowed" in completed.stderr + completed.stdout

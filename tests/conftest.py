@@ -7,8 +7,9 @@ Pytest configuration and shared fixtures for L1nkZip tests.
 import os
 
 
-# The app refuses the published alphabet. Set a long stand-in before importing it.
+# The app refuses default secrets. Set long stand-ins before importing it.
 os.environ["GENERATOR_STRING"] = "zyxwvutsrqponmlkjihgfedcba987654"
+os.environ["TOKEN"] = "test-admin-token-12345"
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
