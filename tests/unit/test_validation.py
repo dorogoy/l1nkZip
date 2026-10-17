@@ -370,8 +370,11 @@ async def test_validate_url_blocks_local_use_nat64_private_ip(monkeypatch):
         "http://[64:ff9b:1::10.0.0.1]",
         "http://[64:ff9b:1:1::10.0.0.1]",
         "http://[64:ff9b:1:abcd::127.0.0.1]",
-        "http://[64:ff9b:1:7f:0:100::]",  # RFC 6052 /48 standard layout embedding 127.0.0.1
-        "http://[64:ff9b:1:7f:0:100:808:808]",  # RFC 6052 /48 standard layout embedding 127.0.0.1 with non-zero suffix
+        "http://[64:ff9b:1:c0a8:1:100::]",  # 192.168.1.1 (canonical RFC 6052 /48)
+        "http://[64:ff9b:1:a14:1e:2800::]",  # 10.20.30.40 (canonical RFC 6052 /48)
+        "http://[64:ff9b:1:ac10:5:500::]",  # 172.16.5.5 (canonical RFC 6052 /48)
+        "http://[64:ff9b:1:6440:0:100::]",  # 100.64.0.1 (canonical RFC 6052 /48)
+        "http://[64:ff9b:1:c0a8:1:100:808:808]",  # 192.168.1.1 with non-zero suffix
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
@@ -389,7 +392,7 @@ async def test_validate_url_allows_local_use_nat64_public_ip(monkeypatch):
     for public_nat64_local in [
         "http://[64:ff9b:1::8.8.8.8]",
         "http://[64:ff9b:1:1::8.8.8.8]",
-        "http://[64:ff9b:1:8:808:800::]",  # RFC 6052 /48 standard layout embedding 8.8.8.8
+        "http://[64:ff9b:1:808:8:800::]",  # 8.8.8.8 (canonical RFC 6052 /48)
     ]:
         assert await validate_url(public_nat64_local) == public_nat64_local
 

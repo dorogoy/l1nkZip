@@ -79,6 +79,6 @@
 **Prevention:** Explicitly block `3fff::/20` (`ip.packed[:2] == b"\x3f\xff" and (ip.packed[2] & 0xF0) == 0x00`) alongside `2001:db8::/32` as defense-in-depth during SSRF checks.
 
 ## 2026-10-18 - SSRF Bypass via Standard RFC 6052 /48 Layout for Local-Use NAT64 (`64:ff9b:1::/48`)
-**Vulnerability:** RFC 6052 §2.2 specifies that for a `/48` IPv6 prefix (such as RFC 8215 Local-Use NAT64 `64:ff9b:1::/48`), the embedded 32-bit IPv4 address is located in bytes 7..10 (`ip.packed[7:11]`), with trailing suffix bytes set to zero. Checking only `ip.packed[-4:]` (bytes 12..15) failed to evaluate private/loopback IPv4 addresses placed in bytes 7..10, allowing SSRF bypasses while simultaneously rejecting standard public NAT64 addresses whose suffix bytes evaluate to `0.0.0.0`.
-**Learning:** For `/48` NAT64 prefixes, evaluating both `ip.packed[7:11]` (RFC 6052 standard position) and `ip.packed[-4:]` (when non-zero) ensures embedded IPv4 destinations in either location are safely unwrapped and evaluated.
-**Prevention:** Always check both standard RFC 6052 embedded positions (`ip.packed[7:11]` and `ip.packed[-4:]`) when unwrapping `/48` NAT64 IPv6 addresses.
+**Vulnerability:** RFC 6052 §2.2 specifies that for a `/48` IPv6 prefix (such as RFC 8215 Local-Use NAT64 `64:ff9b:1::/48`), the embedded 32-bit IPv4 address is split across bits 48..63 (`ip.packed[6:8]`) and bits 72..87 (`ip.packed[9:11]`), with the u-octet (`ip.packed[8]`) required to be zero. Checking contiguous bytes 7..10 or only `ip.packed[-4:]` failed to evaluate private/loopback IPv4 addresses in canonical RFC 6052 /48 layout, allowing SSRF bypasses.
+**Learning:** Reconstructing the split 32-bit IPv4 address (`ip.packed[6:8] + ip.packed[9:11]`) and verifying `ip.packed[8] == 0` extracts the canonical target IPv4 address for RFC 6052 /48 prefixes.
+**Prevention:** Always reconstruct split IPv4 fields (`ip.packed[6:8] + ip.packed[9:11]`) and check u-octet when evaluating `/48` NAT64 IPv6 addresses.
