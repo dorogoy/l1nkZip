@@ -82,3 +82,8 @@
 **Vulnerability:** RFC 6052 §2.2 specifies that for a `/48` IPv6 prefix (such as RFC 8215 Local-Use NAT64 `64:ff9b:1::/48`), the embedded 32-bit IPv4 address is split across bits 48..63 (`ip.packed[6:8]`) and bits 72..87 (`ip.packed[9:11]`), with the u-octet (`ip.packed[8]`) required to be zero. Checking contiguous bytes 7..10 or only `ip.packed[-4:]` failed to evaluate private/loopback IPv4 addresses in canonical RFC 6052 /48 layout, allowing SSRF bypasses.
 **Learning:** Reconstructing the split 32-bit IPv4 address (`ip.packed[6:8] + ip.packed[9:11]`) and verifying `ip.packed[8] == 0` extracts the canonical target IPv4 address for RFC 6052 /48 prefixes.
 **Prevention:** Always reconstruct split IPv4 fields (`ip.packed[6:8] + ip.packed[9:11]`) and check u-octet when evaluating `/48` NAT64 IPv6 addresses.
+
+## 2026-10-20 - SSRF Bypass via Deprecated 6bone IPv6 Range (`3ffe::/16`)
+**Vulnerability:** The 6bone experimental IPv6 network prefix (`3ffe::/16`, RFC 2471) was formally obsoleted and phased out by RFC 3701. In Python's standard `ipaddress` module, addresses in `3ffe::/16` (such as `3ffe::1`) evaluate to `is_global=True` and `is_private=False`, allowing potential SSRF bypasses targeting legacy unrouted IPv6 infrastructure.
+**Learning:** Checking `ip.packed[:2] == b"\x3f\xfe"` explicitly identifies all addresses within the deprecated 6bone `/16` prefix.
+**Prevention:** Explicitly block `3ffe::/16` (`ip.packed[:2] == b"\x3f\xfe"`) during URL validation for SSRF prevention.
