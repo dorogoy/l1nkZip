@@ -84,6 +84,6 @@
 **Prevention:** Always reconstruct split IPv4 fields (`ip.packed[6:8] + ip.packed[9:11]`) and check u-octet when evaluating `/48` NAT64 IPv6 addresses.
 
 ## 2026-10-20 - SSRF Bypass via Deprecated 6bone IPv6 Range (`3ffe::/16`)
-**Vulnerability:** The 6bone experimental IPv6 network prefix (`3ffe::/16`, RFC 2772) was formally obsoleted and phased out by RFC 3701. In Python's standard `ipaddress` module, addresses in `3ffe::/16` (such as `3ffe::1`) evaluate to `is_global=True` and `is_private=False`, allowing potential SSRF bypasses targeting legacy unrouted IPv6 infrastructure.
+**Vulnerability:** The 6bone experimental IPv6 network prefix (`3ffe::/16`, RFC 2471) was formally obsoleted and phased out by RFC 3701. In Python's standard `ipaddress` module, addresses in `3ffe::/16` (such as `3ffe::1`) evaluate to `is_global=True` and `is_private=False`, allowing potential SSRF bypasses targeting legacy unrouted IPv6 infrastructure.
 **Learning:** Checking `ip.packed[:2] == b"\x3f\xfe"` explicitly identifies all addresses within the deprecated 6bone `/16` prefix.
 **Prevention:** Explicitly block `3ffe::/16` (`ip.packed[:2] == b"\x3f\xfe"`) during URL validation for SSRF prevention.
