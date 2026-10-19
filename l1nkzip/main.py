@@ -196,7 +196,15 @@ async def validate_url(url: str) -> str:
     hostname = parsed.hostname
     if hostname:
         hostname_lower = hostname.lower()
-        if hostname_lower == "localhost" or hostname_lower.endswith(".localhost"):
+        # Block reserved local and internal network domain names (RFC 6761, RFC 6762, RFC 8375, IANA)
+        if hostname_lower == "home.arpa" or hostname_lower.endswith(
+            (
+                ".localhost",
+                ".local",
+                ".internal",
+                ".home.arpa",
+            )
+        ):
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Invalid URL: local or private network address not allowed",

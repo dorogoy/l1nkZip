@@ -87,3 +87,13 @@
 **Vulnerability:** The 6bone experimental IPv6 network prefix (`3ffe::/16`, RFC 2471) was formally obsoleted and phased out by RFC 3701. In Python's standard `ipaddress` module, addresses in `3ffe::/16` (such as `3ffe::1`) evaluate to `is_global=True` and `is_private=False`, allowing potential SSRF bypasses targeting legacy unrouted IPv6 infrastructure.
 **Learning:** Checking `ip.packed[:2] == b"\x3f\xfe"` explicitly identifies all addresses within the deprecated 6bone `/16` prefix.
 **Prevention:** Explicitly block `3ffe::/16` (`ip.packed[:2] == b"\x3f\xfe"`) during URL validation for SSRF prevention.
+
+## 2026-10-22 - Rejected Unwrapping of 6over4 IPv6 Interface Identifiers (`0000:0000` Prefix)
+**Vulnerability:** Proposal to unwrap 6over4 IPv6 interface identifiers (`0000:0000` prefix at bytes 8..12, RFC 2529) to extract embedded IPv4 addresses for SSRF checks.
+**Learning:** In standard IPv6 addressing, the upper 32 bits of a 64-bit interface identifier (`ip.packed[8:12]`) are `0000:0000` (`b"\x00\x00\x00\x00"`) for all low-numbered host IDs (such as `::1`, `::2`, or AS112 address `2001:4:112::1`). Unwrapping `ip.packed[-4:]` whenever `ip.packed[8:12] == b"\x00\x00\x00\x00"` misinterprets lower 32 bits of standard IPv6 host IDs (like `2001:4:112::1`, whose low bytes are `0.0.0.1`) as IPv4 addresses, falsely blocking globally reachable IPv6 destinations and breaking prefix evaluation.
+**Prevention:** Do not unwrap `0000:0000` as an embedded 6over4 IPv4 address during IPv6 SSRF checks.
+
+## 2026-10-22 - SSRF Bypass via Reserved Local/Internal TLDs (`.local`, `.internal`, `.home.arpa`)
+**Vulnerability:** Reserved top-level domain names such as `.local` (RFC 6762 mDNS), `.internal` (IANA private networks), and `.home.arpa` (RFC 8375 home networks) were not blocked during static URL validation prior to DNS resolution. If DNS or mDNS resolution failed during static validation or resolved on client/internal networks, hostnames like `http://printer.local` or `http://app.internal` could be accepted as shorten target links.
+**Learning:** Checking `hostname_lower == "home.arpa" or hostname_lower.endswith((".localhost", ".local", ".internal", ".home.arpa"))` explicitly blocks all reserved local and internal network domain names (including bare `home.arpa` and subdomains) at URL validation time.
+**Prevention:** Always include reserved local/internal TLDs (`.local`, `.internal`, `.home.arpa`, `.localhost`) in static hostname checks during URL validation to prevent SSRF targeting local mDNS or private networks.
