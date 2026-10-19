@@ -95,5 +95,5 @@
 
 ## 2026-10-22 - SSRF Bypass via Reserved Local/Internal TLDs (`.local`, `.internal`, `.home.arpa`)
 **Vulnerability:** Reserved top-level domain names such as `.local` (RFC 6762 mDNS), `.internal` (IANA private networks), and `.home.arpa` (RFC 8375 home networks) were not blocked during static URL validation prior to DNS resolution. If DNS or mDNS resolution failed during static validation or resolved on client/internal networks, hostnames like `http://printer.local` or `http://app.internal` could be accepted as shorten target links.
-**Learning:** Checking `hostname_lower in ("localhost", "local", "internal") or hostname_lower.endswith((".localhost", ".localhost.", ".local", ".local.", ".internal", ".internal.", ".home.arpa", ".home.arpa."))` explicitly blocks all reserved local and internal network domain names at URL validation time.
+**Learning:** Checking `hostname_lower == "home.arpa" or hostname_lower.endswith((".localhost", ".local", ".internal", ".home.arpa"))` explicitly blocks all reserved local and internal network domain names (including bare `home.arpa` and subdomains) at URL validation time.
 **Prevention:** Always include reserved local/internal TLDs (`.local`, `.internal`, `.home.arpa`, `.localhost`) in static hostname checks during URL validation to prevent SSRF targeting local mDNS or private networks.

@@ -32,6 +32,7 @@ invalid_urls = [
     ("ssrf_subdomain_local", "http://app.service.local", 422),
     ("ssrf_internal_tld", "http://app.internal", 422),
     ("ssrf_home_arpa_tld", "http://router.home.arpa", 422),
+    ("ssrf_bare_home_arpa", "http://home.arpa", 422),
     ("ssrf_loopback_ip", "http://127.0.0.1", 422),
     ("ssrf_private_ip_10", "http://10.0.0.1", 422),
     ("ssrf_private_ip_192", "http://192.168.1.1", 422),
