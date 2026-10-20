@@ -111,7 +111,10 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # Deprecated 6bone IPv6 prefix (3ffe::/16, RFC 3701) non-routable range
         if ip.packed[:2] == b"\x3f\xfe":
             return True
-        # Discard IPv6 prefix (100::/64, RFC 6666) black-hole / non-routable range
+        # Discard IPv6 prefix (100::/64, RFC 6666) black-hole / non-routable range.
+        # Defense-in-depth: the stdlib-flag fallback below already rejects these on
+        # Python >= 3.14, but keep it explicit so the block does not depend on
+        # stdlib classification staying stable across versions.
         if ip.packed[:8] == b"\x01\x00\x00\x00\x00\x00\x00\x00":
             return True
     if isinstance(ip, ipaddress.IPv4Address):
