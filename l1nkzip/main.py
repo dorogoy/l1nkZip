@@ -202,13 +202,26 @@ async def validate_url(url: str) -> str:
     hostname = parsed.hostname
     if hostname:
         hostname_lower = hostname.lower()
-        # Block reserved local and internal network domain names (RFC 6761, RFC 6762, RFC 8375, IANA)
-        if hostname_lower == "home.arpa" or hostname_lower.endswith(
+        # Block reserved local, special-use, and internal network domain names
+        # (RFC 2606, RFC 6761, RFC 6762, RFC 7686, RFC 8375, RFC 9462, IANA)
+        if hostname_lower in (
+            "home.arpa",
+            "onion",
+            "alt",
+            "invalid",
+            "test",
+            "example",
+        ) or hostname_lower.endswith(
             (
                 ".localhost",
                 ".local",
                 ".internal",
                 ".home.arpa",
+                ".alt",
+                ".onion",
+                ".invalid",
+                ".test",
+                ".example",
             )
         ):
             raise HTTPException(
