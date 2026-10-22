@@ -203,7 +203,9 @@ async def validate_url(url: str) -> str:
     if hostname:
         hostname_lower = hostname.lower()
         # Block reserved local, internal, and special-use network domain names
-        # (RFC 6761, RFC 6762, RFC 7686, RFC 8375, IANA)
+        # (RFC 6761, RFC 6762, RFC 7686, RFC 8375, IANA). The suffix check is the
+        # operative gate; bare single-label hosts ("test", "onion", ...) are already
+        # rejected by validators.url, so the equality entries are defense-in-depth.
         if hostname_lower in ("home.arpa", "onion", "test", "alt", "invalid", "example") or hostname_lower.endswith(
             (
                 ".localhost",

@@ -498,3 +498,31 @@ async def test_validate_url_blocks_discard_ipv6(monkeypatch):
         await validate_url("http://[100::1]")
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_special_use_tlds(monkeypatch):
+    """Special-use TLDs must be blocked by the SSRF check itself, with the
+    format gate neutralized, so the new entries are pinned."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    for url in [
+        "http://service.onion",
+        "http://service.test",
+        "http://service.alt",
+        "http://service.invalid",
+        "http://service.example",
+        "http://onion",
+        "http://test",
+        "http://alt",
+        "http://invalid",
+        "http://example",
+    ]:
+        with pytest.raises(HTTPException) as exc_info:
+            await validate_url(url)
+        assert exc_info.value.status_code == 422
+        assert "local or private network" in exc_info.value.detail
