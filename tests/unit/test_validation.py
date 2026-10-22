@@ -33,6 +33,11 @@ invalid_urls = [
     ("ssrf_internal_tld", "http://app.internal", 422),
     ("ssrf_home_arpa_tld", "http://router.home.arpa", 422),
     ("ssrf_bare_home_arpa", "http://home.arpa", 422),
+    ("ssrf_alt_tld", "http://node.alt", 422),
+    ("ssrf_onion_tld", "http://hidden.onion", 422),
+    ("ssrf_invalid_tld", "http://server.invalid", 422),
+    ("ssrf_test_tld", "http://server.test", 422),
+    ("ssrf_example_tld", "http://server.example", 422),
     ("ssrf_loopback_ip", "http://127.0.0.1", 422),
     ("ssrf_private_ip_10", "http://10.0.0.1", 422),
     ("ssrf_private_ip_192", "http://192.168.1.1", 422),
@@ -488,3 +493,31 @@ async def test_validate_url_blocks_discard_ipv6(monkeypatch):
         await validate_url("http://[100::1]")
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_special_use_tlds(monkeypatch):
+    """Special-use domain names (.alt, .onion, .invalid, .test, .example) must be blocked to prevent SSRF."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+
+    for url in [
+        "http://app.alt",
+        "http://hidden.onion",
+        "http://server.invalid",
+        "http://my.test",
+        "http://site.example",
+        "http://alt",
+        "http://onion",
+        "http://invalid",
+        "http://test",
+        "http://example",
+    ]:
+        with pytest.raises(HTTPException) as exc_info:
+            await validate_url(url)
+        assert exc_info.value.status_code == 422
+        assert "local or private network" in exc_info.value.detail
