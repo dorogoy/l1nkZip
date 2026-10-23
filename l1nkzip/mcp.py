@@ -131,7 +131,8 @@ async def _handle_shorten_url(arguments: dict) -> list[types.TextContent]:
     except HTTPException as e:
         raise ValueError(f"Invalid URL: {e.detail}") from e
     except Exception as e:
-        raise ValueError(f"Invalid URL: {e}") from e
+        logger.error("Validation error in MCP shorten_url", extra={"error": str(e), "url": url})
+        raise ValueError("Invalid URL format") from e
 
     if config.settings.phishtank:
         try:
@@ -195,7 +196,8 @@ async def _handle_get_original_url(arguments: dict) -> list[types.TextContent]:
     except HTTPException as e:
         raise ValueError(f"Invalid short link: {e.detail}") from e
     except Exception as e:
-        raise ValueError(f"Invalid short link: {e}") from e
+        logger.error("Validation error in MCP get_original_url", extra={"error": str(e), "link": link})
+        raise ValueError("Invalid short link format") from e
 
     loop = asyncio.get_running_loop()
     original_url: str | None = None
