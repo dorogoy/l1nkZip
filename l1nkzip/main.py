@@ -99,6 +99,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # it explicitly rather than relying on stdlib is_private classification
         if ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x10:
             return True
+        # Benchmarking IPv6 prefix (2001:2::/48, RFC 5180) non-routable range
+        if ip.packed.startswith(b"\x20\x01\x00\x02"):
+            return True
         # AMT (2001:3::/32, Automatic Multicast Tunneling, RFC 7450) non-routable range
         if ip.packed.startswith(b"\x20\x01\x00\x03"):
             return True
