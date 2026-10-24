@@ -71,7 +71,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
             if ip.packed[8] != 0:
                 return True  # non-zero u-octet: not a valid RFC 6052 /48 embedding
             embedded = ip.packed[6:8] + ip.packed[9:11]
-            if embedded[0] != 0 and _is_blocked_ip(ipaddress.IPv4Address(embedded)):
+            if (ip.packed[-4:] == b"\x00\x00\x00\x00" or embedded[0] != 0) and _is_blocked_ip(
+                ipaddress.IPv4Address(embedded)
+            ):
                 return True
             # Legacy/last-4 placement; translators ignore suffix bits, so don't gate on them being zero
             if ip.packed[-4:] != b"\x00\x00\x00\x00" and _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:])):

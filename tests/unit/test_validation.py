@@ -387,6 +387,8 @@ async def test_validate_url_blocks_local_use_nat64_private_ip(monkeypatch):
         "http://[64:ff9b:1:ac10:5:500::]",  # 172.16.5.5 (canonical RFC 6052 /48)
         "http://[64:ff9b:1:6440:0:100::]",  # 100.64.0.1 (canonical RFC 6052 /48)
         "http://[64:ff9b:1:c0a8:1:100:808:808]",  # 192.168.1.1 with non-zero suffix
+        "http://[64:ff9b:1::100:0:0]",  # 0.0.0.1 (canonical RFC 6052 /48, 0.0.0.0/8 range)
+        "http://[64:ff9b:1::]",  # 0.0.0.0 (canonical RFC 6052 /48, 0.0.0.0/8 range)
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
