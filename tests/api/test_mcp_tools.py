@@ -192,6 +192,16 @@ class TestShortenUrlTool:
 
         assert first[0].text == second[0].text
 
+    @pytest.mark.asyncio
+    async def test_shorten_url_unexpected_validation_error_does_not_leak_detail(self, handlers):
+        _, call_tool = handlers
+        with patch("l1nkzip.main.validate_url", side_effect=RuntimeError("sensitive internal error")):
+            with pytest.raises(ValueError) as exc_info:
+                await call_tool("shorten_url", {"url": "https://example.com"})
+
+        assert "sensitive internal error" not in str(exc_info.value)
+        assert str(exc_info.value) == "Invalid URL format"
+
 
 class TestGetOriginalUrlTool:
     """AC 3: get_original_url execution."""
@@ -268,6 +278,16 @@ class TestGetOriginalUrlTool:
             mock_retry.return_value = FakePhish()
             with pytest.raises(ValueError, match="phishing"):
                 await call_tool("get_original_url", {"link": short_link})
+
+    @pytest.mark.asyncio
+    async def test_get_original_url_unexpected_validation_error_does_not_leak_detail(self, handlers):
+        _, call_tool = handlers
+        with patch("l1nkzip.main.validate_short_link", side_effect=RuntimeError("sensitive internal error")):
+            with pytest.raises(ValueError) as exc_info:
+                await call_tool("get_original_url", {"link": "abcd"})
+
+        assert "sensitive internal error" not in str(exc_info.value)
+        assert str(exc_info.value) == "Invalid short link format"
 
 
 class TestUnknownTool:
