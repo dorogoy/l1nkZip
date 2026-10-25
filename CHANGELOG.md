@@ -5,6 +5,20 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.2](https://github.com/dorogoy/l1nkZip/compare/v1.3.1...v1.3.2) (2026-10-25)
+
+
+### Bug Fixes
+
+* block Discard IPv6 prefix (100::/64) in SSRF URL validation ([#354](https://github.com/dorogoy/l1nkZip/issues/354)) ([83585ea](https://github.com/dorogoy/l1nkZip/commit/83585ead51f69227b275000e563fe22711970f7b))
+* block IPv6 Benchmarking prefix (2001:2::/48) to prevent SSRF ([#362](https://github.com/dorogoy/l1nkZip/issues/362)) ([7f68528](https://github.com/dorogoy/l1nkZip/commit/7f68528a09d205d56294ef7fd00838986ef59892))
+* block reserved local and internal network domain names for SSRF prevention ([#352](https://github.com/dorogoy/l1nkZip/issues/352)) ([2be0b03](https://github.com/dorogoy/l1nkZip/commit/2be0b0346cdcb2b5ed6cbe17a9fbe62ee3c46699))
+* **deps:** bump fastapi from 0.143.0 to 0.143.3 ([ca987b7](https://github.com/dorogoy/l1nkZip/commit/ca987b7a2498b073c36745578d752d0779d4d633))
+* **deps:** bump pydantic-settings from 2.15.0 to 2.16.0 ([d975104](https://github.com/dorogoy/l1nkZip/commit/d97510409da272c232716ed640310451521dac7f))
+* **deps:** bump ty from 0.0.86 to 0.0.89 ([74649a1](https://github.com/dorogoy/l1nkZip/commit/74649a1f77cfa5c7addbddc60f910f6a50a626c6))
+* prevent internal exception leakage in MCP tool validation ([#360](https://github.com/dorogoy/l1nkZip/issues/360)) ([9e75718](https://github.com/dorogoy/l1nkZip/commit/9e75718dab44534fe756ef8cb559fe5a105f2fce))
+* SSRF bypass via zero-network targets in NAT64 ([#361](https://github.com/dorogoy/l1nkZip/issues/361)) ([4a793cb](https://github.com/dorogoy/l1nkZip/commit/4a793cb4d3034a76c2baae43064869a27998d5a2))
+
 ## [1.3.1](https://github.com/dorogoy/l1nkZip/compare/v1.3.0...v1.3.1) (2026-10-18)
 
 
