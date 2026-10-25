@@ -99,6 +99,12 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # it explicitly rather than relying on stdlib is_private classification
         if ip.packed.startswith(b"\x20\x01\x00") and (ip.packed[3] & 0xF0) == 0x10:
             return True
+        # Benchmarking (2001:2::/48, RFC 5180) plus the rest of the unallocated
+        # 2001:2::/32 — all inside the IETF-reserved 2001::/23 block (RFC 2928),
+        # so no globally routable address is caught. Defense-in-depth: the
+        # stdlib-flag fallback below already rejects these on Python >= 3.14.
+        if ip.packed.startswith(b"\x20\x01\x00\x02"):
+            return True
         # AMT (2001:3::/32, Automatic Multicast Tunneling, RFC 7450) non-routable range
         if ip.packed.startswith(b"\x20\x01\x00\x03"):
             return True
