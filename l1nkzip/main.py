@@ -218,6 +218,9 @@ async def validate_url(url: str) -> str:
         # Note: Bare single-label hosts are rejected upstream by validators.url;
         # the bare hostname list is kept here as defense-in-depth.
         if hostname_lower in (
+            "localhost",
+            "local",
+            "internal",
             "home.arpa",
             "onion",
             "alt",
