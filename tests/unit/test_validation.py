@@ -536,6 +536,9 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
         "http://invalid",
         "http://test",
         "http://example",
+        "http://localhost",
+        "http://local",
+        "http://internal",
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
