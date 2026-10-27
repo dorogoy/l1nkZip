@@ -108,6 +108,12 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # AMT (2001:3::/32, Automatic Multicast Tunneling, RFC 7450) non-routable range
         if ip.packed.startswith(b"\x20\x01\x00\x03"):
             return True
+        # 2001:5::/32 — unallocated IETF reservation inside 2001::/23 (RFC 2928);
+        # formerly the LISP EID block (RFC 7954, allocation terminated 2019-09).
+        # Defense-in-depth: the stdlib is_private fallback below already rejects
+        # 2001:5::/32 on Python >= 3.14.
+        if ip.packed.startswith(b"\x20\x01\x00\x05"):
+            return True
         # IETF Protocol Assignments (2001:1::/32, RFC 2928): CPython exempts the
         # globally reachable anycast addresses inside this block (PCP 2001:1::1,
         # TURN 2001:1::2) from the private 2001::/23 range, so block the whole /32
