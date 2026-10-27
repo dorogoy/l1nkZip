@@ -71,7 +71,7 @@ invalid_urls = [
     ("ssrf_orchidv1_ip", "http://[2001:10::1]", 422),
     ("ssrf_benchmarking_ipv6", "http://[2001:2::1]", 422),
     ("ssrf_amt_ipv6", "http://[2001:3::1]", 422),
-    ("ssrf_srv6_ipv6", "http://[2001:5::1]", 422),
+    ("ssrf_2001_5_ipv6", "http://[2001:5::1]", 422),
     ("ssrf_amt_ipv4", "http://192.52.193.1", 422),
     ("ssrf_lisp_ipv6", "http://[2001:1::1]", 422),
     ("ssrf_turn_anycast_ipv6", "http://[2001:1::2]", 422),
@@ -431,8 +431,8 @@ async def test_validate_url_blocks_benchmarking_ipv6(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_validate_url_blocks_srv6_ipv6(monkeypatch):
-    """SRv6 / Segment Routing Identifier IPv6 addresses (2001:5::/32, RFC 9256) must be blocked to prevent SSRF."""
+async def test_validate_url_blocks_2001_5_ipv6(monkeypatch):
+    """2001:5::/32 IPv6 addresses (unallocated IETF reservation inside 2001::/23) must be blocked to prevent SSRF."""
     from fastapi import HTTPException
 
     from l1nkzip import main
