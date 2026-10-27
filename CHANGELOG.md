@@ -5,6 +5,15 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.3](https://github.com/dorogoy/l1nkZip/compare/v1.3.2...v1.3.3) (2026-10-27)
+
+
+### Bug Fixes
+
+* block SRv6 Segment Routing IPv6 prefix (2001:5::/32) in URL validation ([#365](https://github.com/dorogoy/l1nkZip/issues/365)) ([059a31d](https://github.com/dorogoy/l1nkZip/commit/059a31d5b18bf108acf504b0b7f25f654f2b3216))
+* **deps:** bump the uv group across 1 directory with 2 updates ([5ca5871](https://github.com/dorogoy/l1nkZip/commit/5ca58717414a829490628f4080c5cd172548acce))
+* **security:** explicitly block bare reserved hostnames as defense in depth ([#364](https://github.com/dorogoy/l1nkZip/issues/364)) ([6d9c7ea](https://github.com/dorogoy/l1nkZip/commit/6d9c7ea20b806aa5d3b6e0bc3c603f752d85dbb7))
+
 ## [1.3.2](https://github.com/dorogoy/l1nkZip/compare/v1.3.1...v1.3.2) (2026-10-25)
 
 
