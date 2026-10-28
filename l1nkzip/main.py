@@ -148,6 +148,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # Deprecated 6to4 Anycast IPv4 prefix (192.88.99.0/24, RFC 7526)
         if ip.packed[:3] == b"\xc0\x58\x63":
             return True
+        # Benchmarking IPv4 prefix (198.18.0.0/15, RFC 2544 / RFC 6890) non-routable range
+        if ip.packed[0] == 198 and (ip.packed[1] & 0xFE) == 18:
+            return True
     return (
         not ip.is_global
         or ip.is_private
