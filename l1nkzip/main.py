@@ -153,6 +153,11 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # already rejects these on Python >= 3.14.
         if ip.packed[0] == 198 and (ip.packed[1] & 0xFE) == 18:
             return True
+        # Documentation IPv4 prefixes (192.0.2.0/24 TEST-NET-1, 198.51.100.0/24 TEST-NET-2,
+        # 203.0.113.0/24 TEST-NET-3, RFC 5737 / RFC 6890) non-routable ranges.
+        # Defense-in-depth: the stdlib-flag fallback below already rejects these on Python >= 3.14.
+        if ip.packed[:3] in (b"\xc0\x00\x02", b"\xc6\x33\x64", b"\xcb\x00\x71"):
+            return True
     return (
         not ip.is_global
         or ip.is_private
