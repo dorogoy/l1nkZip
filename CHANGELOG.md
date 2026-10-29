@@ -5,6 +5,17 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.4](https://github.com/dorogoy/l1nkZip/compare/v1.3.3...v1.3.4) (2026-10-29)
+
+
+### Bug Fixes
+
+* block IPv4 Benchmarking Range (198.18.0.0/15) ([#371](https://github.com/dorogoy/l1nkZip/issues/371)) ([bfb1d6b](https://github.com/dorogoy/l1nkZip/commit/bfb1d6b447768fbf608e4f8ac1bed94c3abc1148))
+* block IPv4 documentation address ranges (TEST-NET-1/2/3) ([d352354](https://github.com/dorogoy/l1nkZip/commit/d3523540103b37e2baf520a63fca0e2fe35010d9))
+* **deps:** bump fastapi from 0.143.3 to 0.162.0 ([2672a8a](https://github.com/dorogoy/l1nkZip/commit/2672a8af260cc131c7a68836ea9575ef54d37d15))
+* **deps:** bump pydantic-settings from 2.16.0 to 2.16.1 ([a475462](https://github.com/dorogoy/l1nkZip/commit/a475462bc3d3b570b2dc0ee4757aeace90f05d42))
+* **deps:** bump ruff from 0.16.10 to 0.17.2 ([9189c60](https://github.com/dorogoy/l1nkZip/commit/9189c604dbfab6affd6db8e26611e75fe51a45b3))
+
 ## [1.3.3](https://github.com/dorogoy/l1nkZip/compare/v1.3.2...v1.3.3) (2026-10-27)
 
 
