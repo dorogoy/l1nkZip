@@ -83,6 +83,9 @@ invalid_urls = [
     ("ssrf_6bone_ipv6", "http://[3ffe::1]", 422),
     ("ssrf_discard_ipv6", "http://[100::1]", 422),
     ("ssrf_benchmarking_ipv4", "http://198.18.0.1", 422),
+    ("ssrf_test_net_1_ipv4", "http://192.0.2.1", 422),
+    ("ssrf_test_net_2_ipv4", "http://198.51.100.1", 422),
+    ("ssrf_test_net_3_ipv4", "http://203.0.113.1", 422),
 ]
 
 # Test cases for admin token validation
@@ -226,6 +229,24 @@ async def test_validate_url_blocks_teredo_and_zero_network(monkeypatch):
     zero_network = "http://0.0.0.1"
 
     for url in [teredo_loopback, teredo_private, teredo_public, zero_network]:
+        with pytest.raises(HTTPException) as exc_info:
+            await validate_url(url)
+        assert exc_info.value.status_code == 422
+        assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_documentation_ipv4(monkeypatch):
+    """IPv4 Documentation addresses (TEST-NET-1 192.0.2.0/24, TEST-NET-2 198.51.100.0/24,
+    TEST-NET-3 203.0.113.0/24) must be blocked to prevent SSRF.
+    """
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    for url in ["http://192.0.2.1", "http://198.51.100.1", "http://203.0.113.1"]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
         assert exc_info.value.status_code == 422
