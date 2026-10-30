@@ -56,6 +56,8 @@ invalid_urls = [
     ("ssrf_ipv4_mapped_hex_loopback", "http://[::ffff:7f00:1]", 422),
     ("ssrf_nat64_loopback", "http://[64:ff9b::127.0.0.1]", 422),
     ("ssrf_nat64_private", "http://[64:ff9b::10.0.0.1]", 422),
+    ("ssrf_nat64_rfc8215_loopback", "http://[100:64::127.0.0.1]", 422),
+    ("ssrf_nat64_rfc8215_private", "http://[100:64::10.0.0.1]", 422),
     ("ssrf_6to4_loopback", "http://[2002:7f00:0001::]", 422),
     ("ssrf_6to4_private", "http://[2002:0a00:0001::]", 422),
     ("ssrf_isatap_loopback", "http://[2000::5efe:7f00:1]", 422),
@@ -233,6 +235,26 @@ async def test_validate_url_blocks_teredo_and_zero_network(monkeypatch):
             await validate_url(url)
         assert exc_info.value.status_code == 422
         assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_rfc8215_nat64(monkeypatch):
+    """RFC 8215 Local-Use NAT64 (100:64::/96) addresses embedding private/loopback IPv4 addresses must be blocked,
+    while public targets must be allowed."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    for url in ["http://[100:64::127.0.0.1]", "http://[100:64::10.0.0.1]"]:
+        with pytest.raises(HTTPException) as exc_info:
+            await validate_url(url)
+        assert exc_info.value.status_code == 422
+        assert "local or private network" in exc_info.value.detail
+
+    public_nat64 = "http://[100:64::8.8.8.8]"
+    assert await validate_url(public_nat64) == public_nat64
 
 
 @pytest.mark.asyncio

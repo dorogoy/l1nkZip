@@ -65,6 +65,9 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # Check Well-Known Prefix for NAT64 (64:ff9b::/96)
         if ip.packed.startswith(b"\x00\x64\xff\x9b" + b"\x00" * 8):
             return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
+        # Check Local-Use Prefix for NAT64 (100:64::/96, RFC 8215 / RFC 6052)
+        if ip.packed.startswith(b"\x01\x00\x00\x64" + b"\x00" * 8):
+            return _is_blocked_ip(ipaddress.IPv4Address(ip.packed[-4:]))
         # Check Local-Use Prefix for NAT64 (64:ff9b:1::/48, RFC 8215 / RFC 6052)
         if ip.packed.startswith(b"\x00\x64\xff\x9b\x00\x01"):
             # RFC 6052 §2.2, /48: IPv4 = bits 48..63 + bits 72..87; u-octet (bits 64..71) MUST be 0
