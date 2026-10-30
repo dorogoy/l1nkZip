@@ -238,23 +238,19 @@ async def test_validate_url_blocks_teredo_and_zero_network(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_validate_url_rfc8215_nat64(monkeypatch):
-    """RFC 8215 Local-Use NAT64 (100:64::/96) addresses embedding private/loopback IPv4 addresses must be blocked,
-    while public targets must be allowed."""
+async def test_validate_url_blocks_100_64_reserved_ipv6(monkeypatch):
+    """100:64::/96 addresses sit inside the reserved 100::/8 Discard-Only range and must be blocked as reserved."""
     from fastapi import HTTPException
 
     from l1nkzip import main
     from l1nkzip.main import validate_url
 
     monkeypatch.setattr(main.validators, "url", lambda _: True)
-    for url in ["http://[100:64::127.0.0.1]", "http://[100:64::10.0.0.1]"]:
+    for url in ["http://[100:64::127.0.0.1]", "http://[100:64::10.0.0.1]", "http://[100:64::8.8.8.8]"]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
         assert exc_info.value.status_code == 422
         assert "local or private network" in exc_info.value.detail
-
-    public_nat64 = "http://[100:64::8.8.8.8]"
-    assert await validate_url(public_nat64) == public_nat64
 
 
 @pytest.mark.asyncio

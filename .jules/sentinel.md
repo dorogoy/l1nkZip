@@ -103,7 +103,7 @@
 **Learning:** `0.0.0.0/8` IPv4 targets (`ip.packed[0] == 0`) have `embedded[0] == 0`. Gating split `/48` evaluation with `ip.packed[-4:] == b"\x00\x00\x00\x00" or embedded[0] != 0` ensures split placement canonical targets in `0.0.0.0/8` are evaluated and blocked while allowing legacy last-4 placement targets.
 **Prevention:** Evaluate `_is_blocked_ip(ipaddress.IPv4Address(embedded))` whenever canonical split placement is used (`ip.packed[-4:] == b"\x00\x00\x00\x00"`), without requiring `embedded[0] != 0`.
 
-## 2026-10-27 - SSRF Bypass via Local-Use NAT64 IPv6 Translation Prefix (`100:64::/96`)
-**Vulnerability:** Local-Use NAT64 IPv6 hostnames using the RFC 8215 prefix `100:64::/96` (such as `100:64::127.0.0.1` or `100:64::10.0.0.1`) embed target IPv4 addresses in the last 4 bytes (`ip.packed[-4:]`). In Python's standard `ipaddress` module, `100:64::/96` addresses evaluate to `is_reserved=True`, which causes static validation to block all `100:64::/96` destinations including valid public IPv4 targets, while failing to explicitly evaluate the embedded IPv4 target.
-**Learning:** Checking `ip.packed.startswith(b"\x01\x00\x00\x64" + b"\x00" * 8)` identifies Local-Use NAT64 addresses (`100:64::/96`), allowing extraction of `ipaddress.IPv4Address(ip.packed[-4:])` to recursively evaluate `_is_blocked_ip`.
-**Prevention:** Always unwrap RFC 8215 Local-Use NAT64 (`100:64::/96`) embedded IPv4 addresses alongside Well-Known NAT64 (`64:ff9b::/96`) and recursively evaluate the extracted IPv4 address against blocked IP rules.
+## 2026-10-27 - Rejected Unwrapping of `100:64::/96` IPv6 Addresses
+**Vulnerability:** Proposal to unwrap `100:64::/96` as an IPv6 translation prefix.
+**Learning:** `100:64::/96` is not an IANA-allocated IPv6 translation prefix (RFC 8215 allocates `64:ff9b:1::/48`). `100:64::/96` is part of the non-routable Discard IPv6 block (`100::/8`), for which Python's `ipaddress` module returns `is_reserved=True`. Unwrapping embedded IPv4 in `100:64::/96` would weaken URL validation by accepting previously blocked reserved IPv6 destinations.
+**Prevention:** Do not unwrap `100:64::/96` during SSRF checks; allow all addresses in `100::/8` to be blocked as reserved by `is_reserved=True`.
