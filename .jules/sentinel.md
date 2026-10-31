@@ -102,3 +102,8 @@
 **Vulnerability:** Evaluating embedded IPv4 addresses in RFC 6052 Local-Use NAT64 (`64:ff9b:1::/48`) gated `_is_blocked_ip` with `if embedded[0] != 0`. Non-routable targets in the `0.0.0.0/8` range (such as `0.0.0.1` or `0.0.0.0`) had `embedded[0] == 0`, causing `embedded[0] != 0` to evaluate to `False`. This skipped `_is_blocked_ip` evaluation when `ip.packed[-4:] == b"\x00\x00\x00\x00"`, bypassing SSRF validation.
 **Learning:** `0.0.0.0/8` IPv4 targets (`ip.packed[0] == 0`) have `embedded[0] == 0`. Gating split `/48` evaluation with `ip.packed[-4:] == b"\x00\x00\x00\x00" or embedded[0] != 0` ensures split placement canonical targets in `0.0.0.0/8` are evaluated and blocked while allowing legacy last-4 placement targets.
 **Prevention:** Evaluate `_is_blocked_ip(ipaddress.IPv4Address(embedded))` whenever canonical split placement is used (`ip.packed[-4:] == b"\x00\x00\x00\x00"`), without requiring `embedded[0] != 0`.
+
+## 2026-10-27 - Rejected Unwrapping of `100:64::/96` IPv6 Addresses
+**Vulnerability:** Proposal to unwrap `100:64::/96` as an IPv6 translation prefix.
+**Learning:** `100:64::/96` is not an IANA-allocated IPv6 translation prefix (RFC 8215 allocates `64:ff9b:1::/48`). `100:64::/96` is part of the non-routable Discard IPv6 block (`100::/8`), for which Python's `ipaddress` module returns `is_reserved=True`. Unwrapping embedded IPv4 in `100:64::/96` would weaken URL validation by accepting previously blocked reserved IPv6 destinations.
+**Prevention:** Do not unwrap `100:64::/96` during SSRF checks; allow all addresses in `100::/8` to be blocked as reserved by `is_reserved=True`.
