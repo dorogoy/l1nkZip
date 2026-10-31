@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.5](https://github.com/dorogoy/l1nkZip/compare/v1.3.4...v1.3.5) (2026-10-31)
+
+
+### Documentation
+
+* **tests:** keep 100:64::/96 blocked as reserved range (rejected NAT64-unwrap proposal) ([#374](https://github.com/dorogoy/l1nkZip/issues/374)) ([11cb729](https://github.com/dorogoy/l1nkZip/commit/11cb7293d9c62bf3263d3550aa72ca721d3b398b))
+
 ## [1.3.4](https://github.com/dorogoy/l1nkZip/compare/v1.3.3...v1.3.4) (2026-10-29)
 
 
