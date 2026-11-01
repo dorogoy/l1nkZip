@@ -38,6 +38,10 @@ invalid_urls = [
     ("ssrf_invalid_tld", "http://server.invalid", 422),
     ("ssrf_test_tld", "http://server.test", 422),
     ("ssrf_example_tld", "http://server.example", 422),
+    ("ssrf_corp_tld", "http://portal.corp", 422),
+    ("ssrf_home_tld", "http://router.home", 422),
+    ("ssrf_lan_tld", "http://nas.lan", 422),
+    ("ssrf_localdomain_tld", "http://server.localdomain", 422),
     ("ssrf_loopback_ip", "http://127.0.0.1", 422),
     ("ssrf_private_ip_10", "http://10.0.0.1", 422),
     ("ssrf_private_ip_192", "http://192.168.1.1", 422),
@@ -602,6 +606,10 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
         "http://server.invalid",
         "http://my.test",
         "http://site.example",
+        "http://portal.corp",
+        "http://router.home",
+        "http://nas.lan",
+        "http://server.localdomain",
         "http://alt",
         "http://onion",
         "http://invalid",
@@ -610,6 +618,10 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
         "http://localhost",
         "http://local",
         "http://internal",
+        "http://corp",
+        "http://home",
+        "http://lan",
+        "http://localdomain",
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)

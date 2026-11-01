@@ -107,3 +107,8 @@
 **Vulnerability:** Proposal to unwrap `100:64::/96` as an IPv6 translation prefix.
 **Learning:** `100:64::/96` is not an IANA-allocated IPv6 translation prefix (RFC 8215 allocates `64:ff9b:1::/48`). `100:64::/96` is part of the non-routable Discard IPv6 block (`100::/8`), for which Python's `ipaddress` module returns `is_reserved=True`. Unwrapping embedded IPv4 in `100:64::/96` would weaken URL validation by accepting previously blocked reserved IPv6 destinations.
 **Prevention:** Do not unwrap `100:64::/96` during SSRF checks; allow all addresses in `100::/8` to be blocked as reserved by `is_reserved=True`.
+
+## 2026-10-29 - SSRF Bypass via Non-Delegated Private / Internal Network TLDs (`.corp`, `.home`, `.lan`, `.localdomain`)
+**Vulnerability:** Private and enterprise internal network top-level domains such as `.corp`, `.home`, `.lan`, and `.localdomain` (which are non-delegated or permanently reserved by ICANN due to name collision risks) were not included in the static hostname blocklist prior to DNS resolution. If DNS resolution was skipped, failed in static checks, or resolved within internal split-horizon environments, URLs targeting intranet devices could be accepted.
+**Learning:** Including `.corp`, `.home`, `.lan`, and `.localdomain` in the static hostname blacklist (`hostname_lower in (...)` and `hostname_lower.endswith(...)`) prevents SSRF against enterprise and home internal networks.
+**Prevention:** Always block recognized internal private and name-collision TLDs (`.corp`, `.home`, `.lan`, `.localdomain`) alongside RFC special-use domains during static URL validation.
