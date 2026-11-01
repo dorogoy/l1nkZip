@@ -42,6 +42,8 @@ invalid_urls = [
     ("ssrf_home_tld", "http://router.home", 422),
     ("ssrf_lan_tld", "http://nas.lan", 422),
     ("ssrf_localdomain_tld", "http://server.localdomain", 422),
+    ("ssrf_lan_subdomain_tld", "http://nas.router.lan", 422),
+    ("ssrf_uppercase_lan_tld", "http://ROUTER.LAN", 422),
     ("ssrf_loopback_ip", "http://127.0.0.1", 422),
     ("ssrf_private_ip_10", "http://10.0.0.1", 422),
     ("ssrf_private_ip_192", "http://192.168.1.1", 422),
