@@ -230,7 +230,7 @@ async def validate_url(url: str) -> str:
     if hostname:
         hostname_lower = hostname.lower()
         # Block reserved local, special-use, and internal network domain names
-        # (RFC 2606, RFC 6761, RFC 6762, RFC 7686, RFC 8375, RFC 9476, ICANN name collisions, IANA)
+        # (RFC 2606, RFC 6761, RFC 6762, RFC 7686, RFC 8375, RFC 9462, RFC 9476, RFC 9665, ICANN name collisions, IANA)
         # Note: Bare single-label hosts are rejected upstream by validators.url;
         # the bare hostname list is kept here as defense-in-depth.
         if hostname_lower in (
@@ -238,6 +238,8 @@ async def validate_url(url: str) -> str:
             "local",
             "internal",
             "home.arpa",
+            "service.arpa",
+            "resolver.arpa",
             "onion",
             "alt",
             "invalid",
@@ -253,6 +255,8 @@ async def validate_url(url: str) -> str:
                 ".local",
                 ".internal",
                 ".home.arpa",
+                ".service.arpa",
+                ".resolver.arpa",
                 ".alt",
                 ".onion",
                 ".invalid",
