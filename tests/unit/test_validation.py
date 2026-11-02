@@ -33,6 +33,7 @@ invalid_urls = [
     ("ssrf_internal_tld", "http://app.internal", 422),
     ("ssrf_home_arpa_tld", "http://router.home.arpa", 422),
     ("ssrf_bare_home_arpa", "http://home.arpa", 422),
+    ("ssrf_arpa_tld", "http://in-addr.arpa", 422),
     ("ssrf_service_arpa_tld", "http://default.service.arpa", 422),
     ("ssrf_bare_service_arpa", "http://service.arpa", 422),
     ("ssrf_resolver_arpa_tld", "http://dns.resolver.arpa", 422),
@@ -628,12 +629,15 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
         "http://home",
         "http://lan",
         "http://localdomain",
+        "http://arpa",
         "http://service.arpa",
         "http://default.service.arpa",
         "http://sub.service.arpa",
         "http://resolver.arpa",
         "http://dns.resolver.arpa",
         "http://sub.resolver.arpa",
+        "http://6tisch.arpa",
+        "http://eap.arpa",
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
@@ -644,6 +648,8 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
 @pytest.mark.parametrize(
     "url",
     [
+        "http://arpa",
+        "http://ARPA",
         "http://service.arpa",
         "http://default.service.arpa",
         "http://printer.service.arpa",
@@ -654,12 +660,17 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
         "http://dot.resolver.arpa",
         "http://RESOLVER.ARPA",
         "http://DNS.RESOLVER.ARPA",
+        "http://home.arpa",
+        "http://6tisch.arpa",
+        "http://eap.arpa",
+        "http://in-addr.arpa",
+        "http://1.0.0.127.in-addr.arpa",
     ],
 )
 @pytest.mark.asyncio
-async def test_validate_url_blocks_locally_served_arpa_domains(monkeypatch, url):
-    """Transport-Independent Locally-Served ARPA domains (service.arpa RFC 9665,
-    resolver.arpa RFC 9462) must be blocked during URL validation to prevent SSRF.
+async def test_validate_url_blocks_arpa_infrastructure_domains(monkeypatch, url):
+    """Infrastructure-only .arpa domain and all its subdomains (RFC 3172, RFC 6761,
+    RFC 8375, RFC 9462, RFC 9665) must be blocked during URL validation to prevent SSRF.
     """
     from fastapi import HTTPException
 
