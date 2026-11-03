@@ -33,6 +33,11 @@ invalid_urls = [
     ("ssrf_internal_tld", "http://app.internal", 422),
     ("ssrf_home_arpa_tld", "http://router.home.arpa", 422),
     ("ssrf_bare_home_arpa", "http://home.arpa", 422),
+    ("ssrf_arpa_tld", "http://in-addr.arpa", 422),
+    ("ssrf_service_arpa_tld", "http://default.service.arpa", 422),
+    ("ssrf_bare_service_arpa", "http://service.arpa", 422),
+    ("ssrf_resolver_arpa_tld", "http://dns.resolver.arpa", 422),
+    ("ssrf_bare_resolver_arpa", "http://resolver.arpa", 422),
     ("ssrf_alt_tld", "http://node.alt", 422),
     ("ssrf_onion_tld", "http://hidden.onion", 422),
     ("ssrf_invalid_tld", "http://server.invalid", 422),
@@ -624,8 +629,56 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
         "http://home",
         "http://lan",
         "http://localdomain",
+        "http://arpa",
+        "http://service.arpa",
+        "http://default.service.arpa",
+        "http://sub.service.arpa",
+        "http://resolver.arpa",
+        "http://dns.resolver.arpa",
+        "http://sub.resolver.arpa",
+        "http://6tisch.arpa",
+        "http://eap.arpa",
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)
         assert exc_info.value.status_code == 422
         assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://arpa",
+        "http://ARPA",
+        "http://service.arpa",
+        "http://default.service.arpa",
+        "http://printer.service.arpa",
+        "http://SERVICE.ARPA",
+        "http://DEFAULT.SERVICE.ARPA",
+        "http://resolver.arpa",
+        "http://dns.resolver.arpa",
+        "http://dot.resolver.arpa",
+        "http://RESOLVER.ARPA",
+        "http://DNS.RESOLVER.ARPA",
+        "http://home.arpa",
+        "http://6tisch.arpa",
+        "http://eap.arpa",
+        "http://in-addr.arpa",
+        "http://1.0.0.127.in-addr.arpa",
+    ],
+)
+@pytest.mark.asyncio
+async def test_validate_url_blocks_arpa_infrastructure_domains(monkeypatch, url):
+    """Infrastructure-only .arpa domain and all its subdomains (RFC 3172, RFC 6761,
+    RFC 8375, RFC 9462, RFC 9665) must be blocked during URL validation to prevent SSRF.
+    """
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    with pytest.raises(HTTPException) as exc_info:
+        await validate_url(url)
+    assert exc_info.value.status_code == 422
+    assert "local or private network" in exc_info.value.detail
