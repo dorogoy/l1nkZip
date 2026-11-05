@@ -49,6 +49,12 @@ invalid_urls = [
     ("ssrf_localdomain_tld", "http://server.localdomain", 422),
     ("ssrf_lan_subdomain_tld", "http://nas.router.lan", 422),
     ("ssrf_uppercase_lan_tld", "http://ROUTER.LAN", 422),
+    ("ssrf_intranet_tld", "http://portal.intranet", 422),
+    ("ssrf_private_tld", "http://router.private", 422),
+    ("ssrf_intranet_subdomain_tld", "http://corp.service.intranet", 422),
+    ("ssrf_private_subdomain_tld", "http://db.internal.private", 422),
+    ("ssrf_uppercase_intranet_tld", "http://PORTAL.INTRANET", 422),
+    ("ssrf_uppercase_private_tld", "http://ROUTER.PRIVATE", 422),
     ("ssrf_loopback_ip", "http://127.0.0.1", 422),
     ("ssrf_private_ip_10", "http://10.0.0.1", 422),
     ("ssrf_private_ip_192", "http://192.168.1.1", 422),
@@ -638,6 +644,10 @@ async def test_validate_url_blocks_special_use_tlds(monkeypatch):
         "http://sub.resolver.arpa",
         "http://6tisch.arpa",
         "http://eap.arpa",
+        "http://app.intranet",
+        "http://node.private",
+        "http://intranet",
+        "http://private",
     ]:
         with pytest.raises(HTTPException) as exc_info:
             await validate_url(url)

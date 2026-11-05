@@ -247,6 +247,8 @@ async def validate_url(url: str) -> str:
             "home",
             "lan",
             "localdomain",
+            "intranet",
+            "private",
         ) or hostname_lower.endswith(
             (
                 ".localhost",
@@ -262,6 +264,8 @@ async def validate_url(url: str) -> str:
                 ".home",
                 ".lan",
                 ".localdomain",
+                ".intranet",
+                ".private",
             )
         ):
             raise HTTPException(
