@@ -5,6 +5,17 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.6](https://github.com/dorogoy/l1nkZip/compare/v1.3.5...v1.3.6) (2026-11-05)
+
+
+### Bug Fixes
+
+* block .arpa infrastructure domain in URL validation ([#377](https://github.com/dorogoy/l1nkZip/issues/377)) ([0c4ea0a](https://github.com/dorogoy/l1nkZip/commit/0c4ea0a75f765d8fd0f80e0260a31645647d14a8))
+* **deps:** bump pydantic-settings from 2.16.1 to 2.16.2 ([c6edce1](https://github.com/dorogoy/l1nkZip/commit/c6edce1accf16e53dfe0378ab099b01553d3d580))
+* **deps:** bump pytest from 9.1.1 to 9.2.0 ([4a54d29](https://github.com/dorogoy/l1nkZip/commit/4a54d295b3d14ad6b3d81fb77f130776b806b4b7))
+* **deps:** bump ty from 0.0.89 to 0.0.95 ([8c0fbae](https://github.com/dorogoy/l1nkZip/commit/8c0fbae0866534141246c38f35cb6cb9c81ca5df))
+* SSRF bypass via private DNS namespace TLDs (.intranet, .private) ([#378](https://github.com/dorogoy/l1nkZip/issues/378)) ([e0a6308](https://github.com/dorogoy/l1nkZip/commit/e0a6308650eaa414cd7ffa3b3fa39fce86be69b9))
+
 ## [1.3.5](https://github.com/dorogoy/l1nkZip/compare/v1.3.4...v1.3.5) (2026-11-01)
 
 
