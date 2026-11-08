@@ -101,6 +101,7 @@ invalid_urls = [
     ("ssrf_ipv6_doc_rfc9637", "http://[3fff::1]", 422),
     ("ssrf_6bone_ipv6", "http://[3ffe::1]", 422),
     ("ssrf_discard_ipv6", "http://[100::1]", 422),
+    ("ssrf_srv6_ipv6", "http://[5f00::1]", 422),
     ("ssrf_benchmarking_ipv4", "http://198.18.0.1", 422),
     ("ssrf_test_net_1_ipv4", "http://192.0.2.1", 422),
     ("ssrf_test_net_2_ipv4", "http://198.51.100.1", 422),
@@ -586,6 +587,22 @@ async def test_validate_url_blocks_discard_ipv6(monkeypatch):
         await validate_url("http://[100::1]")
     assert exc_info.value.status_code == 422
     assert "local or private network" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_validate_url_blocks_srv6_ipv6(monkeypatch):
+    """Segment Routing (SRv6) SIDs IPv6 addresses (5f00::/16, RFC 9602) must be blocked to prevent SSRF."""
+    from fastapi import HTTPException
+
+    from l1nkzip import main
+    from l1nkzip.main import validate_url
+
+    monkeypatch.setattr(main.validators, "url", lambda _: True)
+    for url in ["http://[5f00::1]", "http://[5f00:ffff::1]"]:
+        with pytest.raises(HTTPException) as exc_info:
+            await validate_url(url)
+        assert exc_info.value.status_code == 422
+        assert "local or private network" in exc_info.value.detail
 
 
 @pytest.mark.asyncio

@@ -134,6 +134,12 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
         # stdlib classification staying stable across versions.
         if ip.packed[:8] == b"\x01\x00\x00\x00\x00\x00\x00\x00":
             return True
+        # Segment Routing (SRv6) SIDs (5f00::/16, RFC 9602) non-routable range.
+        # Defense-in-depth: the stdlib-flag fallback below already rejects these on
+        # Python >= 3.14 (is_reserved=True), but keep it explicit so the block does
+        # not depend on stdlib classification staying stable across versions.
+        if ip.packed[:2] == b"\x5f\x00":
+            return True
     if isinstance(ip, ipaddress.IPv4Address):
         if ip.packed[0] == 0:
             return True
