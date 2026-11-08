@@ -5,6 +5,13 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.7](https://github.com/dorogoy/l1nkZip/compare/v1.3.6...v1.3.7) (2026-11-08)
+
+
+### Bug Fixes
+
+* block SRv6 SIDs IPv6 prefix (5f00::/16) ([#383](https://github.com/dorogoy/l1nkZip/issues/383)) ([1d23ec5](https://github.com/dorogoy/l1nkZip/commit/1d23ec58cb9b7edcb35ba361777650961026ffb5))
+
 ## [1.3.6](https://github.com/dorogoy/l1nkZip/compare/v1.3.5...v1.3.6) (2026-11-05)
 
 
