@@ -5,6 +5,16 @@
 
 * **deps:** bump fastapi from 0.120.0 to 0.135.1 ([e44ab02](https://github.com/dorogoy/l1nkZip/commit/e44ab02e62c76b413c2e03fb4c18342ee4f4a980))
 
+## [1.3.7](https://github.com/dorogoy/l1nkZip/compare/v1.3.6...v1.3.7) (2026-11-16)
+
+
+### Bug Fixes
+
+* block SRv6 SIDs IPv6 prefix (5f00::/16) ([#383](https://github.com/dorogoy/l1nkZip/issues/383)) ([1d23ec5](https://github.com/dorogoy/l1nkZip/commit/1d23ec58cb9b7edcb35ba361777650961026ffb5))
+* **deps:** bump opentelemetry-api ([2674c9d](https://github.com/dorogoy/l1nkZip/commit/2674c9d284cea26a4aed9a08d53417db4805ee4c))
+* **deps:** bump pytest-asyncio from 1.4.0 to 1.5.0 ([8f98fe7](https://github.com/dorogoy/l1nkZip/commit/8f98fe747463fe2300b7f289a33fa6d01bdd2b5b))
+* **deps:** bump ty from 0.0.95 to 0.0.102 ([0c216e0](https://github.com/dorogoy/l1nkZip/commit/0c216e0e8980027dc48fda4cfe631bede26b78cc))
+
 ## [1.3.6](https://github.com/dorogoy/l1nkZip/compare/v1.3.5...v1.3.6) (2026-11-05)
 
 
